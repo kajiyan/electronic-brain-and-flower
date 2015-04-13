@@ -39,9 +39,12 @@ publish
 .idea
 
 sftp-config.json
-app.js
+# app.js
 node_modules
 bower_components
+
+# node
+node/word-sender/config
 
 # openframeWorks
 of_v0.8.4/addons
