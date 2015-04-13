@@ -42,3 +42,17 @@ sftp-config.json
 app.js
 node_modules
 bower_components
+
+# openframeWorks
+of_v0.8.4/addons
+of_v0.8.4/docs
+of_v0.8.4/examples
+of_v0.8.4/export
+of_v0.8.4/libs
+of_v0.8.4/other
+of_v0.8.4/projectGenerator_osx
+of_v0.8.4/scripts
+of_v0.8.4/CHANGELOG.md
+of_v0.8.4/INSTALL.md
+of_v0.8.4/LICENSE.md
+of_v0.8.4/README.md
