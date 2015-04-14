@@ -2,11 +2,18 @@ var express = require('express');
 var router = express.Router();
 
 var config = require('config');
+
+var dgram = require('dgram');
+
 var ntwitter = require('ntwitter');
+var osc = require('osc-min');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   var app = module.parent.exports;
+
+  // UDP
+  var udp = dgram.createSocket("udp4")
 
   // ntwitter のインスタンスを作る
   var twitter = new ntwitter({
@@ -23,6 +30,27 @@ router.get('/', function(req, res, next) {
 
     setTimeout(stream.destroy, 5000);
   });
+
+
+  var sendHeartbeat = function() {
+    var buf;
+    buf = osc.toBuffer({
+      address: "/heartbeat",
+      args: [
+        12,
+        "sttttring",
+        new Buffer("beat"),
+        {
+          type: "integer",
+          value: 7
+        }
+      ]
+    });
+    console.log("SEND!!");
+    return udp.send(buf, 0, buf.length, 12345, "localhost");
+  };
+ 
+  setInterval(sendHeartbeat, 10000);
 
   res.render('api/index.swig.html', { title: 'Express' });
 });
