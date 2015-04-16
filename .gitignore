@@ -59,3 +59,12 @@ of_v0.8.4/CHANGELOG.md
 of_v0.8.4/INSTALL.md
 of_v0.8.4/LICENSE.md
 of_v0.8.4/README.md
+of_v0.8.4/apps/myApps/emptyExample
+of_v0.8.4/apps/myApps/word_bridge/bin/word_bridgeDebug.app
+.gitkeep
+of_v0.8.4/apps/myApps/word_bridge/word_bridge.xcodeproj
+of_v0.8.4/apps/myApps/word_bridge/addons.make
+of_v0.8.4/apps/myApps/word_bridge/config.make
+of_v0.8.4/apps/myApps/word_bridge/Makefile
+of_v0.8.4/apps/myApps/word_bridge/openFrameworks-Info.plist
+of_v0.8.4/apps/myApps/word_bridge/Project.xcconfig

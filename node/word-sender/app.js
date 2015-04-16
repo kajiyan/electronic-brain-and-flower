@@ -6,7 +6,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var config = require('config');
-var ntwitter = require('ntwitter');
 var swig = require('swig');
 
 var app = express();

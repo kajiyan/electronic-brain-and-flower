@@ -5,7 +5,7 @@ var config = require('config');
 
 var dgram = require('dgram');
 
-var ntwitter = require('ntwitter');
+var twitter = require('twitter');
 var osc = require('osc-min');
 
 /* GET home page. */
@@ -13,44 +13,56 @@ router.get('/', function(req, res, next) {
   var app = module.parent.exports;
 
   // UDP
-  var udp = dgram.createSocket("udp4")
+  var udp = dgram.createSocket("udp4");
 
-  // ntwitter のインスタンスを作る
-  var twitter = new ntwitter({
+  // twitter のインスタンスを作る
+  var twitterInstance = new twitter({
     consumer_key: config.ntwitter.consumerKey,
     consumer_secret: config.ntwitter.consumerSecret,
     access_token_key: config.ntwitter.accessTokenKey,
     access_token_secret: config.ntwitter.accessTokenSecret
   });
 
-  twitter.stream('statuses/filter', {'track':'test'}, function(stream) {
-    stream.on('data', function (data) {
-      console.log(data);
+  // twitter stream API
+  twitterInstance.stream('statuses/filter', {track: 'javascript'}, function(stream) {
+    stream.on('data', function(data) {
+      console.log(data.text);
+
+      var buffer;
+      buffer = osc.toBuffer({
+        address: "/word",
+        args: [{
+          type: "string",
+          value: data.text
+        }]
+      });
+      return udp.send(buffer, 0, buffer.length, 12345, "localhost");
     });
 
-    setTimeout(stream.destroy, 5000);
+    stream.on('error', function(error) {
+      throw error;
+    });
   });
 
-
-  var sendHeartbeat = function() {
-    var buf;
-    buf = osc.toBuffer({
-      address: "/heartbeat",
-      args: [
-        12,
-        "sttttring",
-        new Buffer("beat"),
-        {
-          type: "integer",
-          value: 7
-        }
-      ]
-    });
-    console.log("SEND!!");
-    return udp.send(buf, 0, buf.length, 12345, "localhost");
-  };
+  // var sendHeartbeat = function() {
+  //   var buffer;
+  //   buffer = osc.toBuffer({
+  //     address: "/heartbeat",
+  //     args: [
+  //       12,
+  //       "sttttring",
+  //       new Buffer("beat"),
+  //       {
+  //         type: "integer",
+  //         value: 7
+  //       }
+  //     ]
+  //   });
+  //   console.log("SEND!!");
+  //   return udp.send(buffer, 0, buffer.length, 12345, "localhost");
+  // };
  
-  setInterval(sendHeartbeat, 10000);
+  // setInterval(sendHeartbeat, 10000);
 
   res.render('api/index.swig.html', { title: 'Express' });
 });
