@@ -28,8 +28,7 @@
 word-bridgeは以下のアドオン、ファイルに依存する。
 
 - ofxOSC
-- [ofxJSON](https://github.com/jefftimesten/ofxJSON "ofxJSON]")
-
+- [ofxJSON](https://github.com/jefftimesten/ofxJSON "ofxJSON")
 - bin/data/config.json
 
 
@@ -37,3 +36,8 @@ word-bridgeは以下のアドオン、ファイルに依存する。
 - openFrameWorks からOSCを受け取る。
 - サウンドファイルを加工して再生する。
 - サウンドシグナルに合わせてArt-Net経由でDMXを送る。
+
+#### Depends
+electronic-brain-and-flower.maxpat は以下のアドオン、ファイルに依存する。
+
+- [IMP.DMX](http://www.theimpersonalstereo.com/software/imp-dmx/ "IMP.DMX")
