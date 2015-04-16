@@ -31,3 +31,9 @@ word-bridgeは以下のアドオン、ファイルに依存する。
 - [ofxJSON](https://github.com/jefftimesten/ofxJSON "ofxJSON]")
 
 - bin/data/config.json
+
+
+## Max/Msp
+- openFrameWorks からOSCを受け取る。
+- サウンドファイルを加工して再生する。
+- サウンドシグナルに合わせてArt-Net経由でDMXを送る。
