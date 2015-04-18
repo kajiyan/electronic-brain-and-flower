@@ -27,6 +27,19 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+/* ============================================================
+ * CONTROLLER
+ *
+ * client ユーザーの端末からの情報を処理する
+ *
+ ============================================================ */
+var controllers = {
+    'client': require('./controllers/client/')
+};
+
+app.set('controllers', controllers);
+
+
 // ============================================================
 // ROUTES
 var router = {
