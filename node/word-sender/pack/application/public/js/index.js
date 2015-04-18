@@ -376,9 +376,14 @@
 	        client = __webpack_require__(8)(sn, $, _);
 	        return client.setup();
 	      },
+	      "bridge(/)": function() {
+	        var bridge;
+	        bridge = __webpack_require__(9)(sn, $, _);
+	        return bridge.setup();
+	      },
 	      "*default": function() {
 	        var viewer;
-	        viewer = __webpack_require__(9)(sn, $, _);
+	        viewer = __webpack_require__(10)(sn, $, _);
 	        return viewer.setup();
 	      }
 	    };
@@ -407,7 +412,7 @@
 	  })(Backbone.Router);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
 /* 3 */
@@ -12838,49 +12843,49 @@
 	      sn.__client__.models = {
 	        socket: (function() {
 	          var Socket;
-	          Socket = __webpack_require__(21)(sn, $, _);
+	          Socket = __webpack_require__(12)(sn, $, _);
 	          return new Socket();
 	        })(),
 	        devicemotion: (function() {
 	          var Devicemotion;
-	          Devicemotion = __webpack_require__(22)(sn, $, _);
+	          Devicemotion = __webpack_require__(13)(sn, $, _);
 	          return new Devicemotion();
 	        })(),
 	        deviceOrientation: (function() {
 	          var DeviceOrientation;
-	          DeviceOrientation = __webpack_require__(23)(sn, $, _);
+	          DeviceOrientation = __webpack_require__(14)(sn, $, _);
 	          return new DeviceOrientation();
 	        })(),
 	        deviceSensor: (function() {
 	          var DeviceSensor;
-	          DeviceSensor = __webpack_require__(24)(sn, $, _);
+	          DeviceSensor = __webpack_require__(15)(sn, $, _);
 	          return new DeviceSensor();
 	        })(),
 	        image: (function() {
 	          var Image;
-	          Image = __webpack_require__(25)(sn, $, _);
+	          Image = __webpack_require__(16)(sn, $, _);
 	          return new Image();
 	        })(),
 	        resize: (function() {
 	          var Resize;
-	          Resize = __webpack_require__(26)(sn, $, _);
+	          Resize = __webpack_require__(17)(sn, $, _);
 	          return new Resize();
 	        })(),
 	        context: (function() {
 	          var Context;
-	          Context = __webpack_require__(27)(sn, $, _);
+	          Context = __webpack_require__(18)(sn, $, _);
 	          return new Context();
 	        })()
 	      };
 	      sn.__client__.views = {
 	        image: (function() {
 	          var Image;
-	          Image = __webpack_require__(28)(sn, $, _);
+	          Image = __webpack_require__(19)(sn, $, _);
 	          return new Image();
 	        })(),
 	        select: (function() {
 	          var Select;
-	          Select = __webpack_require__(29)(sn, $, _);
+	          Select = __webpack_require__(20)(sn, $, _);
 	          return new Select();
 	        })()
 	      };
@@ -12907,6 +12912,73 @@
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Bridge, Instance;
+	  Bridge = (function(_super) {
+	    __extends(Bridge, _super);
+	
+	    function Bridge(options) {
+	      console.log("Bridge-> constructor");
+	      Bridge.__super__.constructor.apply(this, arguments);
+	      sn.__client__ = {
+	        models: {},
+	        collections: {},
+	        views: {}
+	      };
+	    }
+	
+	    Bridge.prototype.initialize = function() {
+	      console.log("Bridge -> initialize");
+	      this._setting = SETTING;
+	      return this._socket = null;
+	    };
+	
+	    Bridge.prototype.setup = function() {
+	      var key, _base, _results;
+	      console.log("Bridge -> setup");
+	      this._connect();
+	      _results = [];
+	      for (key in sn.__client__.models) {
+	        _results.push(typeof (_base = sn.__client__.models[key]).setup === "function" ? _base.setup() : void 0);
+	      }
+	      return _results;
+	    };
+	
+	    Bridge.prototype._connect = function() {
+	      var socket;
+	      console.log("Bridge -> _connect");
+	      if (this._socket) {
+	        return;
+	      }
+	      socket = io.connect("http://" + this._setting.HOST + ":" + this._setting.PORT + "/bridge");
+	      socket.on("connect", this._connectHandler.bind(this));
+	      return socket.on("trigger", this._triggerHandler.bind(this));
+	    };
+	
+	    Bridge.prototype._connectHandler = function() {
+	      console.log("Bridge -> Socket -> _connectHandler");
+	      return this.set("connected", true);
+	    };
+	
+	    Bridge.prototype._triggerHandler = function() {
+	      return console.log("Bridge -> Socket -> _connectTrigger");
+	    };
+	
+	    return Bridge;
+	
+	  })(Backbone.Model);
+	  return Instance = new Bridge(sn, $, _);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
 	module.exports = function(sn, $, _) {
 	  var Instance, Viewer;
 	  Viewer = (function() {
@@ -12920,54 +12992,54 @@
 	      sn.__viewer__.models = {
 	        image: (function() {
 	          var Image;
-	          return Image = __webpack_require__(11)(sn, $, _);
+	          return Image = __webpack_require__(21)(sn, $, _);
 	        })(),
 	        mode: (function() {
 	          var Mode;
-	          Mode = __webpack_require__(12)(sn, $, _);
+	          Mode = __webpack_require__(22)(sn, $, _);
 	          return new Mode();
 	        })(),
 	        room: (function() {
 	          var Room;
-	          Room = __webpack_require__(13)(sn, $, _);
+	          Room = __webpack_require__(23)(sn, $, _);
 	          return new Room();
 	        })(),
 	        socket: (function() {
 	          var Socket;
-	          Socket = __webpack_require__(14)(sn, $, _);
+	          Socket = __webpack_require__(24)(sn, $, _);
 	          return new Socket();
 	        })(),
 	        context: (function() {
 	          var Context;
-	          Context = __webpack_require__(15)(sn, $, _);
+	          Context = __webpack_require__(25)(sn, $, _);
 	          return new Context();
 	        })()
 	      };
 	      sn.__viewer__.collections = {
 	        images: (function() {
 	          var Images;
-	          Images = __webpack_require__(16)(sn, $, _);
+	          Images = __webpack_require__(26)(sn, $, _);
 	          return new Images();
 	        })()
 	      };
 	      sn.__viewer__.views = {
 	        header: (function() {
 	          var Header;
-	          Header = __webpack_require__(17)(sn, $, _);
+	          Header = __webpack_require__(27)(sn, $, _);
 	          return new Header();
 	        })(),
 	        footer: (function() {
 	          var Footer;
-	          Footer = __webpack_require__(18)(sn, $, _);
+	          Footer = __webpack_require__(28)(sn, $, _);
 	          return new Footer();
 	        })(),
 	        image: (function() {
 	          var Image;
-	          return Image = __webpack_require__(19)(sn, $, _);
+	          return Image = __webpack_require__(29)(sn, $, _);
 	        })(),
 	        images: (function() {
 	          var Images;
-	          Images = __webpack_require__(20)(sn, $, _);
+	          Images = __webpack_require__(30)(sn, $, _);
 	          return new Images();
 	        })()
 	      };
@@ -13001,7 +13073,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.1.2
@@ -14615,662 +14687,7 @@
 
 
 /***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function() {
-	  var Image;
-	  return Image = (function(_super) {
-	    __extends(Image, _super);
-	
-	    Image.prototype.defaults = {
-	      positions: {
-	        x: 0.5,
-	        y: 0.5
-	      },
-	      scale: 1.0
-	    };
-	
-	    function Image() {
-	      console.log("Image -> Constructor");
-	      Image.__super__.constructor.apply(this, arguments);
-	    }
-	
-	    Image.prototype.initialize = function() {
-	      return console.log("Image -> initialize");
-	    };
-	
-	    return Image;
-	
-	  })(Backbone.Model);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
 /* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Mode;
-	  return Mode = (function(_super) {
-	    __extends(Mode, _super);
-	
-	    Mode.prototype.defaults = {
-	      mode: ""
-	    };
-	
-	    function Mode() {
-	      console.log("MODE -> Constructor");
-	      Mode.__super__.constructor.apply(this, arguments);
-	      this._config = SETTING.CONFIG.MODE;
-	      this._refreshInterval = this._config.REFRESH_INTERVAL;
-	      this._timerID = null;
-	      this._events();
-	    }
-	
-	    Mode.prototype._events = function() {
-	      console.log("MODE -> Events");
-	      return this.listenTo(this, "change:mode", this._changeModeHandler);
-	    };
-	
-	    Mode.prototype.toggle = function() {
-	      var dst, src;
-	      console.log("MODE -> toggle");
-	      src = this.get("mode");
-	      switch (src) {
-	        case "layered":
-	          dst = "grid";
-	          break;
-	        case "grid":
-	          dst = "layered";
-	          break;
-	        default:
-	          break;
-	      }
-	      return this.set("mode", dst);
-	    };
-	
-	    Mode.prototype.reset = function() {
-	      console.log("MODE -> reset");
-	      if (this.get("mode" === "layered")) {
-	        this._resetTimer();
-	        return;
-	      }
-	      return this.set("mode", "layered");
-	    };
-	
-	    Mode.prototype._changeModeHandler = function() {
-	      console.log("MODE -> _changeModeHandler");
-	      return this._resetTimer();
-	    };
-	
-	    Mode.prototype._resetTimer = function() {
-	      console.log("MODE -> _resetTimer");
-	      if (this._timerID) {
-	        clearTimeout(this._timerID);
-	        this._timerID = null;
-	      }
-	      return this._timerID = setTimeout((function(_this) {
-	        return function() {
-	          return _this.toggle();
-	        };
-	      })(this), this._refreshInterval * 1000);
-	    };
-	
-	    return Mode;
-	
-	  })(Backbone.Model);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Room;
-	  return Room = (function(_super) {
-	    __extends(Room, _super);
-	
-	    function Room() {
-	      console.log("ROOM -> Constructor");
-	      Room.__super__.constructor.apply(this, arguments);
-	    }
-	
-	    Room.prototype.initialize = function() {
-	      return console.log("ROOM -> initialize");
-	    };
-	
-	    Room.prototype.sync = function(method, model, options) {
-	      console.log("[model] ROOM -> sync method:" + method);
-	      console.log(method, model, options);
-	      switch (method) {
-	        case "create":
-	          break;
-	        case "update":
-	          model.trigger("decide", model.id);
-	          break;
-	        case "read":
-	          console.log(document.body.getAttribute("data-roomId"));
-	          model.set("id", document.body.getAttribute("data-roomId") || localStorage.getItem("roomId"));
-	          break;
-	        case "delete":
-	          break;
-	        default:
-	          break;
-	      }
-	    };
-	
-	    return Room;
-	
-	  })(Backbone.Model);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Socket;
-	  return Socket = (function(_super) {
-	    __extends(Socket, _super);
-	
-	    Socket.prototype.defaults = {
-	      connected: false
-	    };
-	
-	    function Socket() {
-	      console.log("SOCKET -> Constructor");
-	      Socket.__super__.constructor.apply(this, arguments);
-	      this._setting = SETTING;
-	      this._socket = null;
-	    }
-	
-	    Socket.prototype.initialize = function() {
-	      return console.log("SOCKET -> initialize");
-	    };
-	
-	    Socket.prototype.connect = function() {
-	      var socket;
-	      console.log("SOCKET -> Connect");
-	      if (this._socket) {
-	        return;
-	      }
-	      socket = io.connect("http://" + this._setting.HOST + ":" + this._setting.PORT + "/viewer");
-	      socket.on("connect", this._connectHandler.bind(this));
-	      socket.on("connecting", this._connectingHandler.bind(this));
-	      socket.on("connect_failed", this._connectFailedHandler.bind(this));
-	      socket.on("post", this._postHandler.bind(this));
-	      socket.on("trigger", this._triggerHandler.bind(this));
-	      socket.on("disconnect", this._disconnectHandler.bind(this));
-	      socket.on("reconnect", this._reconnectHandler.bind(this));
-	      socket.on("reconnect_failed", this._reconnectFailedHandler.bind(this));
-	      return this._socket = socket;
-	    };
-	
-	    Socket.prototype.join = function(roomID, callback) {
-	      console.log("SOCKET -> join");
-	      return this._socket.emit("join", {
-	        id: roomID
-	      }, callback);
-	    };
-	
-	    Socket.prototype._connectHandler = function() {
-	      console.log("SOCKET -> _connectHandler");
-	      return this.set("connected", true);
-	    };
-	
-	    Socket.prototype._connectingHandler = function() {
-	      return console.log("SOCKET -> _connectingHandler");
-	    };
-	
-	    Socket.prototype._connectFailedHandler = function() {
-	      console.log("SOCKET -> _connectFailedHandler");
-	      return this.trigger("failed", new Error("Connection failed"));
-	    };
-	
-	    Socket.prototype._postHandler = function(data) {
-	      console.log("SOCKET -> _postHandler");
-	      return this.trigger("post", data);
-	    };
-	
-	    Socket.prototype._triggerHandler = function(data) {
-	      console.log("SOCKET -> _triggerHandler");
-	      console.log(data);
-	      return this.trigger("trigger", data.id);
-	    };
-	
-	    Socket.prototype._disconnectHandler = function() {
-	      console.log("SOCKET -> _disconnectHandler");
-	      return this.set("connected", false);
-	    };
-	
-	    Socket.prototype._reconnectHandler = function() {
-	      return console.log("SOCKET -> _reconnectHandler");
-	    };
-	
-	    Socket.prototype._reconnectFailedHandler = function() {
-	      console.log("SOCKET -> _reconnectFailedHandler");
-	      return this.trigger("failed", new Error("Reconnection failed"));
-	    };
-	
-	    return Socket;
-	
-	  })(Backbone.Model);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Context;
-	  return Context = (function(_super) {
-	    __extends(Context, _super);
-	
-	    function Context() {
-	      console.log("CONTEXT -> Constructor");
-	      Context.__super__.constructor.apply(this, arguments);
-	    }
-	
-	    Context.prototype.setup = function() {
-	      console.log("CONTEXT -> Setup");
-	      this._events();
-	      sn.__viewer__.models.mode.reset();
-	      sn.__viewer__.models.room.fetch();
-	      return sn.__viewer__.models.socket.connect();
-	    };
-	
-	    Context.prototype._events = function() {
-	      console.log("CONTEXT -> _events");
-	      this.listenTo(sn.__viewer__.models.socket, "change:connected", this._changeConnectedHandler);
-	      return this.listenTo(sn.__viewer__.models.socket, "failed", this._failedHandler);
-	    };
-	
-	    Context.prototype.run = function() {
-	      return console.log("CONTEXT -> Run");
-	    };
-	
-	    Context.prototype._changeConnectedHandler = function(model, connected) {
-	      console.log("CONTEXT -> _changeConnectedHandler");
-	      if (connected) {
-	        console.log("connect");
-	      } else {
-	        console.log("disconnect");
-	        return;
-	      }
-	      return sn.__viewer__.models.socket.join(sn.__viewer__.models.room.id, (function(err, roomID) {
-	        if (err) {
-	          console.log(err);
-	          return;
-	        }
-	        return sn.__viewer__.models.room.save({
-	          "id": roomID
-	        });
-	      }).bind(this));
-	    };
-	
-	    Context.prototype._failedHandler = function(err) {
-	      console.log("CONTEXT -> FailedHandler");
-	      return console.log(err);
-	    };
-	
-	    return Context;
-	
-	  })(Backbone.Model);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Images;
-	  return Images = (function(_super) {
-	    __extends(Images, _super);
-	
-	    function Images() {
-	      console.log("Collection | Images -> Constructor");
-	      Images.__super__.constructor.apply(this, arguments);
-	      this._config = SETTING;
-	      this._host = this._config.HOST;
-	      this._port = this._config.PORT;
-	      this._maxNumberOfImages = this._config.CONFIG.IMAGES.MAX_NUMBER_OF_IMAGES;
-	      this._stubs = this._config.CONFIG.IMAGES.STUBS;
-	    }
-	
-	    Images.prototype.initialize = function() {
-	      return console.log("Collection | Images -> Initialize");
-	    };
-	
-	    Images.prototype.model = sn.__viewer__.models.image;
-	
-	    Images.prototype.setup = function() {
-	      console.log("Collection | Images -> setup");
-	      return this._events();
-	    };
-	
-	    Images.prototype.url = function() {
-	      console.log("Collection | Images -> url");
-	      return "//" + this._host + ":" + this._port + "/rooms/" + (sn.__viewer__.models.room.get("id")) + "/images";
-	    };
-	
-	    Images.prototype.parse = function(response) {
-	      return response.results.splice(response.results.length - this._maxNumberOfImages);
-	    };
-	
-	    Images.prototype.addStubImage = function() {
-	      var model, stub;
-	      console.log("Collection | Images -> addStubImage");
-	      stub = _(this._stubs).shuffle().pop();
-	      model = new sn.__viewer__.models.image({
-	        id: "stub" + (new Date()).getTime(),
-	        width: stub.width,
-	        height: stub.height,
-	        data: stub.data
-	      });
-	      this.add(model);
-	      return setTimeout((function(_this) {
-	        return function() {
-	          return model.set("visible", true);
-	        };
-	      })(this), 0);
-	    };
-	
-	    Images.prototype._addHandler = function() {
-	      console.log("Collection | Images -> _addHandler");
-	      if (this.length > this._maxNumberOfImages) {
-	        return this.remove(this.at(0));
-	      }
-	    };
-	
-	    Images.prototype._events = function() {
-	      console.log("Collection | Images -> _events");
-	      this.listenTo(this, "add", this._addHandler);
-	      this.listenTo(sn.__viewer__.models.room, 'decide', this._decideHandler);
-	      this.listenTo(sn.__viewer__.models.socket, 'post', this._postHandler);
-	      this.listenTo(sn.__viewer__.models.socket, 'trigger', this._triggerHandler);
-	      return this.listenTo(sn.__viewer__.models.context, 'clear', this._clearHandler);
-	    };
-	
-	    Images.prototype._decideHandler = function() {
-	      console.log("Collection | Images -> _decideHandler");
-	      return this.fetch({
-	        reset: true
-	      });
-	    };
-	
-	    Images.prototype._postHandler = function(data) {
-	      var model;
-	      console.log("Collection | Images -> _postHandler");
-	      console.log(sn.__viewer__.models.image);
-	      model = new sn.__viewer__.models.image({
-	        id: data.id,
-	        width: data.width,
-	        height: data.height,
-	        data: data.data,
-	        userInfo: data.userInfo
-	      });
-	      return this.add(model);
-	    };
-	
-	    Images.prototype._triggerHandler = function(id) {
-	      var item;
-	      console.log("Collection | Images -> _triggerHandler");
-	      item = this.get(id);
-	      return item.set("visible", true);
-	    };
-	
-	    Images.prototype._clearHandler = function() {
-	      return console.log("Collection | Images -> _clearHandler");
-	    };
-	
-	    return Images;
-	
-	  })(Backbone.Collection);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Header;
-	  return Header = (function(_super) {
-	    __extends(Header, _super);
-	
-	    function Header() {
-	      console.log("Header -> Constructor");
-	      Header.__super__.constructor.apply(this, arguments);
-	    }
-	
-	    Header.prototype.el = "#header";
-	
-	    Header.prototype.events = {
-	      'click .btn-fullScreen': '_clickFullScreenHandler'
-	    };
-	
-	    Header.prototype.initialize = function() {
-	      return console.log("Header -> initialize");
-	    };
-	
-	    Header.prototype._toggleFullScreen = function() {
-	      return console.log("Header -> _toggleFullScreen");
-	    };
-	
-	    Header.prototype._clickFullScreenHandler = function() {
-	      return console.log("Header -> _clickFullScreenHandler");
-	    };
-	
-	    return Header;
-	
-	  })(Backbone.View);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Footer;
-	  return Footer = (function(_super) {
-	    __extends(Footer, _super);
-	
-	    function Footer() {
-	      console.log("Footer -> Constructor");
-	      Footer.__super__.constructor.apply(this, arguments);
-	    }
-	
-	    Footer.prototype.el = "#footer";
-	
-	    Footer.prototype.events = {
-	      "click .btn-clear": "_clickClearHandler"
-	    };
-	
-	    Footer.prototype.initialize = function() {
-	      console.log("Footer -> initialize");
-	      return this.listenTo(sn.__viewer__.models.room, 'decide', this._decideRoomHandler);
-	    };
-	
-	    Footer.prototype._clickClearHandler = function() {
-	      console.log("Footer -> _clickClearHandler");
-	      if (!confirm("Clear all images ?")) {
-	        return false;
-	      }
-	      return sn.__viewer__.models.trigger("clear");
-	    };
-	
-	    Footer.prototype._decideRoomHandler = function(id) {
-	      console.log("Footer -> _decideRoomHandler");
-	      return this.$el.addClass("visible").find(".footer-url-roomId").text(id);
-	    };
-	
-	    return Footer;
-	
-	  })(Backbone.View);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Image;
-	  return Image = (function(_super) {
-	    __extends(Image, _super);
-	
-	    function Image() {
-	      console.log("View | Image -> Constructor");
-	      Image.__super__.constructor.apply(this, arguments);
-	    }
-	
-	    Image.prototype.tagName = "li";
-	
-	    Image.prototype.className = "image";
-	
-	    Image.prototype.initialize = function() {
-	      console.log("View | Image -> initialize");
-	      this._config = SETTING.CONFIG.VIEWER.IMAGE;
-	      this.listenTo(this.model, "change:visible", this._changeVisibleHandler);
-	      this.listenTo(this.model, "change:delay", this._changeDelayHandler);
-	      this.listenTo(this.model, "change:position", this._changePositionHandler);
-	      this.listenTo(this.model, "change:scale", this._changeScaleHandler);
-	      return this.listenTo(this.model, "remove", this.remove);
-	    };
-	
-	    Image.prototype.template = _.template('<div class="image-inner">' + '<div class="image-inner2">' + '<div class="image-inner3">' + '<div class="image-inner4">' + '<div class="image-inner5">' + '<% if(typeof(data)!="undefined"){ %>' + '<img src="<%= data %>" />' + '<% } else if(typeof(url)!="undefined") { %>' + '<img src="<%= url %>" />' + '<% } %>' + '<div class="image-flash"></div>' + '</div>' + '</div>' + '</div>' + '</div>' + '</div>');
-	
-	    Image.prototype.render = function() {
-	      console.log("View | Image -> render");
-	      return this.$el.html(this.template(this.model.attributes));
-	    };
-	
-	    return Image;
-	
-	  })(Backbone.View);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-	
-	module.exports = function(sn, $, _) {
-	  var Images;
-	  return Images = (function(_super) {
-	    __extends(Images, _super);
-	
-	    function Images() {
-	      console.log("View | Images -> Constructor");
-	      Images.__super__.constructor.apply(this, arguments);
-	    }
-	
-	    Images.prototype.collection = sn.__viewer__.collections.images;
-	
-	    Images.prototype.el = $("#images");
-	
-	    Images.prototype.events = {};
-	
-	    Images.prototype.initialize = function() {
-	      console.log("View | Images -> initialize");
-	      this._modes = {};
-	      return this._views = [];
-	    };
-	
-	    Images.prototype.setup = function() {
-	      console.log("View | Images -> setup");
-	      this.listenTo(this.collection, "add", this._addHandler);
-	      this.listenTo(this.collection, "reset", this._resetHandler);
-	      this.listenTo(this.collection, "change:visible", this._changeVisibleHandler);
-	      return this.listenTo(sn.__viewer__.models.mode, "change:mode", this._changeModeHandler);
-	    };
-	
-	    Images.prototype._append = function(image) {
-	      var view;
-	      console.log("View | Images -> _append");
-	      view = new sn.__viewer__.views.image({
-	        model: image
-	      });
-	      this.$el.append(view.render());
-	      return this._views.push(view);
-	    };
-	
-	    Images.prototype._addHandler = function(image) {
-	      console.log("View | Images -> _addHandler");
-	      this._append(image);
-	      return _.invoke(this._modes, "addHandler");
-	    };
-	
-	    Images.prototype._resetHandler = function(collection) {
-	      return console.log("View | Images -> _resetHandler");
-	    };
-	
-	    Images.prototype._changeVisibleHandler = function() {
-	      return console.log("View | Images -> _changeVisibleHandler");
-	    };
-	
-	    Images.prototype._changeModeHandler = function(model, mode) {
-	      return console.log("View | Images -> _changeModeHandler");
-	    };
-	
-	    Images.prototype._resizeHandler = function() {
-	      return console.log("View | Images -> _resizeHandler");
-	    };
-	
-	    return Images;
-	
-	  })(Backbone.View);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ },
-/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15392,10 +14809,10 @@
 	  })(Backbone.Model);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 22 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -15436,10 +14853,10 @@
 	  })(Backbone.Model);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 23 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15464,10 +14881,10 @@
 	  })(Backbone.Model);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 24 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15523,10 +14940,10 @@
 	  })(Backbone.Model);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 25 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15583,10 +15000,10 @@
 	  })(Backbone.Model);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 26 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15631,10 +15048,10 @@
 	  })(Backbone.Model);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 27 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15695,10 +15112,10 @@
 	  })(Backbone.Model);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 28 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15753,10 +15170,10 @@
 	  })(Backbone.View);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ },
-/* 29 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
@@ -15827,7 +15244,662 @@
 	  })(Backbone.View);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function() {
+	  var Image;
+	  return Image = (function(_super) {
+	    __extends(Image, _super);
+	
+	    Image.prototype.defaults = {
+	      positions: {
+	        x: 0.5,
+	        y: 0.5
+	      },
+	      scale: 1.0
+	    };
+	
+	    function Image() {
+	      console.log("Image -> Constructor");
+	      Image.__super__.constructor.apply(this, arguments);
+	    }
+	
+	    Image.prototype.initialize = function() {
+	      return console.log("Image -> initialize");
+	    };
+	
+	    return Image;
+	
+	  })(Backbone.Model);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Mode;
+	  return Mode = (function(_super) {
+	    __extends(Mode, _super);
+	
+	    Mode.prototype.defaults = {
+	      mode: ""
+	    };
+	
+	    function Mode() {
+	      console.log("MODE -> Constructor");
+	      Mode.__super__.constructor.apply(this, arguments);
+	      this._config = SETTING.CONFIG.MODE;
+	      this._refreshInterval = this._config.REFRESH_INTERVAL;
+	      this._timerID = null;
+	      this._events();
+	    }
+	
+	    Mode.prototype._events = function() {
+	      console.log("MODE -> Events");
+	      return this.listenTo(this, "change:mode", this._changeModeHandler);
+	    };
+	
+	    Mode.prototype.toggle = function() {
+	      var dst, src;
+	      console.log("MODE -> toggle");
+	      src = this.get("mode");
+	      switch (src) {
+	        case "layered":
+	          dst = "grid";
+	          break;
+	        case "grid":
+	          dst = "layered";
+	          break;
+	        default:
+	          break;
+	      }
+	      return this.set("mode", dst);
+	    };
+	
+	    Mode.prototype.reset = function() {
+	      console.log("MODE -> reset");
+	      if (this.get("mode" === "layered")) {
+	        this._resetTimer();
+	        return;
+	      }
+	      return this.set("mode", "layered");
+	    };
+	
+	    Mode.prototype._changeModeHandler = function() {
+	      console.log("MODE -> _changeModeHandler");
+	      return this._resetTimer();
+	    };
+	
+	    Mode.prototype._resetTimer = function() {
+	      console.log("MODE -> _resetTimer");
+	      if (this._timerID) {
+	        clearTimeout(this._timerID);
+	        this._timerID = null;
+	      }
+	      return this._timerID = setTimeout((function(_this) {
+	        return function() {
+	          return _this.toggle();
+	        };
+	      })(this), this._refreshInterval * 1000);
+	    };
+	
+	    return Mode;
+	
+	  })(Backbone.Model);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Room;
+	  return Room = (function(_super) {
+	    __extends(Room, _super);
+	
+	    function Room() {
+	      console.log("ROOM -> Constructor");
+	      Room.__super__.constructor.apply(this, arguments);
+	    }
+	
+	    Room.prototype.initialize = function() {
+	      return console.log("ROOM -> initialize");
+	    };
+	
+	    Room.prototype.sync = function(method, model, options) {
+	      console.log("[model] ROOM -> sync method:" + method);
+	      console.log(method, model, options);
+	      switch (method) {
+	        case "create":
+	          break;
+	        case "update":
+	          model.trigger("decide", model.id);
+	          break;
+	        case "read":
+	          console.log(document.body.getAttribute("data-roomId"));
+	          model.set("id", document.body.getAttribute("data-roomId") || localStorage.getItem("roomId"));
+	          break;
+	        case "delete":
+	          break;
+	        default:
+	          break;
+	      }
+	    };
+	
+	    return Room;
+	
+	  })(Backbone.Model);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Socket;
+	  return Socket = (function(_super) {
+	    __extends(Socket, _super);
+	
+	    Socket.prototype.defaults = {
+	      connected: false
+	    };
+	
+	    function Socket() {
+	      console.log("SOCKET -> Constructor");
+	      Socket.__super__.constructor.apply(this, arguments);
+	      this._setting = SETTING;
+	      this._socket = null;
+	    }
+	
+	    Socket.prototype.initialize = function() {
+	      return console.log("SOCKET -> initialize");
+	    };
+	
+	    Socket.prototype.connect = function() {
+	      var socket;
+	      console.log("SOCKET -> Connect");
+	      if (this._socket) {
+	        return;
+	      }
+	      socket = io.connect("http://" + this._setting.HOST + ":" + this._setting.PORT + "/viewer");
+	      socket.on("connect", this._connectHandler.bind(this));
+	      socket.on("connecting", this._connectingHandler.bind(this));
+	      socket.on("connect_failed", this._connectFailedHandler.bind(this));
+	      socket.on("post", this._postHandler.bind(this));
+	      socket.on("trigger", this._triggerHandler.bind(this));
+	      socket.on("disconnect", this._disconnectHandler.bind(this));
+	      socket.on("reconnect", this._reconnectHandler.bind(this));
+	      socket.on("reconnect_failed", this._reconnectFailedHandler.bind(this));
+	      return this._socket = socket;
+	    };
+	
+	    Socket.prototype.join = function(roomID, callback) {
+	      console.log("SOCKET -> join");
+	      return this._socket.emit("join", {
+	        id: roomID
+	      }, callback);
+	    };
+	
+	    Socket.prototype._connectHandler = function() {
+	      console.log("SOCKET -> _connectHandler");
+	      return this.set("connected", true);
+	    };
+	
+	    Socket.prototype._connectingHandler = function() {
+	      return console.log("SOCKET -> _connectingHandler");
+	    };
+	
+	    Socket.prototype._connectFailedHandler = function() {
+	      console.log("SOCKET -> _connectFailedHandler");
+	      return this.trigger("failed", new Error("Connection failed"));
+	    };
+	
+	    Socket.prototype._postHandler = function(data) {
+	      console.log("SOCKET -> _postHandler");
+	      return this.trigger("post", data);
+	    };
+	
+	    Socket.prototype._triggerHandler = function(data) {
+	      console.log("SOCKET -> _triggerHandler");
+	      console.log(data);
+	      return this.trigger("trigger", data.id);
+	    };
+	
+	    Socket.prototype._disconnectHandler = function() {
+	      console.log("SOCKET -> _disconnectHandler");
+	      return this.set("connected", false);
+	    };
+	
+	    Socket.prototype._reconnectHandler = function() {
+	      return console.log("SOCKET -> _reconnectHandler");
+	    };
+	
+	    Socket.prototype._reconnectFailedHandler = function() {
+	      console.log("SOCKET -> _reconnectFailedHandler");
+	      return this.trigger("failed", new Error("Reconnection failed"));
+	    };
+	
+	    return Socket;
+	
+	  })(Backbone.Model);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Context;
+	  return Context = (function(_super) {
+	    __extends(Context, _super);
+	
+	    function Context() {
+	      console.log("CONTEXT -> Constructor");
+	      Context.__super__.constructor.apply(this, arguments);
+	    }
+	
+	    Context.prototype.setup = function() {
+	      console.log("CONTEXT -> Setup");
+	      this._events();
+	      sn.__viewer__.models.mode.reset();
+	      sn.__viewer__.models.room.fetch();
+	      return sn.__viewer__.models.socket.connect();
+	    };
+	
+	    Context.prototype._events = function() {
+	      console.log("CONTEXT -> _events");
+	      this.listenTo(sn.__viewer__.models.socket, "change:connected", this._changeConnectedHandler);
+	      return this.listenTo(sn.__viewer__.models.socket, "failed", this._failedHandler);
+	    };
+	
+	    Context.prototype.run = function() {
+	      return console.log("CONTEXT -> Run");
+	    };
+	
+	    Context.prototype._changeConnectedHandler = function(model, connected) {
+	      console.log("CONTEXT -> _changeConnectedHandler");
+	      if (connected) {
+	        console.log("connect");
+	      } else {
+	        console.log("disconnect");
+	        return;
+	      }
+	      return sn.__viewer__.models.socket.join(sn.__viewer__.models.room.id, (function(err, roomID) {
+	        if (err) {
+	          console.log(err);
+	          return;
+	        }
+	        return sn.__viewer__.models.room.save({
+	          "id": roomID
+	        });
+	      }).bind(this));
+	    };
+	
+	    Context.prototype._failedHandler = function(err) {
+	      console.log("CONTEXT -> FailedHandler");
+	      return console.log(err);
+	    };
+	
+	    return Context;
+	
+	  })(Backbone.Model);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Images;
+	  return Images = (function(_super) {
+	    __extends(Images, _super);
+	
+	    function Images() {
+	      console.log("Collection | Images -> Constructor");
+	      Images.__super__.constructor.apply(this, arguments);
+	      this._config = SETTING;
+	      this._host = this._config.HOST;
+	      this._port = this._config.PORT;
+	      this._maxNumberOfImages = this._config.CONFIG.IMAGES.MAX_NUMBER_OF_IMAGES;
+	      this._stubs = this._config.CONFIG.IMAGES.STUBS;
+	    }
+	
+	    Images.prototype.initialize = function() {
+	      return console.log("Collection | Images -> Initialize");
+	    };
+	
+	    Images.prototype.model = sn.__viewer__.models.image;
+	
+	    Images.prototype.setup = function() {
+	      console.log("Collection | Images -> setup");
+	      return this._events();
+	    };
+	
+	    Images.prototype.url = function() {
+	      console.log("Collection | Images -> url");
+	      return "//" + this._host + ":" + this._port + "/rooms/" + (sn.__viewer__.models.room.get("id")) + "/images";
+	    };
+	
+	    Images.prototype.parse = function(response) {
+	      return response.results.splice(response.results.length - this._maxNumberOfImages);
+	    };
+	
+	    Images.prototype.addStubImage = function() {
+	      var model, stub;
+	      console.log("Collection | Images -> addStubImage");
+	      stub = _(this._stubs).shuffle().pop();
+	      model = new sn.__viewer__.models.image({
+	        id: "stub" + (new Date()).getTime(),
+	        width: stub.width,
+	        height: stub.height,
+	        data: stub.data
+	      });
+	      this.add(model);
+	      return setTimeout((function(_this) {
+	        return function() {
+	          return model.set("visible", true);
+	        };
+	      })(this), 0);
+	    };
+	
+	    Images.prototype._addHandler = function() {
+	      console.log("Collection | Images -> _addHandler");
+	      if (this.length > this._maxNumberOfImages) {
+	        return this.remove(this.at(0));
+	      }
+	    };
+	
+	    Images.prototype._events = function() {
+	      console.log("Collection | Images -> _events");
+	      this.listenTo(this, "add", this._addHandler);
+	      this.listenTo(sn.__viewer__.models.room, 'decide', this._decideHandler);
+	      this.listenTo(sn.__viewer__.models.socket, 'post', this._postHandler);
+	      this.listenTo(sn.__viewer__.models.socket, 'trigger', this._triggerHandler);
+	      return this.listenTo(sn.__viewer__.models.context, 'clear', this._clearHandler);
+	    };
+	
+	    Images.prototype._decideHandler = function() {
+	      console.log("Collection | Images -> _decideHandler");
+	      return this.fetch({
+	        reset: true
+	      });
+	    };
+	
+	    Images.prototype._postHandler = function(data) {
+	      var model;
+	      console.log("Collection | Images -> _postHandler");
+	      console.log(sn.__viewer__.models.image);
+	      model = new sn.__viewer__.models.image({
+	        id: data.id,
+	        width: data.width,
+	        height: data.height,
+	        data: data.data,
+	        userInfo: data.userInfo
+	      });
+	      return this.add(model);
+	    };
+	
+	    Images.prototype._triggerHandler = function(id) {
+	      var item;
+	      console.log("Collection | Images -> _triggerHandler");
+	      item = this.get(id);
+	      return item.set("visible", true);
+	    };
+	
+	    Images.prototype._clearHandler = function() {
+	      return console.log("Collection | Images -> _clearHandler");
+	    };
+	
+	    return Images;
+	
+	  })(Backbone.Collection);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Header;
+	  return Header = (function(_super) {
+	    __extends(Header, _super);
+	
+	    function Header() {
+	      console.log("Header -> Constructor");
+	      Header.__super__.constructor.apply(this, arguments);
+	    }
+	
+	    Header.prototype.el = "#header";
+	
+	    Header.prototype.events = {
+	      'click .btn-fullScreen': '_clickFullScreenHandler'
+	    };
+	
+	    Header.prototype.initialize = function() {
+	      return console.log("Header -> initialize");
+	    };
+	
+	    Header.prototype._toggleFullScreen = function() {
+	      return console.log("Header -> _toggleFullScreen");
+	    };
+	
+	    Header.prototype._clickFullScreenHandler = function() {
+	      return console.log("Header -> _clickFullScreenHandler");
+	    };
+	
+	    return Header;
+	
+	  })(Backbone.View);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Footer;
+	  return Footer = (function(_super) {
+	    __extends(Footer, _super);
+	
+	    function Footer() {
+	      console.log("Footer -> Constructor");
+	      Footer.__super__.constructor.apply(this, arguments);
+	    }
+	
+	    Footer.prototype.el = "#footer";
+	
+	    Footer.prototype.events = {
+	      "click .btn-clear": "_clickClearHandler"
+	    };
+	
+	    Footer.prototype.initialize = function() {
+	      console.log("Footer -> initialize");
+	      return this.listenTo(sn.__viewer__.models.room, 'decide', this._decideRoomHandler);
+	    };
+	
+	    Footer.prototype._clickClearHandler = function() {
+	      console.log("Footer -> _clickClearHandler");
+	      if (!confirm("Clear all images ?")) {
+	        return false;
+	      }
+	      return sn.__viewer__.models.trigger("clear");
+	    };
+	
+	    Footer.prototype._decideRoomHandler = function(id) {
+	      console.log("Footer -> _decideRoomHandler");
+	      return this.$el.addClass("visible").find(".footer-url-roomId").text(id);
+	    };
+	
+	    return Footer;
+	
+	  })(Backbone.View);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Image;
+	  return Image = (function(_super) {
+	    __extends(Image, _super);
+	
+	    function Image() {
+	      console.log("View | Image -> Constructor");
+	      Image.__super__.constructor.apply(this, arguments);
+	    }
+	
+	    Image.prototype.tagName = "li";
+	
+	    Image.prototype.className = "image";
+	
+	    Image.prototype.initialize = function() {
+	      console.log("View | Image -> initialize");
+	      this._config = SETTING.CONFIG.VIEWER.IMAGE;
+	      this.listenTo(this.model, "change:visible", this._changeVisibleHandler);
+	      this.listenTo(this.model, "change:delay", this._changeDelayHandler);
+	      this.listenTo(this.model, "change:position", this._changePositionHandler);
+	      this.listenTo(this.model, "change:scale", this._changeScaleHandler);
+	      return this.listenTo(this.model, "remove", this.remove);
+	    };
+	
+	    Image.prototype.template = _.template('<div class="image-inner">' + '<div class="image-inner2">' + '<div class="image-inner3">' + '<div class="image-inner4">' + '<div class="image-inner5">' + '<% if(typeof(data)!="undefined"){ %>' + '<img src="<%= data %>" />' + '<% } else if(typeof(url)!="undefined") { %>' + '<img src="<%= url %>" />' + '<% } %>' + '<div class="image-flash"></div>' + '</div>' + '</div>' + '</div>' + '</div>' + '</div>');
+	
+	    Image.prototype.render = function() {
+	      console.log("View | Image -> render");
+	      return this.$el.html(this.template(this.model.attributes));
+	    };
+	
+	    return Image;
+	
+	  })(Backbone.View);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Backbone) {var __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+	
+	module.exports = function(sn, $, _) {
+	  var Images;
+	  return Images = (function(_super) {
+	    __extends(Images, _super);
+	
+	    function Images() {
+	      console.log("View | Images -> Constructor");
+	      Images.__super__.constructor.apply(this, arguments);
+	    }
+	
+	    Images.prototype.collection = sn.__viewer__.collections.images;
+	
+	    Images.prototype.el = $("#images");
+	
+	    Images.prototype.events = {};
+	
+	    Images.prototype.initialize = function() {
+	      console.log("View | Images -> initialize");
+	      this._modes = {};
+	      return this._views = [];
+	    };
+	
+	    Images.prototype.setup = function() {
+	      console.log("View | Images -> setup");
+	      this.listenTo(this.collection, "add", this._addHandler);
+	      this.listenTo(this.collection, "reset", this._resetHandler);
+	      this.listenTo(this.collection, "change:visible", this._changeVisibleHandler);
+	      return this.listenTo(sn.__viewer__.models.mode, "change:mode", this._changeModeHandler);
+	    };
+	
+	    Images.prototype._append = function(image) {
+	      var view;
+	      console.log("View | Images -> _append");
+	      view = new sn.__viewer__.views.image({
+	        model: image
+	      });
+	      this.$el.append(view.render());
+	      return this._views.push(view);
+	    };
+	
+	    Images.prototype._addHandler = function(image) {
+	      console.log("View | Images -> _addHandler");
+	      this._append(image);
+	      return _.invoke(this._modes, "addHandler");
+	    };
+	
+	    Images.prototype._resetHandler = function(collection) {
+	      return console.log("View | Images -> _resetHandler");
+	    };
+	
+	    Images.prototype._changeVisibleHandler = function() {
+	      return console.log("View | Images -> _changeVisibleHandler");
+	    };
+	
+	    Images.prototype._changeModeHandler = function(model, mode) {
+	      return console.log("View | Images -> _changeModeHandler");
+	    };
+	
+	    Images.prototype._resizeHandler = function() {
+	      return console.log("View | Images -> _resizeHandler");
+	    };
+	
+	    return Images;
+	
+	  })(Backbone.View);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }
 /******/ ])

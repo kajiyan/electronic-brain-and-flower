@@ -65,9 +65,12 @@ module.exports = Client = (function() {
           });
         });
 
+        // 画像が送信された時に発火する
         socket.on('trigger', function(data){
           console.log('[Controller] Client -> socketIO -> trigger');
-          console.log(socket.roomId,data);
+          console.log(socket.roomId, data);
+
+          // controllers.bridge.socketIO.to(roomId).emit('trigger', data);
 
           eve.emit('trigger', socket.roomId, data, function(err, imageId){
             if(err){

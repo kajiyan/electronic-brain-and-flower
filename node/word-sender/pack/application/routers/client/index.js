@@ -44,7 +44,7 @@ router.get('/:roomid', function(req, res, next) {
     // roomId があればビューに反映する
     var keyData = {
       'roomid': GET[key]
-    }
+    };
 
     res.render('client/index.swig.html', keyData);
   } else {

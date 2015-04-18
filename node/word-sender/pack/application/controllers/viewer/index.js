@@ -44,9 +44,22 @@ module.exports = Viewer = (function() {
             callback(err);
             return;
           }
+          // console.log("join ID----------");
+          // console.log(id);
+          // console.log("----------");
           socket.join(id);
           callback(err, id);
         });
+
+        // // bridge event emitter
+        // controllers.bridge.eve.emit('join', data.id, function(err, id) {
+        //   if(err){
+        //     callback(err);
+        //     return;
+        //   }
+        // //   socket.join(id);
+        //   callback(err, id);
+        // });
 
       });
     });

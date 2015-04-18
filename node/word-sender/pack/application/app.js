@@ -33,7 +33,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 var controllers = {
   'rooms':  require('./controllers/rooms/'),
   'client': require('./controllers/client/'),
-  'viewer': require('./controllers/viewer/')
+  'viewer': require('./controllers/viewer/'),
+  'bridge': require('./controllers/bridge/')
 };
 
 app.set('controllers', controllers);
@@ -55,12 +56,14 @@ app.set('models', models);
 var router = {
   'index':  require('./routers/'),
   'client': require('./routers/client/'),
-  'rooms':  require('./routers/rooms/')
+  'rooms':  require('./routers/rooms/'),
+  'bridge': require('./routers/bridge/')
 };
 
 app.use('/', router.index);
 app.use('/client', router.client);
 app.use('/rooms', router.rooms);
+app.use('/bridge', router.bridge);
 
 
 // catch 404 and forward to error handler

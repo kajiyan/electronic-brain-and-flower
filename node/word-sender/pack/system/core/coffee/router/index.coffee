@@ -25,6 +25,9 @@ module.exports = (sn, $, _) ->
       "client(/)(:roomid)": () ->
         client = require("../client")(sn, $, _)
         client.setup()
+      "bridge(/)": () ->
+        bridge = require("../bridge")(sn, $, _)
+        bridge.setup()
       "*default": () ->
         viewer = require("../viewer")(sn, $, _)
         viewer.setup()

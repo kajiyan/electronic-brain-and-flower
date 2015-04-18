@@ -1,5 +1,7 @@
 var io = require('socket.io-client');
-var socket = io.connect('http://ec2-54-65-140-79.ap-northeast-1.compute.amazonaws.com:3030/client');
+var viewerSocket = io.connect('http://localhost:3030/viewer');
+
+// var socket = io.connect('http://ec2-54-65-140-79.ap-northeast-1.compute.amazonaws.com:3030/client');
  
 // socket.on('news', function (data) {
 //     console.log(data);
