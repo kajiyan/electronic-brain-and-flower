@@ -21,6 +21,10 @@ sshする際はデバイスの環境に合わせてVagrantfile の秘密鍵ま�
 適切に設定する必要がある。
 
 
+node 関連のファイルは下記のディレクトリにアップする。  
+/usr/share/nginx/node/ebaf/
+
+
 #### OSC RECEIVE PORT
 - Node                  : 12001
 - OpenFrameWorks [Main] : 12002
