@@ -28,27 +28,39 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 /* ============================================================
- * CONTROLLER
- *
- * client ユーザーの端末からの情報を処理する
- *
+    CONTROLLER
  ============================================================ */
 var controllers = {
-    'client': require('./controllers/client/')
+  'rooms':  require('./controllers/rooms/'),
+  'client': require('./controllers/client/'),
+  'viewer': require('./controllers/viewer/')
 };
 
 app.set('controllers', controllers);
 
 
-// ============================================================
-// ROUTES
-var router = {
-  'index': require('./routes/'),
-  'api': require('./routes/api/')
+/* ============================================================
+    MODEL
+  ============================================================ */
+var models = {
+  'rooms': require('./models/rooms/')
 };
 
-app.use('/api', router.api);
+app.set('models', models);
+
+
+/* ============================================================
+    ROUTES
+  ============================================================ */
+var router = {
+  'index':  require('./routers/'),
+  'client': require('./routers/client/'),
+  'rooms':  require('./routers/rooms/')
+};
+
 app.use('/', router.index);
+app.use('/client', router.client);
+app.use('/rooms', router.rooms);
 
 
 // catch 404 and forward to error handler

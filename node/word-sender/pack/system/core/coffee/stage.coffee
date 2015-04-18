@@ -33,11 +33,11 @@ module.exports = (sn) ->
         @_events()
 
         # カーニングを設定
-        @$els.textQuantize
-          .quantize()
-          .then =>
-            @$els.textQuantize.removeClass "is-invisibility"
-            onDone()
+        # @$els.textQuantize
+        #   .quantize()
+        #   .then =>
+        #     @$els.textQuantize.removeClass "is-invisibility"
+        #     onDone()
 
         # windowLeft = window.screenLeft or window.screenX or 0
         # windowTop = window.screenTop or window.screenY or 0

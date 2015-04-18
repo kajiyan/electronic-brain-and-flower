@@ -1,31 +1,26 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta name="viewport" content="width=device-width" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="" />
   <meta charset="UTF-8">
 
   <title></title>
 
-  <link rel="stylesheet" href="./stylesheets/style.css">
+  <link rel="stylesheet" href="./css/style.css">
   <!-- <script src="http://localhost:3001/socket.io/socket.io.js"></script> -->
   <script src="./socket.io/socket.io.js"></script>
-  <script src="./javascripts/typePack.js?v=1.0.0"></script>
+  <script src="./common/js/common.js?v=1.0.0"></script>
+  <script src="./js/index.js?v=1.0.0"></script>
 </head>
 
 <body data-roomId="{{ roomId }}">
   <div id="wrapper">
     <section id="header">
-      <a href="#" class="btn btn-fullScreen">
-        <span class="inner">fullScreen</span>
-      </a>
     </section>
 
     <ul id="images"></ul>
 
     <section id="footer" class="footer">
-      <p class="footer-url">http://play.paparacci.me/<span class="footer-url-roomId"></span></p>
+      <p class="footer-url">ID <span class="footer-url-roomId"></span></p>
       <p><a href="#" class="btn btn-clear">Clear</a></p>
       <img src="">
     </section>

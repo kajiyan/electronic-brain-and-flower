@@ -35,10 +35,13 @@ do (window=window, document=document, $=jQuery) ->
 
   # ============================================================
   # Module
-  # require("./router")(sn, $, Backbone, _)
+  sn.router = do ->
+    Router = require("./router/index")(sn, $, _)
+    return new Router()
 
   $(window).load ->
     console.log SETTING
+
     
     # window.SETTING = require( "../../config/setting" )()
 
@@ -76,8 +79,8 @@ do (window=window, document=document, $=jQuery) ->
       common.stage.windowResized()
 
       $.when(
+        sn.router.setup()
         sn.stage.setup()
-        # sn.clock.setup()
       ).then( =>
         $("body").removeClass "is-invisibility"
         console.log  "- SETUP SCRIPT -"

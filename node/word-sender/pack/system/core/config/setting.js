@@ -34,8 +34,7 @@ module.exports = function( options ){
   setting.DEBUG_PORT = 80;
 
   setting.DEBUG_LOCAL_HOST = "localhost";
-  setting.DEBUG_LOCAL_PORT = 3031;
-
+  setting.DEBUG_LOCAL_PORT = 3030;
 
   setting.SYSTEM      = "system";
   setting.SYSTEM_CORE = "core";
@@ -125,7 +124,7 @@ module.exports = function( options ){
     setting.PATH.COMMON_FILE     = common;
     setting.PATH.COMMON_ENGINE   = common + setting.ENGINE + "/";
     setting.PATH.COMMON_SASS     = common + setting.STYLE + "/";
-    setting.PATH.COMMON_ALT_JS   = common + setting.ALT_JS + "/"
+    setting.PATH.COMMON_ALT_JS   = common + setting.ALT_JS + "/";
   }
 
   setting.CONFIG = {
@@ -175,6 +174,42 @@ module.exports = function( options ){
     },
     META: {
       VIEWPORT: "width=980"
+    },
+    MODE: {
+      REFRESH_INTERVAL: 10
+    },
+    IMAGES: {
+      MAX_NUMBER_OF_IMAGES: 25,
+      STUBS: [
+        {
+          WIDTH: 480,
+          HEIGHT: 640,
+          DATA: ""
+        },
+        {
+          WIDTH: 480,
+          HEIGHT: 640,
+          DATA: ""
+        },
+        {
+          WIDTH: 640,
+          HEIGHT: 480,
+          DATA: ""
+        }
+      ]
+    },
+    VIEWER: {
+      VIEW: {
+        IMAGE: {
+          BASE_SIZE_RATIO: 0.75,
+          MAX_ROTATION: 15
+        }
+      }
+    },
+    CLIENT: {
+      DEVICE_ORIENTATION: {
+        THRESHOLD: 1.5 * 9.8
+      }
     }
   };
 

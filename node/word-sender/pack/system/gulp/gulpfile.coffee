@@ -137,7 +137,7 @@ gulp.task "compassOptimize", ->
 # File watching
 # ------------------------------
 # gulp.task "watch", ["server"], ->
-gulp.task "watch", ["server"], ->
+gulp.task "watch", ->
   for key, value of SETTING.TARGET
     gulp.watch(
       ["#{SETTING.CORE}#{SETTING.ENGINE}#{value}/*.#{SETTING.ENGINE_ATTRIBUTE}.html"]
@@ -153,7 +153,7 @@ gulp.task "watch", ["server"], ->
       ["#{key}Webpack", browserSync.reload]
     )
   gulp.watch(
-    ["#{SETTING.PATH.COMMON_ALT_JS}pack/*.coffee"]
+    ["#{SETTING.PATH.COMMON_ALT_JS}*.coffee"]
     ["commonWebpack", browserSync.reload]
   )
 

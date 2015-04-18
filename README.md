@@ -25,6 +25,9 @@ node 関連のファイルは下記のディレクトリにアップする。
 /usr/share/nginx/node/ebaf/
 
 
+EC2のSecurity Groups はNodeの実行環境に合わせて適切に設定する。
+
+
 #### OSC RECEIVE PORT
 - Node                  : 12001
 - OpenFrameWorks [Main] : 12002

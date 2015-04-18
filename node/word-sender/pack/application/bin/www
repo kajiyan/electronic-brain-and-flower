@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('word-sender:server');
 var http = require('http');
 var socketio = require('socket.io');
+// var webSocket = require('websocket');
 
 /**
  * Get port from environment and store in Express.
@@ -17,20 +18,14 @@ var port = normalizePort(process.env.PORT || '3030');
 app.set('port', port);
 
 
-
 /**
  * Create HTTP server.
  */
 var server = http.createServer(app);
+
+// socket.io server
 var io = socketio(server);
-
-
 app.set('socketIO', io);
-
-server.listen(app.get('port'), function() {
-  console.log('listening');
-});
-
 
 
 /*
@@ -44,6 +39,7 @@ for (var key in app.get('controllers')) {
 /**
  * Listen on provided port, on all network interfaces.
  */
+
 
 server.listen(port);
 server.on('error', onError);
@@ -69,6 +65,7 @@ function normalizePort(val) {
 
   return false;
 }
+
 
 /**
  * Event listener for HTTP server "error" event.
