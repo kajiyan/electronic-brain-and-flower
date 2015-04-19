@@ -35,6 +35,21 @@ EC2のSecurity Groups はNodeの実行環境に合わせて適切に設定する
 - Max/Msp               : 12004
 
 
+#### DMX CHANNEL
+- 1ch メタルハライドランプ 安定器 1
+- 2ch 電球
+- 3ch 
+- 4ch 
+- 5ch メタルハライドランプ 安定器 2
+- 6ch 
+- 7ch  
+- 8ch  
+- 9ch  超音波 噴霧機
+- 10ch スポット型電球
+- 11ch 汲み上げポンプ
+- 12ch サーキュレーター 
+
+
 ## Node
 - Server PORT: 3030
 - Front End DEBUG PORT: 3031
