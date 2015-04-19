@@ -1,5 +1,6 @@
 # 電脳と花 electronic-brain-and-flower
 
+[各APIについて](https://github.com/kajiyan/electronic-brain-and-flower/blob/master/docs/api.md)  
 [Twitter App - 電脳と花](https://apps.twitter.com/app/8181167 "Twitter App")
 
 
