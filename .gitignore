@@ -69,3 +69,5 @@ of_v0.8.4/apps/myApps/word_bridge/Makefile
 of_v0.8.4/apps/myApps/word_bridge/openFrameworks-Info.plist
 of_v0.8.4/apps/myApps/word_bridge/Project.xcconfig
 node/word-sender/pack/application/public/images/api
+node/word-sender/pack/application/config
+node/twitter-app/config

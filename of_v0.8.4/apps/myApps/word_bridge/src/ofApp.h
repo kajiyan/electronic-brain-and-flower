@@ -9,7 +9,6 @@
 
 
 #define FPS  60.0
-#define PORT 12345
 
 
 class ofApp : public ofBaseApp{

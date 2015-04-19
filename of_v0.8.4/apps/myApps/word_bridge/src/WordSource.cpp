@@ -56,6 +56,9 @@ void WordSource::_sendSignalToMax() {
     message.setAddress("/instanceID");
     message.addIntArg(_ID);
     
+    message.setAddress("/smileTrigger");
+    message.addIntArg(_ID);
+    
     _maxSender.sendMessage(message);
 }
 

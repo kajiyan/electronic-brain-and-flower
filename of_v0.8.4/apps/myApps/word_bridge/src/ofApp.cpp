@@ -9,9 +9,7 @@ using Poco::RegularExpression;
 
 
 //--------------------------------------------------------------
-void ofApp::setup(){
-    cout << "listening for osc messages on port " << PORT << "\n";
-    
+void ofApp::setup(){    
     /*
      * Basic Configuration
      */
@@ -36,10 +34,10 @@ void ofApp::setup(){
         (*it)->setup();
         (*it)->update();
     }
-    
+
     
     // OSCを受信するポートの設定
-    receiver.setup(PORT);
+    receiver.setup(setting["address"]["openFrameWorks"]["main"]["port"].asInt());
 }
 
 
