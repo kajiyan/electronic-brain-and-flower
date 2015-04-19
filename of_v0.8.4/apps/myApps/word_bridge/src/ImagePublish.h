@@ -11,16 +11,17 @@ class ImagePublish {
     private:
         int _ID;
         ofImage _image;
-        bool _loading;
-        bool _loadingComplete;
+        bool _isLoading;
+        bool _isLoadingComplete;
+        bool _isPublishComplete;
+        vector <string> _loadFileNames;
+        
     public:
         ImagePublish( int ID );
         void urlResponse(ofHttpResponse & response);
 //        void setup();
         void update();
         void draw();
-//
-//        void setID(int ID);
 };
 
 #endif

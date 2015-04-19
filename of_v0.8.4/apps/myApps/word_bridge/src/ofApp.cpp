@@ -50,8 +50,8 @@ void ofApp::setup(){
     /*
      * imagePublish
      */
-    for(int i = 0; i < wordsSize; i++){
-        // wordSourceのインスタンスを作る
+    for(int i = 0; i < ImagePublishSize; i++){
+        // imagePublishのインスタンスを作る
         ImagePublish *imagePublishInstance = new ImagePublish( i );
         imagePublishs.push_back(imagePublishInstance);
     }

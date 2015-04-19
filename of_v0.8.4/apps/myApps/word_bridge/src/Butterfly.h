@@ -42,13 +42,24 @@ class Butterfly {
         Boolean _isSlowFlip = false;
         
         int _flg = 0;
+        // float* _peakArray;
+        vector <float *> _peakArray;
         vector <float *> _peak;
+    
         int _directionX = -1;
         int _directionY = -1;
         float _pRadZ;
-        
+    
+        //float* _orbitArray;
+        vector <float *> _orbitArray;
         vector <float *> _orbit;
+    
+        //float* _rotationArray;
+        vector <float *> _rotationArray;
         vector <float *> _rotation;
+    
+        //float* _flipArray;
+        vector <float *> _flipArray;
         vector <float *> _flip;
         
         float _px = 0;
