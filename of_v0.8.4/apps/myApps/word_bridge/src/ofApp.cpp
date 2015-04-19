@@ -8,14 +8,40 @@ using Poco::replace;
 using Poco::RegularExpression;
 
 
+GLfloat lightOnePosition[] = {40.0, 40, 100.0, 0.0};
+GLfloat lightOneColor[] = {0.99, 0.99, 0.99, 1.0};
+
+GLfloat lightTwoPosition[] = {-40.0, 40, 100.0, 0.0};
+GLfloat lightTwoColor[] = {0.99, 0.99, 0.99, 1.0};
+
+
 //--------------------------------------------------------------
 void ofApp::setup(){    
     /*
      * Basic Configuration
      */
     ofSetVerticalSync(true);
+    ofEnableSmoothing();
     ofSetFrameRate(FPS);
     ofSetWindowTitle("電脳と花");
+    
+    //some model / light stuff
+    ofEnableDepthTest();
+    glShadeModel (GL_SMOOTH);
+    
+    /* initialize lighting */
+    glLightfv (GL_LIGHT0, GL_POSITION, lightOnePosition);
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, lightOneColor);
+    glEnable (GL_LIGHT0);
+    glLightfv (GL_LIGHT1, GL_POSITION, lightTwoPosition);
+    glLightfv (GL_LIGHT1, GL_DIFFUSE, lightTwoColor);
+    glEnable (GL_LIGHT1);
+    glEnable (GL_LIGHTING);
+    glColorMaterial (GL_FRONT_AND_BACK, GL_DIFFUSE);
+    glEnable (GL_COLOR_MATERIAL);
+
+    
+    ofBackground(100, 100, 100);
     
     // 設定ファイルを取得する
     setting.open("config.json");
@@ -59,16 +85,32 @@ void ofApp::update(){
             cout << wordValidation(messageBody) << "\n";
         }
     }
+    
+    /*
+     * Butterfly
+     */
+    for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
+        (*it)->update();
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    /*
+     * Butterfly
+     */
+    for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
+        (*it)->draw();
+    }
 
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+    if(key == 'b'){
+        Butterfly *bt = new Butterfly(FPS);
+        butterfrys.push_back(bt);
+    }
 }
 
 //--------------------------------------------------------------
