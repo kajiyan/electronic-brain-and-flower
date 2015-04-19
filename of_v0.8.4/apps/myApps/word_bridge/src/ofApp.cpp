@@ -48,6 +48,15 @@ void ofApp::setup(){
     ofLogNotice("ofApp::setup") << setting.getRawString();
     
     /*
+     * imagePublish
+     */
+    for(int i = 0; i < wordsSize; i++){
+        // wordSourceのインスタンスを作る
+        ImagePublish *imagePublishInstance = new ImagePublish( i );
+        imagePublishs.push_back(imagePublishInstance);
+    }
+    
+    /*
      * wordSource
      */
     for(int i = 0; i < wordsSize; i++){
@@ -55,6 +64,7 @@ void ofApp::setup(){
         WordSource *wordInstance = new WordSource( i );
         wordSources.push_back(wordInstance);
     }
+    
     // wordSourceのインスタンスのセットアップ
     for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->setup();
@@ -87,6 +97,13 @@ void ofApp::update(){
     }
     
     /*
+     * ImagePublish
+     */
+    for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
+        (*it)->update();
+    }
+    
+    /*
      * Butterfly
      */
     for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
@@ -96,6 +113,13 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    /*
+     * ImagePublish
+     */
+    for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
+        (*it)->draw();
+    }
+    
     /*
      * Butterfly
      */

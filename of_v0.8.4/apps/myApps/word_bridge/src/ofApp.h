@@ -6,6 +6,7 @@
 
 
 #include "Butterfly.h"
+#include "ImagePublish.h"
 #include "WordSource.h"
 
 
@@ -41,6 +42,16 @@ class ofApp : public ofBaseApp{
          
          ============================================================================= */
         vector<Butterfly *> butterfrys;
+    
+    
+        /* =============================================================================
+     
+         ImagePublish
+         HTTP経由で画像を取得して書き出すクラス
+     
+         ============================================================================= */
+        int ImagePublishSize = 1;
+        vector<ImagePublish *> imagePublishs;
     
     
         /* =============================================================================
