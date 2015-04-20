@@ -134,6 +134,8 @@ void ofApp::keyPressed(int key){
     if(key == 'b'){
         Butterfly *bt = new Butterfly(FPS);
         butterfrys.push_back(bt);
+        
+        imagePublishs[0]->addLoadFileName("http://two-tone-cat.c.blog.so-net.ne.jp/_images/blog/_bec/two-tone-cat/calpis201303-2f009.jpg");
     }
 }
 

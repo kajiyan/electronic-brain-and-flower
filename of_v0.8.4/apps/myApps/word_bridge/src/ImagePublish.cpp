@@ -1,12 +1,8 @@
-//
-//  ImagePublish.cpp
-//  word_bridge
-//
-//  Created by KAJIYA HIROKI on 2015/04/19.
-//
-//
-
 #include "ImagePublish.h"
+
+#include "Poco/RegularExpression.h"
+
+using Poco::RegularExpression;
 
 //--------------------------------------------------------------
 ImagePublish::ImagePublish( int ID ) {
@@ -17,61 +13,42 @@ ImagePublish::ImagePublish( int ID ) {
     _isLoadingComplete = false;
     _isPublishComplete = false;
     ofRegisterURLNotification(this);
-    
-    // string *loadFileName = new string( "i" );
-    // _loadFileNames.push_back(loadFileName);
-    string loadFileName = "i";
-    _loadFileNames.push_back(loadFileName);
-
-    for (int i = 0; i < _loadFileNames.size(); i++) {
-        cout << _loadFileNames[i] << "\n";
-    }
-    
-    //    imagePublishs.push_back(imagePublishInstance);
 }
 
 
 //--------------------------------------------------------------
 void ImagePublish::update() {
     // ローディングが完了していなければ画像を読み込む
-    if(!_isLoading && !_isLoadingComplete){
+    if(!_isLoading && !_isLoadingComplete && _loadFileNames.size() > 0){
+        cout << "ImagePublish -> update\n" << _loadFileNames.front();
+        
         _isLoading = true;
         _image.clear();
-        ofLoadURLAsync("http://images.wildmadagascar.org/pictures/bemaraha/tsingy_forest.JPG", "material");
+        
+        // 先頭からファイル名を取得する
+        ofLoadURLAsync( _loadFileNames.front() );
     }
 }
 
 
 //--------------------------------------------------------------
 void ImagePublish::draw() {
-    if(_image.bAllocated()){
-        ofSetColor(255);
-        
-        // アルファブレンディングを無効にする
-        ofDisableAlphaBlending();
-        
-        // 画像を書き出す
-        if(_isPublishComplete) {
-            _image.draw(0, 0);
-        } else {
-            _image.setImageType(OF_IMAGE_GRAYSCALE);
-            _image.saveImage("test.jpg");
-            _image.loadImage("test.jpg");
-            _isPublishComplete = true;
-        }
-        
-        // アルファブレンディングを有効にする
-        ofEnableAlphaBlending();
-    }
 }
 
 
 //--------------------------------------------------------------
 void ImagePublish::urlResponse(ofHttpResponse & response){
-    if(response.status == 200 && response.request.name == "material"){
+    if(response.status == 200){
         _image.loadImage(response.data);
+        
+        // 画像を書き出す
+        _publish();
+        
         _isLoading = false;
-        _isLoadingComplete = true;
+        // すべてのファイルを読み込んだ時の処理
+        if( _loadFileNames.size() == 0 ){
+            _isLoadingComplete = true;
+        }
     }else{
         cout << response.status << " " << response.error << endl;
         if(response.status != -1){
@@ -81,4 +58,31 @@ void ImagePublish::urlResponse(ofHttpResponse & response){
     }
 }
 
+
+//--------------------------------------------------------------
+void ImagePublish::_publish(){
+    if(_image.bAllocated()){
+        ofSetColor(255);
+        
+        // アルファブレンディングを無効にする
+        ofDisableAlphaBlending();
+        
+        RegularExpression fileNameMatch("([^/]+?)([\?#].*)?$");
+        string publishFileName;
+        fileNameMatch.extract(_loadFileNames.front(), publishFileName);
+        
+        _image.saveImage( publishFileName );
+        _loadFileNames.erase( _loadFileNames.begin() );
+        
+        // アルファブレンディングを有効にする
+        ofEnableAlphaBlending();
+    }
+}
+
+
+//--------------------------------------------------------------
+void ImagePublish::addLoadFileName( string fileName ) {
+    _loadFileNames.push_back( fileName );
+    _isLoadingComplete = false;
+}
 

@@ -15,15 +15,15 @@ Butterfly::Butterfly(float _fps){
     
     // 配列の初期化
     for (int i= 0; i < N; i++){
+        float* peak = new float[M];
+        _peakArray.push_back(peak);
+        _peak.push_back(peak);
+        
         _peak.push_back(new float[M]);
         _peak[i][0] = 0;
         _peak[i][1] = 0;
         _peak[i][2] = 0;
     }
-    
-    // for (int i= 0; i < _n; i++){
-    //     _peak.push_back(new float[_m]);
-    // }
     
     // 飛行モードの選択
     createPeak();
@@ -48,71 +48,63 @@ void Butterfly::draw(){
     
     ofSetColor(255);
     
-    // ofEnableSmoothing();
-    // glShadeModel(GL_SMOOTH);
+    ofEnableSmoothing();
+    glShadeModel(GL_SMOOTH);
     
     glPushMatrix();
     
     glTranslatef(ofGetWidth() / 2, ofGetHeight() / 2, 0);
 
-//        glTranslatef(x, y, z);
+    //glTranslatef(x, y, z);
     
-        glRotatef(_rotation[_count][0] * -1 * 180 / PI + -90, 1, 0, 0);   // x軸
-        glRotatef(180, 0, 1, 0);                                          // y軸
-        glRotatef(_rotation[_count][1] * -1 * 180 / PI, 0, 0, 1);         // z軸
-        _body.draw();
+    glRotatef(_rotation[_count][0] * -1 * 180 / PI + -90, 1, 0, 0);   // x軸
+    glRotatef(180, 0, 1, 0);                                          // y軸
+    glRotatef(_rotation[_count][1] * -1 * 180 / PI, 0, 0, 1);         // z軸
+    _body.draw();
         
-        // featherLT
-        glPushMatrix();
-            glRotatef(ft * rfy * 180 / PI, 0, 0, 1);    // y軸
-            glRotatef(-ft * 180 / PI, 0, 1, 0);         // z軸
-            _featherLT.draw();
-            glTranslatef(0, 0, 0);
-        glPopMatrix();
+    // featherLT
+    glPushMatrix();
+    glRotatef(ft * rfy * 180 / PI, 0, 0, 1);    // y軸
+    glRotatef(-ft * 180 / PI, 0, 1, 0);         // z軸
+    _featherLT.draw();
+    glTranslatef(0, 0, 0);
+    glPopMatrix();
         
-        // featherLU
-        glPushMatrix();
-            glRotatef(-fu * 180 / PI, 0, 1, 0);         // y軸
-            glRotatef(fu * rfy * 180 / PI, 0, 0, 1);    // z軸
-            _featherLU.draw();
-            glTranslatef(0, 0, 0);
-        glPopMatrix();
+    // featherLU
+    glPushMatrix();
+    glRotatef(-fu * 180 / PI, 0, 1, 0);         // y軸
+    glRotatef(fu * rfy * 180 / PI, 0, 0, 1);    // z軸
+    _featherLU.draw();
+    glTranslatef(0, 0, 0);
+    glPopMatrix();
         
-        // featherRT
-        glPushMatrix();
-            glRotatef(ft * 180 / PI, 0, 1, 0);          // y軸
-            glRotatef(-ft * rfy * 180 / PI, 0, 0, 1);   // z軸
-            _featherRT.draw();
-            glTranslatef(0, 0, 0);
-        glPopMatrix();
+    // featherRT
+    glPushMatrix();
+    glRotatef(ft * 180 / PI, 0, 1, 0);          // y軸
+    glRotatef(-ft * rfy * 180 / PI, 0, 0, 1);   // z軸
+    _featherRT.draw();
+    glTranslatef(0, 0, 0);
+    glPopMatrix();
         
-        // featherRU
-        glPushMatrix();
-            glRotatef(fu * 180 / PI, 0, 1, 0);          // y軸
-            glRotatef(-fu * rfy * 180 / PI, 0, 0, 1);   // z軸
-            _featherRU.draw();
-            glTranslatef(0, 0, 0);
-        glPopMatrix();
+    // featherRU
+    glPushMatrix();
+    glRotatef(fu * 180 / PI, 0, 1, 0);          // y軸
+    glRotatef(-fu * rfy * 180 / PI, 0, 0, 1);   // z軸
+    _featherRU.draw();
+    glTranslatef(0, 0, 0);
+    glPopMatrix();
         
-        glPushMatrix();
-            glRotatef(_rotation[_count][3] * -1 * 180 / PI, 1, 0, 0); // y軸
-            _hone.draw();
-        glPopMatrix();
+    glPushMatrix();
+    glRotatef(_rotation[_count][3] * -1 * 180 / PI, 1, 0, 0); // y軸
+    _hone.draw();
+    glPopMatrix();
         
-        // glTranslatef(0, 0, 0);
+    // glTranslatef(0, 0, 0);
     glPopMatrix();
     ofPopStyle();
 
     
     if(++_count >= _orbit.size()){
-        //vector<float *> orbit;
-        //vector<float *> rotation;
-        //vector<float *> flip;
-        
-        //delete _orbitArray;
-        //delete _rotationArray;
-        //delete _flipArray;
-        
         for (int i = 0; i < _orbitArray.size(); i++) {
             delete _orbitArray[i];
         }
@@ -131,22 +123,11 @@ void Butterfly::draw(){
         _orbit.clear();
         _rotation.clear();
         _flip.clear();
-        
-        //_orbit.swap(orbit);
-        //_rotation.swap(rotation);
-        //_flip.swap(flip);
-        
-        //vector<float *>(_orbit).swap(_orbit);
-        //vector<float *>(_rotation).swap(_rotation);
-        //vector<float *>(_flip).swap(_flip);
 
         for (int i = 0; i < _peakArray.size(); i++) {
             delete _peakArray[i];
-//            delete _peakArray[i];
         }
         _peakArray.clear();
-//        vector<float *>(_peakArray).swap(_peakArray);
-        //delete _peakArray;
 
         _count = 0;
         
@@ -243,13 +224,10 @@ void Butterfly::createPeak(){
     
     
     _peak.clear();
-//    vector<float *>(_peak).swap(_peak);
-    
     for (int i= 0; i < _n; i++){
         float* peak = new float[_m];
         _peakArray.push_back(peak);
         _peak.push_back(peak);
-         //_peak.push_back(new float[_m]);
     }
     
     _peak[0][0] = initX;
@@ -305,40 +283,22 @@ void Butterfly::generateOrbit(){
     float tmp;
     float plus = 1.0 / (interpolate - 1);
 
-    //_orbitArray = new float[3];
     for (int i= 0; i < INTERPOLATE * ((_n - 1) / 2); i++){
-        //_orbitArray = new float[3];
-        //_orbit.push_back(_orbitArray);
-        
         float* orbit = new float[3];
         _orbitArray.push_back(orbit);
         _orbit.push_back(orbit);
-        
-        //_orbit.push_back(new float[3]);
     }
     
-    //_rotationArray = new float[4];
     for (int i= 0; i < INTERPOLATE * ((_n - 1) / 2); i++){
-        //_rotationArray = new float[4];
-        //_rotation.push_back(_rotationArray);
-        
         float* rotation = new float[4];
         _rotationArray.push_back(rotation);
         _rotation.push_back(rotation);
-        
-        //_rotation.push_back(new float[4]);
     }
     
-    //_flipArray = new float[2];
     for (int i= 0; i < INTERPOLATE * ((_n - 1) / 2); i++){
-        //_flipArray = new float[2];
-        //_flip.push_back(_flipArray);
-        
         float* flip = new float[2];
         _flipArray.push_back(flip);
         _flip.push_back(flip);
-        
-        //_flip.push_back(new float[2]);
     }
     
     float vfl = 0.8;
