@@ -84,6 +84,7 @@ void ofApp::update(){
         ofxOscMessage message;
         receiver.getNextMessage(&message);
         
+        // Tweet を検知したタイミングで受信する
         if(message.getAddress() == "/word"){
             // 受信したテキストを取り出す
             string messageBody = message.getArgAsString(0);
@@ -93,6 +94,16 @@ void ofApp::update(){
             }
             
             cout << wordValidation(messageBody) << "\n";
+        }
+        
+        // Webサーバーに画像データが追加されたタイミングで受信する
+        if(message.getAddress() == "/addImage"){
+            // 受信したテキストを取り出す
+            string messageBody = message.getArgAsString(0);
+            
+            cout << "OSC: /addImage " << messageBody << "\n";
+            
+            imagePublishs[0]->addLoadFileName(messageBody);
         }
     }
     
