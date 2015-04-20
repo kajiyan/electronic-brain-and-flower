@@ -44,23 +44,9 @@ module.exports = Viewer = (function() {
             callback(err);
             return;
           }
-          // console.log("join ID----------");
-          // console.log(id);
-          // console.log("----------");
           socket.join(id);
           callback(err, id);
         });
-
-        // // bridge event emitter
-        // controllers.bridge.eve.emit('join', data.id, function(err, id) {
-        //   if(err){
-        //     callback(err);
-        //     return;
-        //   }
-        // //   socket.join(id);
-        //   callback(err, id);
-        // });
-
       });
     });
 
@@ -81,7 +67,9 @@ module.exports = Viewer = (function() {
   Viewer.prototype.post = function(image, data){
     console.log('[Controller] Viewer -> post');
 
-    data.id = image.id;
+    data.url = "http://" + config.host + ":" + config.port + "/images/api/" +　image.roomId + "/" + image.name;
+    data.id     = image.id;
+
     this.socketIO.to(image.roomId).emit('post', data);
   };
 

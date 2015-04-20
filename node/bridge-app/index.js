@@ -1,5 +1,39 @@
 var io = require('socket.io-client');
+var dgram = require('dgram');
+var osc = require('osc-min');
+
+
 var viewerSocket = io.connect('http://localhost:3030/viewer');
+var udp = dgram.createSocket("udp4");
+
+
+viewerSocket.on("post", function(data){
+  console.log("Bridge App | Socket -> _postHandler");
+
+  var buffer;
+
+  buffer = osc.toBuffer({
+    address: "/addImage",
+    args: [
+      {
+        type: "string",
+        value: data.url
+      }
+    ]
+  });
+  udp.send(buffer, 0, buffer.length, 12002, "localhost");
+});
+
+viewerSocket.on('connect', function(socket){
+  console.log('Bridge App | Socket -> Connect');
+
+  viewerSocket.emit('join', {id: '983621'}, function(err, roomID){
+    if(err){
+      console.log(err);
+      return;
+    }
+  });
+});
 
 // var socket = io.connect('http://ec2-54-65-140-79.ap-northeast-1.compute.amazonaws.com:3030/client');
  

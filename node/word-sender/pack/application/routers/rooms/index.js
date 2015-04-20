@@ -112,6 +112,7 @@ router.get('/:id/images', function(req, res){
       res.json(404, {});
       return;
     }
+
     res.json({
       'results': images
     });

@@ -25,6 +25,10 @@ module.exports = (sn, $, _) ->
     initialize: () ->
       console.log "View | Image -> initialize"
 
+      console.log "-"
+      console.log @model
+      console.log "-"
+
       @_config = SETTING.CONFIG.VIEWER.IMAGE
 
       @listenTo @model, "change:visible", @_changeVisibleHandler

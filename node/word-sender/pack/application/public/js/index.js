@@ -47,9 +47,9 @@
 	/* WEBPACK VAR INJECTION */(function(jQuery, _) {(function(window, document, $) {
 	  "use strict";
 	  sn.tf = new TypeFrameWork();
-	  __webpack_require__(4);
-	  __webpack_require__(6);
+	  __webpack_require__(3);
 	  __webpack_require__(5);
+	  __webpack_require__(4);
 	  sn.support = {};
 	  sn.support.transition = (function() {
 	    if ($.support.transition && $.support.transform && ($.fn.transition != null)) {
@@ -65,9 +65,9 @@
 	  })();
 	  return $(window).load(function() {
 	    console.log(SETTING);
-	    __webpack_require__(4);
-	    __webpack_require__(6);
+	    __webpack_require__(3);
 	    __webpack_require__(5);
+	    __webpack_require__(4);
 	    sn.stage = __webpack_require__(1)(sn);
 	    sn.tf.setup(function() {
 	      common.stage.setWindowResizedEnabled(false);
@@ -103,7 +103,7 @@
 	  });
 	})(window, document, jQuery);
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(3)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(6)))
 
 /***/ },
 /* 1 */
@@ -416,6 +416,1665 @@
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	 * jQuery Transit - CSS3 transitions and transformations
+	 * (c) 2011-2014 Rico Sta. Cruz
+	 * MIT Licensed.
+	 *
+	 * http://ricostacruz.com/jquery.transit
+	 * http://github.com/rstacruz/jquery.transit
+	 */
+	
+	/* jshint expr: true */
+	
+	;(function (root, factory) {
+	
+	  if (true) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(7)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	  } else if (typeof exports === 'object') {
+	    module.exports = factory(require('jquery'));
+	  } else {
+	    factory(root.jQuery);
+	  }
+	
+	}(this, function($) {
+	  $.transit = {
+	    version: "0.9.12",
+	
+	    // Map of $.css() keys to values for 'transitionProperty'.
+	    // See https://developer.mozilla.org/en/CSS/CSS_transitions#Properties_that_can_be_animated
+	    propertyMap: {
+	      marginLeft    : 'margin',
+	      marginRight   : 'margin',
+	      marginBottom  : 'margin',
+	      marginTop     : 'margin',
+	      paddingLeft   : 'padding',
+	      paddingRight  : 'padding',
+	      paddingBottom : 'padding',
+	      paddingTop    : 'padding'
+	    },
+	
+	    // Will simply transition "instantly" if false
+	    enabled: true,
+	
+	    // Set this to false if you don't want to use the transition end property.
+	    useTransitionEnd: false
+	  };
+	
+	  var div = document.createElement('div');
+	  var support = {};
+	
+	  // Helper function to get the proper vendor property name.
+	  // (`transition` => `WebkitTransition`)
+	  function getVendorPropertyName(prop) {
+	    // Handle unprefixed versions (FF16+, for example)
+	    if (prop in div.style) return prop;
+	
+	    var prefixes = ['Moz', 'Webkit', 'O', 'ms'];
+	    var prop_ = prop.charAt(0).toUpperCase() + prop.substr(1);
+	
+	    for (var i=0; i<prefixes.length; ++i) {
+	      var vendorProp = prefixes[i] + prop_;
+	      if (vendorProp in div.style) { return vendorProp; }
+	    }
+	  }
+	
+	  // Helper function to check if transform3D is supported.
+	  // Should return true for Webkits and Firefox 10+.
+	  function checkTransform3dSupport() {
+	    div.style[support.transform] = '';
+	    div.style[support.transform] = 'rotateY(90deg)';
+	    return div.style[support.transform] !== '';
+	  }
+	
+	  var isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+	
+	  // Check for the browser's transitions support.
+	  support.transition      = getVendorPropertyName('transition');
+	  support.transitionDelay = getVendorPropertyName('transitionDelay');
+	  support.transform       = getVendorPropertyName('transform');
+	  support.transformOrigin = getVendorPropertyName('transformOrigin');
+	  support.filter          = getVendorPropertyName('Filter');
+	  support.transform3d     = checkTransform3dSupport();
+	
+	  var eventNames = {
+	    'transition':       'transitionend',
+	    'MozTransition':    'transitionend',
+	    'OTransition':      'oTransitionEnd',
+	    'WebkitTransition': 'webkitTransitionEnd',
+	    'msTransition':     'MSTransitionEnd'
+	  };
+	
+	  // Detect the 'transitionend' event needed.
+	  var transitionEnd = support.transitionEnd = eventNames[support.transition] || null;
+	
+	  // Populate jQuery's `$.support` with the vendor prefixes we know.
+	  // As per [jQuery's cssHooks documentation](http://api.jquery.com/jQuery.cssHooks/),
+	  // we set $.support.transition to a string of the actual property name used.
+	  for (var key in support) {
+	    if (support.hasOwnProperty(key) && typeof $.support[key] === 'undefined') {
+	      $.support[key] = support[key];
+	    }
+	  }
+	
+	  // Avoid memory leak in IE.
+	  div = null;
+	
+	  // ## $.cssEase
+	  // List of easing aliases that you can use with `$.fn.transition`.
+	  $.cssEase = {
+	    '_default':       'ease',
+	    'in':             'ease-in',
+	    'out':            'ease-out',
+	    'in-out':         'ease-in-out',
+	    'snap':           'cubic-bezier(0,1,.5,1)',
+	    // Penner equations
+	    'easeInCubic':    'cubic-bezier(.550,.055,.675,.190)',
+	    'easeOutCubic':   'cubic-bezier(.215,.61,.355,1)',
+	    'easeInOutCubic': 'cubic-bezier(.645,.045,.355,1)',
+	    'easeInCirc':     'cubic-bezier(.6,.04,.98,.335)',
+	    'easeOutCirc':    'cubic-bezier(.075,.82,.165,1)',
+	    'easeInOutCirc':  'cubic-bezier(.785,.135,.15,.86)',
+	    'easeInExpo':     'cubic-bezier(.95,.05,.795,.035)',
+	    'easeOutExpo':    'cubic-bezier(.19,1,.22,1)',
+	    'easeInOutExpo':  'cubic-bezier(1,0,0,1)',
+	    'easeInQuad':     'cubic-bezier(.55,.085,.68,.53)',
+	    'easeOutQuad':    'cubic-bezier(.25,.46,.45,.94)',
+	    'easeInOutQuad':  'cubic-bezier(.455,.03,.515,.955)',
+	    'easeInQuart':    'cubic-bezier(.895,.03,.685,.22)',
+	    'easeOutQuart':   'cubic-bezier(.165,.84,.44,1)',
+	    'easeInOutQuart': 'cubic-bezier(.77,0,.175,1)',
+	    'easeInQuint':    'cubic-bezier(.755,.05,.855,.06)',
+	    'easeOutQuint':   'cubic-bezier(.23,1,.32,1)',
+	    'easeInOutQuint': 'cubic-bezier(.86,0,.07,1)',
+	    'easeInSine':     'cubic-bezier(.47,0,.745,.715)',
+	    'easeOutSine':    'cubic-bezier(.39,.575,.565,1)',
+	    'easeInOutSine':  'cubic-bezier(.445,.05,.55,.95)',
+	    'easeInBack':     'cubic-bezier(.6,-.28,.735,.045)',
+	    'easeOutBack':    'cubic-bezier(.175, .885,.32,1.275)',
+	    'easeInOutBack':  'cubic-bezier(.68,-.55,.265,1.55)'
+	  };
+	
+	  // ## 'transform' CSS hook
+	  // Allows you to use the `transform` property in CSS.
+	  //
+	  //     $("#hello").css({ transform: "rotate(90deg)" });
+	  //
+	  //     $("#hello").css('transform');
+	  //     //=> { rotate: '90deg' }
+	  //
+	  $.cssHooks['transit:transform'] = {
+	    // The getter returns a `Transform` object.
+	    get: function(elem) {
+	      return $(elem).data('transform') || new Transform();
+	    },
+	
+	    // The setter accepts a `Transform` object or a string.
+	    set: function(elem, v) {
+	      var value = v;
+	
+	      if (!(value instanceof Transform)) {
+	        value = new Transform(value);
+	      }
+	
+	      // We've seen the 3D version of Scale() not work in Chrome when the
+	      // element being scaled extends outside of the viewport.  Thus, we're
+	      // forcing Chrome to not use the 3d transforms as well.  Not sure if
+	      // translate is affectede, but not risking it.  Detection code from
+	      // http://davidwalsh.name/detecting-google-chrome-javascript
+	      if (support.transform === 'WebkitTransform' && !isChrome) {
+	        elem.style[support.transform] = value.toString(true);
+	      } else {
+	        elem.style[support.transform] = value.toString();
+	      }
+	
+	      $(elem).data('transform', value);
+	    }
+	  };
+	
+	  // Add a CSS hook for `.css({ transform: '...' })`.
+	  // In jQuery 1.8+, this will intentionally override the default `transform`
+	  // CSS hook so it'll play well with Transit. (see issue #62)
+	  $.cssHooks.transform = {
+	    set: $.cssHooks['transit:transform'].set
+	  };
+	
+	  // ## 'filter' CSS hook
+	  // Allows you to use the `filter` property in CSS.
+	  //
+	  //     $("#hello").css({ filter: 'blur(10px)' });
+	  //
+	  $.cssHooks.filter = {
+	    get: function(elem) {
+	      return elem.style[support.filter];
+	    },
+	    set: function(elem, value) {
+	      elem.style[support.filter] = value;
+	    }
+	  };
+	
+	  // jQuery 1.8+ supports prefix-free transitions, so these polyfills will not
+	  // be necessary.
+	  if ($.fn.jquery < "1.8") {
+	    // ## 'transformOrigin' CSS hook
+	    // Allows the use for `transformOrigin` to define where scaling and rotation
+	    // is pivoted.
+	    //
+	    //     $("#hello").css({ transformOrigin: '0 0' });
+	    //
+	    $.cssHooks.transformOrigin = {
+	      get: function(elem) {
+	        return elem.style[support.transformOrigin];
+	      },
+	      set: function(elem, value) {
+	        elem.style[support.transformOrigin] = value;
+	      }
+	    };
+	
+	    // ## 'transition' CSS hook
+	    // Allows you to use the `transition` property in CSS.
+	    //
+	    //     $("#hello").css({ transition: 'all 0 ease 0' });
+	    //
+	    $.cssHooks.transition = {
+	      get: function(elem) {
+	        return elem.style[support.transition];
+	      },
+	      set: function(elem, value) {
+	        elem.style[support.transition] = value;
+	      }
+	    };
+	  }
+	
+	  // ## Other CSS hooks
+	  // Allows you to rotate, scale and translate.
+	  registerCssHook('scale');
+	  registerCssHook('scaleX');
+	  registerCssHook('scaleY');
+	  registerCssHook('translate');
+	  registerCssHook('rotate');
+	  registerCssHook('rotateX');
+	  registerCssHook('rotateY');
+	  registerCssHook('rotate3d');
+	  registerCssHook('perspective');
+	  registerCssHook('skewX');
+	  registerCssHook('skewY');
+	  registerCssHook('x', true);
+	  registerCssHook('y', true);
+	
+	  // ## Transform class
+	  // This is the main class of a transformation property that powers
+	  // `$.fn.css({ transform: '...' })`.
+	  //
+	  // This is, in essence, a dictionary object with key/values as `-transform`
+	  // properties.
+	  //
+	  //     var t = new Transform("rotate(90) scale(4)");
+	  //
+	  //     t.rotate             //=> "90deg"
+	  //     t.scale              //=> "4,4"
+	  //
+	  // Setters are accounted for.
+	  //
+	  //     t.set('rotate', 4)
+	  //     t.rotate             //=> "4deg"
+	  //
+	  // Convert it to a CSS string using the `toString()` and `toString(true)` (for WebKit)
+	  // functions.
+	  //
+	  //     t.toString()         //=> "rotate(90deg) scale(4,4)"
+	  //     t.toString(true)     //=> "rotate(90deg) scale3d(4,4,0)" (WebKit version)
+	  //
+	  function Transform(str) {
+	    if (typeof str === 'string') { this.parse(str); }
+	    return this;
+	  }
+	
+	  Transform.prototype = {
+	    // ### setFromString()
+	    // Sets a property from a string.
+	    //
+	    //     t.setFromString('scale', '2,4');
+	    //     // Same as set('scale', '2', '4');
+	    //
+	    setFromString: function(prop, val) {
+	      var args =
+	        (typeof val === 'string')  ? val.split(',') :
+	        (val.constructor === Array) ? val :
+	        [ val ];
+	
+	      args.unshift(prop);
+	
+	      Transform.prototype.set.apply(this, args);
+	    },
+	
+	    // ### set()
+	    // Sets a property.
+	    //
+	    //     t.set('scale', 2, 4);
+	    //
+	    set: function(prop) {
+	      var args = Array.prototype.slice.apply(arguments, [1]);
+	      if (this.setter[prop]) {
+	        this.setter[prop].apply(this, args);
+	      } else {
+	        this[prop] = args.join(',');
+	      }
+	    },
+	
+	    get: function(prop) {
+	      if (this.getter[prop]) {
+	        return this.getter[prop].apply(this);
+	      } else {
+	        return this[prop] || 0;
+	      }
+	    },
+	
+	    setter: {
+	      // ### rotate
+	      //
+	      //     .css({ rotate: 30 })
+	      //     .css({ rotate: "30" })
+	      //     .css({ rotate: "30deg" })
+	      //     .css({ rotate: "30deg" })
+	      //
+	      rotate: function(theta) {
+	        this.rotate = unit(theta, 'deg');
+	      },
+	
+	      rotateX: function(theta) {
+	        this.rotateX = unit(theta, 'deg');
+	      },
+	
+	      rotateY: function(theta) {
+	        this.rotateY = unit(theta, 'deg');
+	      },
+	
+	      // ### scale
+	      //
+	      //     .css({ scale: 9 })      //=> "scale(9,9)"
+	      //     .css({ scale: '3,2' })  //=> "scale(3,2)"
+	      //
+	      scale: function(x, y) {
+	        if (y === undefined) { y = x; }
+	        this.scale = x + "," + y;
+	      },
+	
+	      // ### skewX + skewY
+	      skewX: function(x) {
+	        this.skewX = unit(x, 'deg');
+	      },
+	
+	      skewY: function(y) {
+	        this.skewY = unit(y, 'deg');
+	      },
+	
+	      // ### perspectvie
+	      perspective: function(dist) {
+	        this.perspective = unit(dist, 'px');
+	      },
+	
+	      // ### x / y
+	      // Translations. Notice how this keeps the other value.
+	      //
+	      //     .css({ x: 4 })       //=> "translate(4px, 0)"
+	      //     .css({ y: 10 })      //=> "translate(4px, 10px)"
+	      //
+	      x: function(x) {
+	        this.set('translate', x, null);
+	      },
+	
+	      y: function(y) {
+	        this.set('translate', null, y);
+	      },
+	
+	      // ### translate
+	      // Notice how this keeps the other value.
+	      //
+	      //     .css({ translate: '2, 5' })    //=> "translate(2px, 5px)"
+	      //
+	      translate: function(x, y) {
+	        if (this._translateX === undefined) { this._translateX = 0; }
+	        if (this._translateY === undefined) { this._translateY = 0; }
+	
+	        if (x !== null && x !== undefined) { this._translateX = unit(x, 'px'); }
+	        if (y !== null && y !== undefined) { this._translateY = unit(y, 'px'); }
+	
+	        this.translate = this._translateX + "," + this._translateY;
+	      }
+	    },
+	
+	    getter: {
+	      x: function() {
+	        return this._translateX || 0;
+	      },
+	
+	      y: function() {
+	        return this._translateY || 0;
+	      },
+	
+	      scale: function() {
+	        var s = (this.scale || "1,1").split(',');
+	        if (s[0]) { s[0] = parseFloat(s[0]); }
+	        if (s[1]) { s[1] = parseFloat(s[1]); }
+	
+	        // "2.5,2.5" => 2.5
+	        // "2.5,1" => [2.5,1]
+	        return (s[0] === s[1]) ? s[0] : s;
+	      },
+	
+	      rotate3d: function() {
+	        var s = (this.rotate3d || "0,0,0,0deg").split(',');
+	        for (var i=0; i<=3; ++i) {
+	          if (s[i]) { s[i] = parseFloat(s[i]); }
+	        }
+	        if (s[3]) { s[3] = unit(s[3], 'deg'); }
+	
+	        return s;
+	      }
+	    },
+	
+	    // ### parse()
+	    // Parses from a string. Called on constructor.
+	    parse: function(str) {
+	      var self = this;
+	      str.replace(/([a-zA-Z0-9]+)\((.*?)\)/g, function(x, prop, val) {
+	        self.setFromString(prop, val);
+	      });
+	    },
+	
+	    // ### toString()
+	    // Converts to a `transition` CSS property string. If `use3d` is given,
+	    // it converts to a `-webkit-transition` CSS property string instead.
+	    toString: function(use3d) {
+	      var re = [];
+	
+	      for (var i in this) {
+	        if (this.hasOwnProperty(i)) {
+	          // Don't use 3D transformations if the browser can't support it.
+	          if ((!support.transform3d) && (
+	            (i === 'rotateX') ||
+	            (i === 'rotateY') ||
+	            (i === 'perspective') ||
+	            (i === 'transformOrigin'))) { continue; }
+	
+	          if (i[0] !== '_') {
+	            if (use3d && (i === 'scale')) {
+	              re.push(i + "3d(" + this[i] + ",1)");
+	            } else if (use3d && (i === 'translate')) {
+	              re.push(i + "3d(" + this[i] + ",0)");
+	            } else {
+	              re.push(i + "(" + this[i] + ")");
+	            }
+	          }
+	        }
+	      }
+	
+	      return re.join(" ");
+	    }
+	  };
+	
+	  function callOrQueue(self, queue, fn) {
+	    if (queue === true) {
+	      self.queue(fn);
+	    } else if (queue) {
+	      self.queue(queue, fn);
+	    } else {
+	      self.each(function () {
+	                fn.call(this);
+	            });
+	    }
+	  }
+	
+	  // ### getProperties(dict)
+	  // Returns properties (for `transition-property`) for dictionary `props`. The
+	  // value of `props` is what you would expect in `$.css(...)`.
+	  function getProperties(props) {
+	    var re = [];
+	
+	    $.each(props, function(key) {
+	      key = $.camelCase(key); // Convert "text-align" => "textAlign"
+	      key = $.transit.propertyMap[key] || $.cssProps[key] || key;
+	      key = uncamel(key); // Convert back to dasherized
+	
+	      // Get vendor specify propertie
+	      if (support[key])
+	        key = uncamel(support[key]);
+	
+	      if ($.inArray(key, re) === -1) { re.push(key); }
+	    });
+	
+	    return re;
+	  }
+	
+	  // ### getTransition()
+	  // Returns the transition string to be used for the `transition` CSS property.
+	  //
+	  // Example:
+	  //
+	  //     getTransition({ opacity: 1, rotate: 30 }, 500, 'ease');
+	  //     //=> 'opacity 500ms ease, -webkit-transform 500ms ease'
+	  //
+	  function getTransition(properties, duration, easing, delay) {
+	    // Get the CSS properties needed.
+	    var props = getProperties(properties);
+	
+	    // Account for aliases (`in` => `ease-in`).
+	    if ($.cssEase[easing]) { easing = $.cssEase[easing]; }
+	
+	    // Build the duration/easing/delay attributes for it.
+	    var attribs = '' + toMS(duration) + ' ' + easing;
+	    if (parseInt(delay, 10) > 0) { attribs += ' ' + toMS(delay); }
+	
+	    // For more properties, add them this way:
+	    // "margin 200ms ease, padding 200ms ease, ..."
+	    var transitions = [];
+	    $.each(props, function(i, name) {
+	      transitions.push(name + ' ' + attribs);
+	    });
+	
+	    return transitions.join(', ');
+	  }
+	
+	  // ## $.fn.transition
+	  // Works like $.fn.animate(), but uses CSS transitions.
+	  //
+	  //     $("...").transition({ opacity: 0.1, scale: 0.3 });
+	  //
+	  //     // Specific duration
+	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, 500);
+	  //
+	  //     // With duration and easing
+	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, 500, 'in');
+	  //
+	  //     // With callback
+	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, function() { ... });
+	  //
+	  //     // With everything
+	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, 500, 'in', function() { ... });
+	  //
+	  //     // Alternate syntax
+	  //     $("...").transition({
+	  //       opacity: 0.1,
+	  //       duration: 200,
+	  //       delay: 40,
+	  //       easing: 'in',
+	  //       complete: function() { /* ... */ }
+	  //      });
+	  //
+	  $.fn.transition = $.fn.transit = function(properties, duration, easing, callback) {
+	    var self  = this;
+	    var delay = 0;
+	    var queue = true;
+	
+	    var theseProperties = $.extend(true, {}, properties);
+	
+	    // Account for `.transition(properties, callback)`.
+	    if (typeof duration === 'function') {
+	      callback = duration;
+	      duration = undefined;
+	    }
+	
+	    // Account for `.transition(properties, options)`.
+	    if (typeof duration === 'object') {
+	      easing = duration.easing;
+	      delay = duration.delay || 0;
+	      queue = typeof duration.queue === "undefined" ? true : duration.queue;
+	      callback = duration.complete;
+	      duration = duration.duration;
+	    }
+	
+	    // Account for `.transition(properties, duration, callback)`.
+	    if (typeof easing === 'function') {
+	      callback = easing;
+	      easing = undefined;
+	    }
+	
+	    // Alternate syntax.
+	    if (typeof theseProperties.easing !== 'undefined') {
+	      easing = theseProperties.easing;
+	      delete theseProperties.easing;
+	    }
+	
+	    if (typeof theseProperties.duration !== 'undefined') {
+	      duration = theseProperties.duration;
+	      delete theseProperties.duration;
+	    }
+	
+	    if (typeof theseProperties.complete !== 'undefined') {
+	      callback = theseProperties.complete;
+	      delete theseProperties.complete;
+	    }
+	
+	    if (typeof theseProperties.queue !== 'undefined') {
+	      queue = theseProperties.queue;
+	      delete theseProperties.queue;
+	    }
+	
+	    if (typeof theseProperties.delay !== 'undefined') {
+	      delay = theseProperties.delay;
+	      delete theseProperties.delay;
+	    }
+	
+	    // Set defaults. (`400` duration, `ease` easing)
+	    if (typeof duration === 'undefined') { duration = $.fx.speeds._default; }
+	    if (typeof easing === 'undefined')   { easing = $.cssEase._default; }
+	
+	    duration = toMS(duration);
+	
+	    // Build the `transition` property.
+	    var transitionValue = getTransition(theseProperties, duration, easing, delay);
+	
+	    // Compute delay until callback.
+	    // If this becomes 0, don't bother setting the transition property.
+	    var work = $.transit.enabled && support.transition;
+	    var i = work ? (parseInt(duration, 10) + parseInt(delay, 10)) : 0;
+	
+	    // If there's nothing to do...
+	    if (i === 0) {
+	      var fn = function(next) {
+	        self.css(theseProperties);
+	        if (callback) { callback.apply(self); }
+	        if (next) { next(); }
+	      };
+	
+	      callOrQueue(self, queue, fn);
+	      return self;
+	    }
+	
+	    // Save the old transitions of each element so we can restore it later.
+	    var oldTransitions = {};
+	
+	    var run = function(nextCall) {
+	      var bound = false;
+	
+	      // Prepare the callback.
+	      var cb = function() {
+	        if (bound) { self.unbind(transitionEnd, cb); }
+	
+	        if (i > 0) {
+	          self.each(function() {
+	            this.style[support.transition] = (oldTransitions[this] || null);
+	          });
+	        }
+	
+	        if (typeof callback === 'function') { callback.apply(self); }
+	        if (typeof nextCall === 'function') { nextCall(); }
+	      };
+	
+	      if ((i > 0) && (transitionEnd) && ($.transit.useTransitionEnd)) {
+	        // Use the 'transitionend' event if it's available.
+	        bound = true;
+	        self.bind(transitionEnd, cb);
+	      } else {
+	        // Fallback to timers if the 'transitionend' event isn't supported.
+	        window.setTimeout(cb, i);
+	      }
+	
+	      // Apply transitions.
+	      self.each(function() {
+	        if (i > 0) {
+	          this.style[support.transition] = transitionValue;
+	        }
+	        $(this).css(theseProperties);
+	      });
+	    };
+	
+	    // Defer running. This allows the browser to paint any pending CSS it hasn't
+	    // painted yet before doing the transitions.
+	    var deferredRun = function(next) {
+	        this.offsetWidth; // force a repaint
+	        run(next);
+	    };
+	
+	    // Use jQuery's fx queue.
+	    callOrQueue(self, queue, deferredRun);
+	
+	    // Chainability.
+	    return this;
+	  };
+	
+	  function registerCssHook(prop, isPixels) {
+	    // For certain properties, the 'px' should not be implied.
+	    if (!isPixels) { $.cssNumber[prop] = true; }
+	
+	    $.transit.propertyMap[prop] = support.transform;
+	
+	    $.cssHooks[prop] = {
+	      get: function(elem) {
+	        var t = $(elem).css('transit:transform');
+	        return t.get(prop);
+	      },
+	
+	      set: function(elem, value) {
+	        var t = $(elem).css('transit:transform');
+	        t.setFromString(prop, value);
+	
+	        $(elem).css({ 'transit:transform': t });
+	      }
+	    };
+	
+	  }
+	
+	  // ### uncamel(str)
+	  // Converts a camelcase string to a dasherized string.
+	  // (`marginLeft` => `margin-left`)
+	  function uncamel(str) {
+	    return str.replace(/([A-Z])/g, function(letter) { return '-' + letter.toLowerCase(); });
+	  }
+	
+	  // ### unit(number, unit)
+	  // Ensures that number `number` has a unit. If no unit is found, assume the
+	  // default is `unit`.
+	  //
+	  //     unit(2, 'px')          //=> "2px"
+	  //     unit("30deg", 'rad')   //=> "30deg"
+	  //
+	  function unit(i, units) {
+	    if ((typeof i === "string") && (!i.match(/^[\-0-9\.]+$/))) {
+	      return i;
+	    } else {
+	      return "" + i + units;
+	    }
+	  }
+	
+	  // ### toMS(duration)
+	  // Converts given `duration` to a millisecond string.
+	  //
+	  // toMS('fast') => $.fx.speeds[i] => "200ms"
+	  // toMS('normal') //=> $.fx.speeds._default => "400ms"
+	  // toMS(10) //=> '10ms'
+	  // toMS('100ms') //=> '100ms'  
+	  //
+	  function toMS(duration) {
+	    var i = duration;
+	
+	    // Allow string durations like 'fast' and 'slow', without overriding numeric values.
+	    if (typeof i === 'string' && (!i.match(/^[\-0-9\.]+/))) { i = $.fx.speeds[i] || $.fx.speeds._default; }
+	
+	    return unit(i, 'ms');
+	  }
+	
+	  // Export some functions for testable-ness.
+	  $.transit.getTransitionValue = getTransition;
+	
+	  return $;
+	}));
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(jQuery) {(function(window, document, $) {
+	  var sn;
+	  sn = $.Quantize = {};
+	  sn.support = {};
+	  sn.Quantize = (function() {
+	    Quantize.prototype.defaults = {
+	      kerningObj: {
+	        "!": [-0.05, -0.03],
+	        "\"": [-0.06, -0.05],
+	        "#": [-0.02, 0],
+	        "%": [0, -0.03],
+	        "&": [-0.02, 0],
+	        "'": [-0.06, -0.05],
+	        "(": [-0.03, 0],
+	        ")": [0, -0.03],
+	        "*": [-0.02, -0.02],
+	        "+": [-0.03, -0.03],
+	        ",": [-0.05, -0.03],
+	        "-": [-0.03, -0.03],
+	        ".": [-0.05, -0.03],
+	        "0": [0, -0.02],
+	        "1": [-0.03, -0.02],
+	        "2": [-0.02, -0.02],
+	        "3": [-0.02, 0],
+	        "4": [-0.02, 0],
+	        "5": [-0.02, -0.02],
+	        "6": [-0.02, -0.02],
+	        "7": [-0.03, -0.02],
+	        "8": [-0.02, 0],
+	        "9": [-0.02, -0.02],
+	        ":": [-0.05, -0.03],
+	        ";": [-0.05, -0.03],
+	        "<": [-0.03, -0.03],
+	        "=": [-0.03, -0.02],
+	        ">": [-0.03, -0.03],
+	        "?": [-0.02, -0.02],
+	        "@": [-0.02, -0.02],
+	        "B": [0, -0.03],
+	        "C": [-0.02, -0.02],
+	        "D": [-0.05, -0.02],
+	        "E": [-0.05, 0],
+	        "F": [-0.05, 0],
+	        "G": [-0.02, -0.03],
+	        "H": [-0.05, -0.03],
+	        "I": [-0.05, -0.03],
+	        "J": [0, -0.03],
+	        "K": [-0.05, 0],
+	        "M": [-0.05, -0.05],
+	        "N": [-0.05, -0.03],
+	        "O": [-0.02, -0.02],
+	        "P": [-0.05, -0.02],
+	        "Q": [-0.03, -0.02],
+	        "R": [-0.05, -0.02],
+	        "S": [-0.02, 0],
+	        "U": [-0.05, -0.03],
+	        "[": [-0.05, -0.03],
+	        "]": [-0.05, -0.03],
+	        "^": [-0.05, -0.03],
+	        "`": [0, -0.02],
+	        "a": [-0.02, -0.02],
+	        "b": [-0.03, -0.02],
+	        "c": [-0.02, -0.01],
+	        "d": [-0.02, -0.03],
+	        "e": [-0.02, 0],
+	        "g": [-0.02, -0.03],
+	        "h": [-0.03, -0.03],
+	        "i": [-0.03, -0.04],
+	        "j": [0, -0.03],
+	        "k": [-0.02, 0],
+	        "l": [0, -0.03],
+	        "m": [-0.03, -0.03],
+	        "n": [-0.02, -0.05],
+	        "o": [-0.03, -0.02],
+	        "p": [-0.03, 0],
+	        "q": [-0.02, -0.03],
+	        "r": [-0.03, -0.02],
+	        "s": [-0.06, 0],
+	        "u": [-0.03, -0.03],
+	        "{": [0, -0.06],
+	        "|": [0, -0.06],
+	        "}": [0, -0.06],
+	        "~": [0, -0.08],
+	        "　": [-0.15, -0.15],
+	        "、": [-0.03, -0.48],
+	        "。": [-0.03, -0.5],
+	        "〈": [-0.45, -0.02],
+	        "〉": [-0.02, -0.45],
+	        "《": [-0.41, -0.02],
+	        "》": [-0.02, -0.41],
+	        "「": [-0.59, -0.02],
+	        "」": [-0.02, -0.59],
+	        "『": [-0.47, -0.02],
+	        "』": [-0.02, -0.47],
+	        "【": [-0.41, -0.02],
+	        "】": [-0.02, -0.41],
+	        "〒": [-0.09, -0.09],
+	        "〓": [-0.09, -0.09],
+	        "〔": [-0.51, -0.02],
+	        "〕": [-0.02, -0.51],
+	        "〘": [-0.44, -0.03],
+	        "〙": [-0.03, -0.42],
+	        "〜": [-0.03, -0.03],
+	        "〝": [-0.38, -0.02],
+	        "〟": [-0.02, -0.38],
+	        "ぁ": [-0.15, -0.12],
+	        "あ": [-0.08, -0.05],
+	        "ぃ": [-0.14, -0.12],
+	        "い": [-0.06, -0.05],
+	        "ぅ": [-0.21, -0.2],
+	        "う": [-0.15, -0.16],
+	        "ぇ": [-0.15, -0.15],
+	        "え": [-0.09, -0.09],
+	        "ぉ": [-0.12, -0.11],
+	        "お": [-0.05, -0.03],
+	        "か": [-0.06, -0.03],
+	        "が": [-0.06, -0.02],
+	        "き": [-0.14, -0.12],
+	        "ぎ": [-0.14, -0.12],
+	        "く": [-0.2, -0.21],
+	        "ぐ": [-0.2, -0.08],
+	        "け": [-0.11, -0.05],
+	        "げ": [-0.11, 0],
+	        "こ": [-0.15, -0.12],
+	        "ご": [-0.15, -0.02],
+	        "さ": [-0.13, -0.14],
+	        "ざ": [-0.13, -0.03],
+	        "し": [-0.15, -0.06],
+	        "じ": [-0.15, -0.06],
+	        "す": [-0.03, -0.03],
+	        "ず": [-0.03, 0],
+	        "そ": [-0.09, -0.08],
+	        "ぞ": [-0.09, -0.03],
+	        "た": [-0.09, -0.06],
+	        "だ": [-0.09, -0.02],
+	        "ち": [-0.11, -0.08],
+	        "ぢ": [-0.11, -0.06],
+	        "っ": [-0.11, -0.12],
+	        "つ": [-0.03, -0.05],
+	        "づ": [-0.03, -0.04],
+	        "て": [-0.08, -0.08],
+	        "で": [-0.08, -0.02],
+	        "と": [-0.16, -0.15],
+	        "ど": [-0.16, -0.05],
+	        "な": [-0.13, -0.06],
+	        "に": [-0.11, -0.06],
+	        "ぬ": [-0.06, -0.03],
+	        "ね": [-0.05, -0.03],
+	        "の": [-0.06, -0.06],
+	        "は": [-0.09, -0.05],
+	        "ば": [-0.09, 0],
+	        "ぱ": [-0.09, 0],
+	        "ひ": [-0.12, -0.03],
+	        "び": [-0.12, 0],
+	        "ぴ": [-0.12, 0],
+	        "ふ": [-0.02, -0.02],
+	        "ぶ": [-0.02, -0.02],
+	        "ぷ": [-0.02, -0.02],
+	        "へ": [-0.03, 0],
+	        "べ": [-0.03, 0],
+	        "ぺ": [-0.03, 0],
+	        "ほ": [-0.09, -0.05],
+	        "ぼ": [-0.09, 0],
+	        "ぽ": [-0.09, 0],
+	        "ま": [-0.11, -0.12],
+	        "み": [-0.03, -0.02],
+	        "む": [-0.08, -0.05],
+	        "め": [-0.08, -0.05],
+	        "も": [-0.11, -0.14],
+	        "ゃ": [-0.12, -0.11],
+	        "や": [-0.03, -0.03],
+	        "ゅ": [-0.12, -0.12],
+	        "ゆ": [-0.05, -0.03],
+	        "ょ": [-0.18, -0.18],
+	        "よ": [-0.14, -0.12],
+	        "ら": [-0.15, -0.09],
+	        "り": [-0.2, -0.18],
+	        "る": [-0.11, -0.11],
+	        "れ": [-0.03, 0],
+	        "ろ": [-0.1, -0.08],
+	        "ゎ": [-0.12, -0.12],
+	        "わ": [-0.03, -0.03],
+	        "ゐ": [-0.06, -0.08],
+	        "ゑ": [-0.03, -0.03],
+	        "を": [-0.11, -0.06],
+	        "ん": [-0.06, -0.05],
+	        "ゔ": [-0.12, -0.02],
+	        "゛": [0, -0.5],
+	        "゜": [-0.02, -0.54],
+	        "ゝ": [-0.22, -0.2],
+	        "ゞ": [-0.22, -0.11],
+	        "ァ": [-0.15, -0.12],
+	        "ア": [-0.09, -0.06],
+	        "ィ": [-0.2, -0.21],
+	        "イ": [-0.1, -0.15],
+	        "ゥ": [-0.15, -0.16],
+	        "ウ": [-0.09, -0.11],
+	        "ェ": [-0.18, -0.12],
+	        "エ": [-0.03, -0.05],
+	        "ォ": [-0.12, -0.15],
+	        "オ": [-0.05, -0.08],
+	        "カ": [-0.08, -0.05],
+	        "ガ": [-0.08, 0],
+	        "キ": [-0.09, -0.08],
+	        "ギ": [-0.09, -0.02],
+	        "ク": [-0.05, -0.11],
+	        "グ": [-0.03, 0],
+	        "ケ": [-0.05, -0.08],
+	        "ゲ": [-0.05, -0.03],
+	        "コ": [-0.12, -0.11],
+	        "ゴ": [-0.12, 0],
+	        "サ": [-0.02, -0.02],
+	        "ザ": [-0.02, 0],
+	        "シ": [-0.08, -0.02],
+	        "ジ": [-0.08, 0],
+	        "ス": [-0.08, -0.08],
+	        "ズ": [-0.08, -0.06],
+	        "セ": [-0.05, -0.06],
+	        "ゼ": [-0.05, 0],
+	        "ソ": [-0.12, -0.11],
+	        "ゾ": [-0.12, 0],
+	        "タ": [-0.02, -0.11],
+	        "ダ": [-0.02, 0],
+	        "チ": [-0.06, -0.06],
+	        "ヂ": [-0.06, 0],
+	        "ッ": [-0.16, -0.15],
+	        "ツ": [-0.11, -0.09],
+	        "ヅ": [-0.11, 0],
+	        "テ": [-0.08, -0.06],
+	        "デ": [-0.08, 0],
+	        "ト": [-0.22, -0.12],
+	        "ド": [-0.22, -0.08],
+	        "ナ": [-0.06, -0.05],
+	        "ニ": [-0.05, -0.06],
+	        "ヌ": [-0.08, -0.12],
+	        "ネ": [-0.03, -0.09],
+	        "ノ": [-0.08, -0.14],
+	        "ハ": [-0.02, -0.06],
+	        "バ": [-0.02, -0.06],
+	        "パ": [-0.02, -0.06],
+	        "ヒ": [-0.12, -0.12],
+	        "ビ": [-0.12, -0.03],
+	        "ピ": [-0.12, -0.06],
+	        "フ": [-0.12, -0.11],
+	        "ブ": [-0.12, 0],
+	        "プ": [-0.12, 0],
+	        "ヘ": [-0.06, -0.02],
+	        "ベ": [-0.06, -0.02],
+	        "ペ": [-0.06, -0.02],
+	        "ホ": [-0.08, -0.08],
+	        "ボ": [-0.08, -0.03],
+	        "ポ": [-0.08, -0.08],
+	        "マ": [-0.06, -0.05],
+	        "ミ": [-0.15, -0.15],
+	        "ム": [-0.08, -0.09],
+	        "メ": [-0.05, -0.15],
+	        "モ": [-0.06, -0.06],
+	        "ャ": [-0.14, -0.12],
+	        "ヤ": [-0.06, -0.05],
+	        "ュ": [-0.12, -0.12],
+	        "ユ": [-0.05, -0.05],
+	        "ョ": [-0.18, -0.15],
+	        "ヨ": [-0.12, -0.09],
+	        "ラ": [-0.11, -0.11],
+	        "リ": [-0.16, -0.18],
+	        "ル": [-0.02, 0],
+	        "レ": [-0.14, -0.05],
+	        "ロ": [-0.09, -0.13],
+	        "ヮ": [-0.16, -0.15],
+	        "ワ": [-0.11, -0.09],
+	        "ヰ": [-0.06, -0.06],
+	        "ヱ": [-0.03, -0.03],
+	        "ヲ": [-0.12, -0.09],
+	        "ン": [-0.11, -0.08],
+	        "ヴ": [-0.09, 0],
+	        "ヵ": [-0.11, -0.16],
+	        "ヶ": [-0.12, -0.15],
+	        "・": [-0.27, -0.27],
+	        "ー": [-0.08, -0.02],
+	        "ヽ": [-0.16, -0.18],
+	        "ヾ": [-0.16, -0.12],
+	        "！": [-0.28, -0.28],
+	        "＃": [-0.11, -0.11],
+	        "＄": [-0.16, -0.16],
+	        "％": [-0.08, -0.08],
+	        "＆": [-0.09, -0.03],
+	        "（": [-0.47, -0.02],
+	        "）": [-0.02, -0.47],
+	        "＊": [-0.2, -0.2],
+	        "＋": [-0.12, -0.12],
+	        "，": [-0.03, -0.53],
+	        "－": [-0.12, -0.12],
+	        "．": [-0.03, -0.53],
+	        "／": [-0.03, -0.03],
+	        "：": [-0.28, -0.28],
+	        "；": [-0.27, -0.28],
+	        "＜": [-0.12, -0.14],
+	        "＝": [-0.12, -0.12],
+	        "＞": [-0.14, -0.12],
+	        "？": [-0.16, -0.18],
+	        "＠": [-0.06, -0.06],
+	        "［": [-0.47, -0.03],
+	        "＼": [-0.02, -0.03],
+	        "］": [-0.03, -0.47],
+	        "＾": [-0.21, -0.21],
+	        "｀": [-0.21, -0.3],
+	        "｛": [-0.44, -0.02],
+	        "｜": [-0.35, -0.35],
+	        "｝": [-0.02, -0.44],
+	        "～": [-0.05, -0.06],
+	        "ｦ": [-0.03, -0.02],
+	        "ｧ": [-0.05, -0.02],
+	        "ｨ": [-0.03, -0.05],
+	        "ｩ": [-0.06, -0.03],
+	        "ｪ": [-0.05, -0.05],
+	        "ｫ": [-0.03, -0.03],
+	        "ｬ": [-0.02, -0.02],
+	        "ｭ": [-0.05, -0.05],
+	        "ｮ": [-0.06, -0.06],
+	        "ｯ": [-0.03, -0.03],
+	        "ｰ": [-0.03, -0.03],
+	        "ｱ": [-0.02, 0],
+	        "ｲ": [-0.02, -0.02],
+	        "ｳ": [-0.05, -0.02],
+	        "ｴ": [-0.02, -0.02],
+	        "ｵ": [-0.02, -0.02],
+	        "ｶ": [0, -0.03],
+	        "ｷ": [-0.02, -0.02],
+	        "ｸ": [-0.02, -0.02],
+	        "ｹ": [-0.02, -0.02],
+	        "ｺ": [-0.05, -0.05],
+	        "ｻ": [-0.02, -0.02],
+	        "ｼ": [-0.02, -0.02],
+	        "ｽ": [-0.02, -0.02],
+	        "ｿ": [-0.02, 0],
+	        "ﾀ": [-0.02, -0.02],
+	        "ﾁ": [-0.02, -0.02],
+	        "ﾂ": [-0.02, 0],
+	        "ﾃ": [-0.02, -0.02],
+	        "ﾄ": [-0.09, -0.02],
+	        "ﾅ": [-0.02, -0.02],
+	        "ﾆ": [-0.02, -0.02],
+	        "ﾇ": [-0.02, -0.02],
+	        "ﾈ": [-0.02, 0],
+	        "ﾉ": [-0.02, -0.02],
+	        "ﾊ": [-0.02, -0.02],
+	        "ﾋ": [-0.05, -0.03],
+	        "ﾌ": [-0.03, -0.02],
+	        "ﾎ": [-0.02, -0.02],
+	        "ﾏ": [-0.03, 0],
+	        "ﾐ": [-0.03, -0.02],
+	        "ﾑ": [-0.02, 0],
+	        "ﾒ": [0, -0.02],
+	        "ﾓ": [-0.02, -0.03],
+	        "ﾔ": [-0.02, 0],
+	        "ﾕ": [-0.02, -0.02],
+	        "ﾖ": [-0.03, -0.05],
+	        "ﾗ": [-0.05, -0.03],
+	        "ﾘ": [-0.06, -0.05],
+	        "ﾚ": [-0.05, -0.02],
+	        "ﾛ": [-0.03, -0.03],
+	        "ﾜ": [-0.05, -0.02],
+	        "ﾝ": [-0.02, -0.02],
+	        "ﾞ": [0, -0.2],
+	        "ﾟ": [-0.02, -0.22]
+	      },
+	      kerningPairObj: {
+	        "TW": -0.03,
+	        "Lv": -0.07,
+	        "Pe": -0.04,
+	        "Pa": -0.03,
+	        "Kw": -0.04,
+	        "TJ": -0.07,
+	        "Ku": -0.04,
+	        "Ky": -0.04,
+	        "Ko": -0.04,
+	        "SY": -0.04,
+	        "SX": -0.03,
+	        "TA": -0.12,
+	        "Kg": -0.04,
+	        "GW": -0.03,
+	        "Ke": -0.04,
+	        "Ka": -0.04,
+	        "SV": -0.04,
+	        "SW": -0.03,
+	        "Ay": -0.04,
+	        "Aw": -0.04,
+	        "Ly": -0.07,
+	        "SA": -0.04,
+	        "Av": -0.04,
+	        "Au": -0.04,
+	        "RY": -0.04,
+	        "RV": -0.04,
+	        "RX": -0.03,
+	        "QY": -0.04,
+	        "RW": -0.03,
+	        "QX": -0.03,
+	        "GA": -0.04,
+	        "At": -0.04,
+	        "As": -0.04,
+	        "GV": -0.04,
+	        "Aq": -0.04,
+	        "QW": -0.03,
+	        "QV": -0.04,
+	        "Aj": -0.04,
+	        "PY": -0.04,
+	        "QA": -0.04,
+	        "Ag": -0.04,
+	        "Af": -0.04,
+	        "PX": -0.03,
+	        "PW": -0.03,
+	        "PV": -0.04,
+	        "Ae": -0.04,
+	        "PJ": -0.07,
+	        "Ad": -0.04,
+	        "Ac": -0.04,
+	        "Aa": -0.04,
+	        "XS": -0.04,
+	        "OY": -0.04,
+	        "PA": -0.12,
+	        "XQ": -0.04,
+	        "OX": -0.03,
+	        "XO": -0.04,
+	        "OV": -0.04,
+	        "OW": -0.03,
+	        "XJ": -0.04,
+	        "XG": -0.04,
+	        "XC": -0.04,
+	        "OA": -0.04,
+	        "YS": -0.04,
+	        "LV": -0.12,
+	        "LY": -0.12,
+	        "LW": -0.09,
+	        "YQ": -0.04,
+	        "YO": -0.04,
+	        "LT": -0.12,
+	        "LQ": -0.04,
+	        "YJ": -0.07,
+	        "Ao": -0.04,
+	        "LO": -0.04,
+	        "TV": -0.04,
+	        "is": -0.04,
+	        "Yu": -0.06,
+	        "YG": -0.04,
+	        "Ye": -0.09,
+	        "Ya": -0.09,
+	        "YA": -0.12,
+	        "YC": -0.04,
+	        "WS": -0.04,
+	        "Yo": -0.09,
+	        "WO": -0.04,
+	        "WQ": -0.04,
+	        "Xe": -0.06,
+	        "Xa": -0.06,
+	        "Wy": -0.04,
+	        "Wr": -0.04,
+	        "Wo": -0.07,
+	        "WJ": -0.07,
+	        "WG": -0.04,
+	        "LG": -0.04,
+	        "WC": -0.04,
+	        "LC": -0.04,
+	        "We": -0.07,
+	        "KS": -0.03,
+	        "Wa": -0.07,
+	        "VS": -0.04,
+	        "WA": -0.09,
+	        "Vz": -0.04,
+	        "Vy": -0.06,
+	        "KQ": -0.04,
+	        "FJ": -0.07,
+	        "Vw": -0.04,
+	        "VO": -0.04,
+	        "KO": -0.04,
+	        "VQ": -0.04,
+	        "Vu": -0.06,
+	        "VG": -0.04,
+	        "VJ": -0.07,
+	        "FA": -0.12,
+	        "KG": -0.04,
+	        "DV": -0.04,
+	        "DW": -0.03,
+	        "Vr": -0.06,
+	        "Vo": -0.09,
+	        "DY": -0.04,
+	        "CW": -0.03,
+	        "VC": -0.04,
+	        "VA": -0.12,
+	        "CY": -0.04,
+	        "DA": -0.04,
+	        "CV": -0.04,
+	        "Ve": -0.09,
+	        "TY": -0.04,
+	        "UA": -0.04,
+	        "CA": -0.04,
+	        "BY": -0.04,
+	        "BW": -0.03,
+	        "KC": -0.04,
+	        "BV": -0.04,
+	        "BA": -0.03,
+	        "JA": -0.03,
+	        "GY": -0.04,
+	        "AW": -0.09,
+	        "AY": -0.12,
+	        "Va": -0.09,
+	        "AV": -0.12,
+	        "Tz": -0.12,
+	        "Ty": -0.12,
+	        "AQ": -0.04,
+	        "Tw": -0.12,
+	        "AT": -0.12,
+	        "AO": -0.04,
+	        "AG": -0.04,
+	        "Tr": -0.07,
+	        "To": -0.12,
+	        "Te": -0.12,
+	        "Ta": -0.12,
+	        "TX": -0.03,
+	        "Sy": -0.06,
+	        "Sx": -0.03,
+	        "Tu": -0.12,
+	        "AC": -0.04,
+	        "Sw": -0.04,
+	        "Po": -0.04
+	      },
+	      widthOfHalfPitch: {
+	        " ": 0.3036,
+	        " ": 0.3036,
+	        "!": 0.3572,
+	        "\"": 0.5,
+	        "#": 0.625,
+	        "$": 0.625,
+	        "%": 1,
+	        "&": 0.7322,
+	        "'": 0.3036,
+	        "(": 0.3572,
+	        ")": 0.3572,
+	        "*": 0.5,
+	        "+": 0.625,
+	        ",": 0.3036,
+	        "-": 0.4286,
+	        ".": 0.3036,
+	        "/": 0.3572,
+	        "0": 0.625,
+	        "1": 0.625,
+	        "2": 0.625,
+	        "3": 0.625,
+	        "4": 0.625,
+	        "5": 0.625,
+	        "6": 0.625,
+	        "7": 0.625,
+	        "8": 0.625,
+	        "9": 0.625,
+	        ":": 0.3572,
+	        ";": 0.3572,
+	        "<": 0.625,
+	        "=": 0.625,
+	        ">": 0.625,
+	        "?": 0.625,
+	        "@": 0.8036,
+	        "A": 0.6786,
+	        "B": 0.6608,
+	        "C": 0.6786,
+	        "D": 0.7143,
+	        "E": 0.6072,
+	        "F": 0.5715,
+	        "G": 0.7143,
+	        "H": 0.6965,
+	        "I": 0.2679,
+	        "J": 0.4643,
+	        "K": 0.625,
+	        "L": 0.5179,
+	        "M": 0.8572,
+	        "N": 0.6965,
+	        "O": 0.7322,
+	        "P": 0.6429,
+	        "Q": 0.7322,
+	        "R": 0.6429,
+	        "S": 0.625,
+	        "T": 0.5358,
+	        "U": 0.6965,
+	        "V": 0.6429,
+	        "W": 0.9108,
+	        "X": 0.625,
+	        "Y": 0.6072,
+	        "Z": 0.6072,
+	        "[": 0.3572,
+	        "\\": 0.3572,
+	        "]": 0.3572,
+	        "^": 0.625,
+	        "_": 0.5,
+	        "`": 0.3572,
+	        "a": 0.5179,
+	        "b": 0.5536,
+	        "c": 0.5179,
+	        "d": 0.5536,
+	        "e": 0.5358,
+	        "f": 0.2858,
+	        "g": 0.5536,
+	        "h": 0.5536,
+	        "i": 0.25,
+	        "j": 0.25,
+	        "k": 0.5358,
+	        "l": 0.25,
+	        "m": 0.7858,
+	        "n": 0.5536,
+	        "o": 0.5536,
+	        "p": 0.5536,
+	        "q": 0.5536,
+	        "r": 0.375,
+	        "s": 0.4822,
+	        "t": 0.3393,
+	        "u": 0.5358,
+	        "v": 0.5,
+	        "w": 0.7322,
+	        "x": 0.4822,
+	        "y": 0.5179,
+	        "z": 0.4822,
+	        "{": 0.3572,
+	        "|": 0.3036,
+	        "}": 0.3572,
+	        "~": 0.625,
+	        "": 0.3929,
+	        "｡": 0.5,
+	        "｢": 0.5,
+	        "｣": 0.5,
+	        "､": 0.5,
+	        "･": 0.5,
+	        "ｦ": 0.5,
+	        "ｧ": 0.5,
+	        "ｨ": 0.5,
+	        "ｩ": 0.5,
+	        "ｪ": 0.5,
+	        "ｫ": 0.5,
+	        "ｬ": 0.5,
+	        "ｭ": 0.5,
+	        "ｮ": 0.5,
+	        "ｯ": 0.5,
+	        "ｰ": 0.5,
+	        "ｱ": 0.5,
+	        "ｲ": 0.5,
+	        "ｳ": 0.5,
+	        "ｴ": 0.5,
+	        "ｵ": 0.5,
+	        "ｶ": 0.5,
+	        "ｷ": 0.5,
+	        "ｸ": 0.5,
+	        "ｹ": 0.5,
+	        "ｺ": 0.5,
+	        "ｻ": 0.5,
+	        "ｼ": 0.5,
+	        "ｽ": 0.5,
+	        "ｾ": 0.5,
+	        "ｿ": 0.5,
+	        "ﾀ": 0.5,
+	        "ﾁ": 0.5,
+	        "ﾂ": 0.5,
+	        "ﾃ": 0.5,
+	        "ﾄ": 0.5,
+	        "ﾅ": 0.5,
+	        "ﾆ": 0.5,
+	        "ﾇ": 0.5,
+	        "ﾈ": 0.5,
+	        "ﾉ": 0.5,
+	        "ﾊ": 0.5,
+	        "ﾋ": 0.5,
+	        "ﾌ": 0.5,
+	        "ﾍ": 0.5,
+	        "ﾎ": 0.5,
+	        "ﾏ": 0.5,
+	        "ﾐ": 0.5,
+	        "ﾑ": 0.5,
+	        "ﾒ": 0.5,
+	        "ﾓ": 0.5,
+	        "ﾔ": 0.5,
+	        "ﾕ": 0.5,
+	        "ﾖ": 0.5,
+	        "ﾗ": 0.5,
+	        "ﾘ": 0.5,
+	        "ﾙ": 0.5,
+	        "ﾚ": 0.5,
+	        "ﾛ": 0.5,
+	        "ﾜ": 0.5,
+	        "ﾝ": 0.5,
+	        "ﾞ": 0.5,
+	        "ﾟ": 0.5,
+	        "ﾠ": 0.5179,
+	        "": 0.5179,
+	        "": 0.5179,
+	        "": 0.5179,
+	        "": 0.5179
+	      },
+	      firstKerningList: "([｛〔〈《「『【〘〖〝‘“｟«",
+	      beforeException: "〈《「『【〔〘〝（［｛",
+	      afterException: "〉》」』】〕〙〟）］｝"
+	    };
+	
+	    function Quantize($el, options) {
+	      this.$el = $el;
+	      if (this._getBrowser().browser === "MSIE" && this._getBrowser().version <= 7) {
+	        return;
+	      }
+	      this.options = $.extend({}, this.defaults, options);
+	    }
+	
+	    Quantize.prototype.setup = function() {
+	      return $.Deferred((function(_this) {
+	        return function(defer) {
+	          var afterHTML, char, charCode, charWidth, direction, html, i, isBegining, k, l, lineKerning, lineWidth, maxTotal, nextChar, nextCharCode, nextCharWidth, offset, offset1, offset2, offsetEN, offsetException, offsetJP, onDone, regArr, regObj, skip, style, tagHash, total, _i;
+	          onDone = function() {
+	            return defer.resolve();
+	          };
+	          offset = 1;
+	          offset1 = 1;
+	          offset2 = 1;
+	          offsetJP = 0.5;
+	          offsetEN = 0;
+	          offsetException = 0.8;
+	          if (_this.options.offset != null) {
+	            offset = _this.options.offset;
+	          }
+	          html = _this.$el.html().replace(/[\n\r]/g, "");
+	          _this.$el.html("");
+	          afterHTML = "";
+	          tagHash = {};
+	          regObj = RegExp(/<.+?>/g);
+	          regArr = [];
+	          while ((regArr = regObj.exec(html)) !== null) {
+	            tagHash[regArr.index] = regArr[0];
+	          }
+	          isBegining = true;
+	          l = html.length;
+	          total = 0;
+	          maxTotal = 0;
+	          lineWidth = 0;
+	          lineKerning = 0;
+	          skip = 0;
+	          for (i = _i = 0; 0 <= l ? _i <= l : _i >= l; i = 0 <= l ? ++_i : --_i) {
+	            if (i < skip) {
+	              continue;
+	            }
+	            if (tagHash[i]) {
+	              afterHTML += tagHash[i];
+	              skip = i + tagHash[i].length;
+	              isBegining = true;
+	              maxTotal = maxTotal > total ? maxTotal : total;
+	              total = 0;
+	              continue;
+	            }
+	            char = html.charAt(i);
+	            nextChar = html.charAt(i + 1) || "";
+	            charWidth = _this.options.widthOfHalfPitch[char] !== void 0 ? _this.options.widthOfHalfPitch[char] : 1;
+	            nextCharWidth = _this.options.widthOfHalfPitch[nextChar] !== void 0 ? _this.options.widthOfHalfPitch[nextChar] : 1;
+	            charCode = char.charCodeAt(0);
+	            nextCharCode = nextChar.charCodeAt(0);
+	            if (charCode < 256 || (charCode >= 0xff61 && charCode <= 0xff9f)) {
+	              offset1 = offsetEN;
+	            } else {
+	              if (_this.options.afterException.indexOf(charCode) > -1) {
+	                offset1 = offsetException;
+	              } else {
+	                offset1 = offsetJP;
+	              }
+	            }
+	            if (nextCharCode < 256 || (nextCharCode >= 0xff61 && nextCharCode <= 0xff9f)) {
+	              offset2 = offsetEN;
+	            } else {
+	              if (_this.options.beforeException.indexOf(nextCharCode) > -1) {
+	                offset2 = offsetException;
+	              } else {
+	                offset2 = offsetJP;
+	              }
+	            }
+	            k = 0;
+	            if (_this.options.kerningPairObj[char + nextChar]) {
+	              k = _this.options.kerningPairObj[char + nextChar] * (offset1 + offset2) * 0.5;
+	              total += k;
+	            } else {
+	              if (_this.options.kerningObj[char] && _this.options.kerningObj[char][1]) {
+	                k += _this.options.kerningObj[char][1] * offset1;
+	              }
+	              if (_this.options.kerningObj[nextChar] && _this.options.kerningObj[nextChar][0]) {
+	                k += _this.options.kerningObj[nextChar][0] * offset2;
+	              }
+	              total += k;
+	            }
+	            k += _this._getDefaultSpacing(_this.$el);
+	            direction = k >= 0 ? 1 : -1;
+	            style = "letter-spacing:" + ((((0.5 + (1000 * Math.abs(k))) << 0) / 1000) * direction) + "em;";
+	            if (isBegining) {
+	              if (_this.options.kerningObj[char] && _this.options.kerningObj[char][0]) {
+	                if (_this.options.firstKerningList.indexOf(char) !== -1) {
+	                  style += "margin-left:" + (_this.options.kerningObj[char][0] / 2) + "em;";
+	                  total += _this.options.kerningObj[char][0] / 2;
+	                }
+	              }
+	              isBegining = false;
+	            }
+	            afterHTML += "<span style='" + style + "'>" + char + "</span>";
+	            if ((65 <= charCode && charCode <= 90) || (97 <= charCode && charCode <= 122)) {
+	              charWidth *= 1.1;
+	            }
+	            total += charWidth * 1.042;
+	          }
+	          maxTotal = maxTotal > total ? maxTotal : total;
+	          _this.$el.html(afterHTML);
+	          return onDone();
+	        };
+	      })(this)).promise();
+	    };
+	
+	    Quantize.prototype._getDefaultSpacing = function($el) {
+	      var fontSize, letterSpacing;
+	      fontSize = $el.css("font-size");
+	      letterSpacing = $el.css("letter-spacing");
+	      fontSize = (fontSize.replace(/px/, '')) * 1;
+	      if (letterSpacing === "normal") {
+	        letterSpacing = 0;
+	      } else {
+	        letterSpacing = (letterSpacing.replace(/px/, '')) * 1;
+	      }
+	      return letterSpacing / fontSize;
+	    };
+	
+	    Quantize.prototype._getBrowser = function() {
+	      var dataBrowser, dataString, i, index, result, versionSearchString, _i, _ref;
+	      result = {};
+	      dataBrowser = [
+	        {
+	          string: navigator.userAgent,
+	          subString: "Chrome",
+	          identity: "Chrome"
+	        }, {
+	          string: navigator.userAgent,
+	          subString: "MSIE",
+	          identity: "Explorer"
+	        }, {
+	          string: navigator.userAgent,
+	          subString: "Firefox",
+	          identity: "Firefox"
+	        }, {
+	          string: navigator.userAgent,
+	          subString: "Safari",
+	          identity: "Safari"
+	        }, {
+	          string: navigator.userAgent,
+	          subString: "Opera",
+	          identity: "Opera"
+	        }
+	      ];
+	      for (i = _i = 0, _ref = dataBrowser.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+	        dataString = dataBrowser[i].string;
+	        versionSearchString = dataBrowser[i].subString;
+	        if (dataString.indexOf(dataBrowser[i].subString) !== -1) {
+	          result.browser = dataBrowser[i].identity;
+	          break;
+	        } else {
+	          result.browser = "Other";
+	        }
+	      }
+	      index = dataString.indexOf(versionSearchString);
+	      if (index === -1) {
+	        result.version = "Unknown";
+	      } else {
+	        result.version = parseFloat(dataString.substring(index + versionSearchString.length + 1));
+	      }
+	      return result;
+	    };
+	
+	    return Quantize;
+	
+	  })();
+	  $.fn.quantize = function(options) {
+	    return $.Deferred((function(_this) {
+	      return function(defer) {
+	        var limit, onDone;
+	        onDone = function() {
+	          return defer.resolve();
+	        };
+	        limit = _this.size() - 1;
+	        _this.each(function(i, el) {
+	          var $el, instance;
+	          $el = $(el);
+	          instance = new sn.Quantize($el, options);
+	          instance.setup();
+	          $el.data("quantize", instance);
+	          if (i === limit) {
+	            return onDone();
+	          }
+	        });
+	        return onDone();
+	      };
+	    })(this)).promise();
+	  };
+	  return $.Quantize = sn.Quantize;
+	})(window, document, jQuery);
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(jQuery) {jQuery.easing["jswing"]=jQuery.easing["swing"];jQuery.extend(jQuery.easing,{def:"easeOutQuad",swing:function(x,t,b,c,d){return jQuery.easing[jQuery.easing.def](x,t,b,c,d)},easeInQuad:function(x,t,b,c,d){return c*(t/=d)*t+b},easeOutQuad:function(x,t,b,c,d){return-c*(t/=d)*(t-2)+b},easeInOutQuad:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t+b;return-c/2*(--t*(t-2)-1)+b},easeInCubic:function(x,t,b,c,d){return c*(t/=d)*t*t+b},easeOutCubic:function(x,t,b,c,d){return c*((t=t/d-1)*t*t+1)+b},easeInOutCubic:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t+b;return c/2*((t-=2)*t*t+2)+b},easeInQuart:function(x,t,b,c,d){return c*(t/=d)*t*t*t+b},easeOutQuart:function(x,t,b,c,d){return-c*((t=t/d-1)*t*t*t-1)+b},easeInOutQuart:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t*t+b;return-c/2*((t-=2)*t*t*t-2)+b},easeInQuint:function(x,t,b,c,d){return c*(t/=d)*t*t*t*t+b},easeOutQuint:function(x,t,b,c,d){return c*((t=t/d-1)*t*t*t*t+1)+b},easeInOutQuint:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t*t*t+b;return c/2*((t-=2)*t*t*t*t+2)+b},easeInSine:function(x,t,b,c,d){return-c*Math.cos(t/d*(Math.PI/2))+c+b},easeOutSine:function(x,t,b,c,d){return c*Math.sin(t/d*(Math.PI/2))+b},easeInOutSine:function(x,t,b,c,d){return-c/2*(Math.cos(Math.PI*t/d)-1)+b},easeInExpo:function(x,t,b,c,d){return t==0?b:c*Math.pow(2,10*(t/d-1))+b},easeOutExpo:function(x,t,b,c,d){return t==d?b+c:c*(-Math.pow(2,-10*t/d)+1)+b},easeInOutExpo:function(x,t,b,c,d){if(t==0)return b;if(t==d)return b+c;if((t/=d/2)<1)return c/2*Math.pow(2,10*(t-1))+b;return c/2*(-Math.pow(2,-10*--t)+2)+b},easeInCirc:function(x,t,b,c,d){return-c*(Math.sqrt(1-(t/=d)*t)-1)+b},easeOutCirc:function(x,t,b,c,d){return c*Math.sqrt(1-(t=t/d-1)*t)+b},easeInOutCirc:function(x,t,b,c,d){if((t/=d/2)<1)return-c/2*(Math.sqrt(1-t*t)-1)+b;return c/2*(Math.sqrt(1-(t-=2)*t)+1)+b},easeInElastic:function(x,t,b,c,d){var s=1.70158;var p=0;var a=c;if(t==0)return b;if((t/=d)==1)return b+c;if(!p)p=d*.3;if(a<Math.abs(c)){a=c;var s=p/4}else var s=p/(2*Math.PI)*Math.asin(c/a);return-(a*Math.pow(2,10*(t-=1))*Math.sin((t*d-s)*2*Math.PI/p))+b},easeOutElastic:function(x,t,b,c,d){var s=1.70158;var p=0;var a=c;if(t==0)return b;if((t/=d)==1)return b+c;if(!p)p=d*.3;if(a<Math.abs(c)){a=c;var s=p/4}else var s=p/(2*Math.PI)*Math.asin(c/a);return a*Math.pow(2,-10*t)*Math.sin((t*d-s)*2*Math.PI/p)+c+b},easeInOutElastic:function(x,t,b,c,d){var s=1.70158;var p=0;var a=c;if(t==0)return b;if((t/=d/2)==2)return b+c;if(!p)p=d*.3*1.5;if(a<Math.abs(c)){a=c;var s=p/4}else var s=p/(2*Math.PI)*Math.asin(c/a);if(t<1)return-.5*a*Math.pow(2,10*(t-=1))*Math.sin((t*d-s)*2*Math.PI/p)+b;return a*Math.pow(2,-10*(t-=1))*Math.sin((t*d-s)*2*Math.PI/p)*.5+c+b},easeInBack:function(x,t,b,c,d,s){if(s==undefined)s=1.70158;return c*(t/=d)*t*((s+1)*t-s)+b},easeOutBack:function(x,t,b,c,d,s){if(s==undefined)s=1.70158;return c*((t=t/d-1)*t*((s+1)*t+s)+1)+b},easeInOutBack:function(x,t,b,c,d,s){if(s==undefined)s=1.70158;if((t/=d/2)<1)return c/2*t*t*(((s*=1.525)+1)*t-s)+b;return c/2*((t-=2)*t*(((s*=1.525)+1)*t+s)+2)+b},easeInBounce:function(x,t,b,c,d){return c-jQuery.easing.easeOutBounce(x,d-t,0,c,d)+b},easeOutBounce:function(x,t,b,c,d){if((t/=d)<1/2.75){return c*7.5625*t*t+b}else if(t<2/2.75){return c*(7.5625*(t-=1.5/2.75)*t+.75)+b}else if(t<2.5/2.75){return c*(7.5625*(t-=2.25/2.75)*t+.9375)+b}else{return c*(7.5625*(t-=2.625/2.75)*t+.984375)+b}},easeInOutBounce:function(x,t,b,c,d){if(t<d/2)return jQuery.easing.easeInBounce(x,t*2,0,c,d)*.5+b;return jQuery.easing.easeOutBounce(x,t*2-d,0,c,d)*.5+c*.5+b}});
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.2
@@ -1955,1665 +3614,6 @@
 	  }
 	}.call(this));
 
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	 * jQuery Transit - CSS3 transitions and transformations
-	 * (c) 2011-2014 Rico Sta. Cruz
-	 * MIT Licensed.
-	 *
-	 * http://ricostacruz.com/jquery.transit
-	 * http://github.com/rstacruz/jquery.transit
-	 */
-	
-	/* jshint expr: true */
-	
-	;(function (root, factory) {
-	
-	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(7)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	  } else if (typeof exports === 'object') {
-	    module.exports = factory(require('jquery'));
-	  } else {
-	    factory(root.jQuery);
-	  }
-	
-	}(this, function($) {
-	  $.transit = {
-	    version: "0.9.12",
-	
-	    // Map of $.css() keys to values for 'transitionProperty'.
-	    // See https://developer.mozilla.org/en/CSS/CSS_transitions#Properties_that_can_be_animated
-	    propertyMap: {
-	      marginLeft    : 'margin',
-	      marginRight   : 'margin',
-	      marginBottom  : 'margin',
-	      marginTop     : 'margin',
-	      paddingLeft   : 'padding',
-	      paddingRight  : 'padding',
-	      paddingBottom : 'padding',
-	      paddingTop    : 'padding'
-	    },
-	
-	    // Will simply transition "instantly" if false
-	    enabled: true,
-	
-	    // Set this to false if you don't want to use the transition end property.
-	    useTransitionEnd: false
-	  };
-	
-	  var div = document.createElement('div');
-	  var support = {};
-	
-	  // Helper function to get the proper vendor property name.
-	  // (`transition` => `WebkitTransition`)
-	  function getVendorPropertyName(prop) {
-	    // Handle unprefixed versions (FF16+, for example)
-	    if (prop in div.style) return prop;
-	
-	    var prefixes = ['Moz', 'Webkit', 'O', 'ms'];
-	    var prop_ = prop.charAt(0).toUpperCase() + prop.substr(1);
-	
-	    for (var i=0; i<prefixes.length; ++i) {
-	      var vendorProp = prefixes[i] + prop_;
-	      if (vendorProp in div.style) { return vendorProp; }
-	    }
-	  }
-	
-	  // Helper function to check if transform3D is supported.
-	  // Should return true for Webkits and Firefox 10+.
-	  function checkTransform3dSupport() {
-	    div.style[support.transform] = '';
-	    div.style[support.transform] = 'rotateY(90deg)';
-	    return div.style[support.transform] !== '';
-	  }
-	
-	  var isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-	
-	  // Check for the browser's transitions support.
-	  support.transition      = getVendorPropertyName('transition');
-	  support.transitionDelay = getVendorPropertyName('transitionDelay');
-	  support.transform       = getVendorPropertyName('transform');
-	  support.transformOrigin = getVendorPropertyName('transformOrigin');
-	  support.filter          = getVendorPropertyName('Filter');
-	  support.transform3d     = checkTransform3dSupport();
-	
-	  var eventNames = {
-	    'transition':       'transitionend',
-	    'MozTransition':    'transitionend',
-	    'OTransition':      'oTransitionEnd',
-	    'WebkitTransition': 'webkitTransitionEnd',
-	    'msTransition':     'MSTransitionEnd'
-	  };
-	
-	  // Detect the 'transitionend' event needed.
-	  var transitionEnd = support.transitionEnd = eventNames[support.transition] || null;
-	
-	  // Populate jQuery's `$.support` with the vendor prefixes we know.
-	  // As per [jQuery's cssHooks documentation](http://api.jquery.com/jQuery.cssHooks/),
-	  // we set $.support.transition to a string of the actual property name used.
-	  for (var key in support) {
-	    if (support.hasOwnProperty(key) && typeof $.support[key] === 'undefined') {
-	      $.support[key] = support[key];
-	    }
-	  }
-	
-	  // Avoid memory leak in IE.
-	  div = null;
-	
-	  // ## $.cssEase
-	  // List of easing aliases that you can use with `$.fn.transition`.
-	  $.cssEase = {
-	    '_default':       'ease',
-	    'in':             'ease-in',
-	    'out':            'ease-out',
-	    'in-out':         'ease-in-out',
-	    'snap':           'cubic-bezier(0,1,.5,1)',
-	    // Penner equations
-	    'easeInCubic':    'cubic-bezier(.550,.055,.675,.190)',
-	    'easeOutCubic':   'cubic-bezier(.215,.61,.355,1)',
-	    'easeInOutCubic': 'cubic-bezier(.645,.045,.355,1)',
-	    'easeInCirc':     'cubic-bezier(.6,.04,.98,.335)',
-	    'easeOutCirc':    'cubic-bezier(.075,.82,.165,1)',
-	    'easeInOutCirc':  'cubic-bezier(.785,.135,.15,.86)',
-	    'easeInExpo':     'cubic-bezier(.95,.05,.795,.035)',
-	    'easeOutExpo':    'cubic-bezier(.19,1,.22,1)',
-	    'easeInOutExpo':  'cubic-bezier(1,0,0,1)',
-	    'easeInQuad':     'cubic-bezier(.55,.085,.68,.53)',
-	    'easeOutQuad':    'cubic-bezier(.25,.46,.45,.94)',
-	    'easeInOutQuad':  'cubic-bezier(.455,.03,.515,.955)',
-	    'easeInQuart':    'cubic-bezier(.895,.03,.685,.22)',
-	    'easeOutQuart':   'cubic-bezier(.165,.84,.44,1)',
-	    'easeInOutQuart': 'cubic-bezier(.77,0,.175,1)',
-	    'easeInQuint':    'cubic-bezier(.755,.05,.855,.06)',
-	    'easeOutQuint':   'cubic-bezier(.23,1,.32,1)',
-	    'easeInOutQuint': 'cubic-bezier(.86,0,.07,1)',
-	    'easeInSine':     'cubic-bezier(.47,0,.745,.715)',
-	    'easeOutSine':    'cubic-bezier(.39,.575,.565,1)',
-	    'easeInOutSine':  'cubic-bezier(.445,.05,.55,.95)',
-	    'easeInBack':     'cubic-bezier(.6,-.28,.735,.045)',
-	    'easeOutBack':    'cubic-bezier(.175, .885,.32,1.275)',
-	    'easeInOutBack':  'cubic-bezier(.68,-.55,.265,1.55)'
-	  };
-	
-	  // ## 'transform' CSS hook
-	  // Allows you to use the `transform` property in CSS.
-	  //
-	  //     $("#hello").css({ transform: "rotate(90deg)" });
-	  //
-	  //     $("#hello").css('transform');
-	  //     //=> { rotate: '90deg' }
-	  //
-	  $.cssHooks['transit:transform'] = {
-	    // The getter returns a `Transform` object.
-	    get: function(elem) {
-	      return $(elem).data('transform') || new Transform();
-	    },
-	
-	    // The setter accepts a `Transform` object or a string.
-	    set: function(elem, v) {
-	      var value = v;
-	
-	      if (!(value instanceof Transform)) {
-	        value = new Transform(value);
-	      }
-	
-	      // We've seen the 3D version of Scale() not work in Chrome when the
-	      // element being scaled extends outside of the viewport.  Thus, we're
-	      // forcing Chrome to not use the 3d transforms as well.  Not sure if
-	      // translate is affectede, but not risking it.  Detection code from
-	      // http://davidwalsh.name/detecting-google-chrome-javascript
-	      if (support.transform === 'WebkitTransform' && !isChrome) {
-	        elem.style[support.transform] = value.toString(true);
-	      } else {
-	        elem.style[support.transform] = value.toString();
-	      }
-	
-	      $(elem).data('transform', value);
-	    }
-	  };
-	
-	  // Add a CSS hook for `.css({ transform: '...' })`.
-	  // In jQuery 1.8+, this will intentionally override the default `transform`
-	  // CSS hook so it'll play well with Transit. (see issue #62)
-	  $.cssHooks.transform = {
-	    set: $.cssHooks['transit:transform'].set
-	  };
-	
-	  // ## 'filter' CSS hook
-	  // Allows you to use the `filter` property in CSS.
-	  //
-	  //     $("#hello").css({ filter: 'blur(10px)' });
-	  //
-	  $.cssHooks.filter = {
-	    get: function(elem) {
-	      return elem.style[support.filter];
-	    },
-	    set: function(elem, value) {
-	      elem.style[support.filter] = value;
-	    }
-	  };
-	
-	  // jQuery 1.8+ supports prefix-free transitions, so these polyfills will not
-	  // be necessary.
-	  if ($.fn.jquery < "1.8") {
-	    // ## 'transformOrigin' CSS hook
-	    // Allows the use for `transformOrigin` to define where scaling and rotation
-	    // is pivoted.
-	    //
-	    //     $("#hello").css({ transformOrigin: '0 0' });
-	    //
-	    $.cssHooks.transformOrigin = {
-	      get: function(elem) {
-	        return elem.style[support.transformOrigin];
-	      },
-	      set: function(elem, value) {
-	        elem.style[support.transformOrigin] = value;
-	      }
-	    };
-	
-	    // ## 'transition' CSS hook
-	    // Allows you to use the `transition` property in CSS.
-	    //
-	    //     $("#hello").css({ transition: 'all 0 ease 0' });
-	    //
-	    $.cssHooks.transition = {
-	      get: function(elem) {
-	        return elem.style[support.transition];
-	      },
-	      set: function(elem, value) {
-	        elem.style[support.transition] = value;
-	      }
-	    };
-	  }
-	
-	  // ## Other CSS hooks
-	  // Allows you to rotate, scale and translate.
-	  registerCssHook('scale');
-	  registerCssHook('scaleX');
-	  registerCssHook('scaleY');
-	  registerCssHook('translate');
-	  registerCssHook('rotate');
-	  registerCssHook('rotateX');
-	  registerCssHook('rotateY');
-	  registerCssHook('rotate3d');
-	  registerCssHook('perspective');
-	  registerCssHook('skewX');
-	  registerCssHook('skewY');
-	  registerCssHook('x', true);
-	  registerCssHook('y', true);
-	
-	  // ## Transform class
-	  // This is the main class of a transformation property that powers
-	  // `$.fn.css({ transform: '...' })`.
-	  //
-	  // This is, in essence, a dictionary object with key/values as `-transform`
-	  // properties.
-	  //
-	  //     var t = new Transform("rotate(90) scale(4)");
-	  //
-	  //     t.rotate             //=> "90deg"
-	  //     t.scale              //=> "4,4"
-	  //
-	  // Setters are accounted for.
-	  //
-	  //     t.set('rotate', 4)
-	  //     t.rotate             //=> "4deg"
-	  //
-	  // Convert it to a CSS string using the `toString()` and `toString(true)` (for WebKit)
-	  // functions.
-	  //
-	  //     t.toString()         //=> "rotate(90deg) scale(4,4)"
-	  //     t.toString(true)     //=> "rotate(90deg) scale3d(4,4,0)" (WebKit version)
-	  //
-	  function Transform(str) {
-	    if (typeof str === 'string') { this.parse(str); }
-	    return this;
-	  }
-	
-	  Transform.prototype = {
-	    // ### setFromString()
-	    // Sets a property from a string.
-	    //
-	    //     t.setFromString('scale', '2,4');
-	    //     // Same as set('scale', '2', '4');
-	    //
-	    setFromString: function(prop, val) {
-	      var args =
-	        (typeof val === 'string')  ? val.split(',') :
-	        (val.constructor === Array) ? val :
-	        [ val ];
-	
-	      args.unshift(prop);
-	
-	      Transform.prototype.set.apply(this, args);
-	    },
-	
-	    // ### set()
-	    // Sets a property.
-	    //
-	    //     t.set('scale', 2, 4);
-	    //
-	    set: function(prop) {
-	      var args = Array.prototype.slice.apply(arguments, [1]);
-	      if (this.setter[prop]) {
-	        this.setter[prop].apply(this, args);
-	      } else {
-	        this[prop] = args.join(',');
-	      }
-	    },
-	
-	    get: function(prop) {
-	      if (this.getter[prop]) {
-	        return this.getter[prop].apply(this);
-	      } else {
-	        return this[prop] || 0;
-	      }
-	    },
-	
-	    setter: {
-	      // ### rotate
-	      //
-	      //     .css({ rotate: 30 })
-	      //     .css({ rotate: "30" })
-	      //     .css({ rotate: "30deg" })
-	      //     .css({ rotate: "30deg" })
-	      //
-	      rotate: function(theta) {
-	        this.rotate = unit(theta, 'deg');
-	      },
-	
-	      rotateX: function(theta) {
-	        this.rotateX = unit(theta, 'deg');
-	      },
-	
-	      rotateY: function(theta) {
-	        this.rotateY = unit(theta, 'deg');
-	      },
-	
-	      // ### scale
-	      //
-	      //     .css({ scale: 9 })      //=> "scale(9,9)"
-	      //     .css({ scale: '3,2' })  //=> "scale(3,2)"
-	      //
-	      scale: function(x, y) {
-	        if (y === undefined) { y = x; }
-	        this.scale = x + "," + y;
-	      },
-	
-	      // ### skewX + skewY
-	      skewX: function(x) {
-	        this.skewX = unit(x, 'deg');
-	      },
-	
-	      skewY: function(y) {
-	        this.skewY = unit(y, 'deg');
-	      },
-	
-	      // ### perspectvie
-	      perspective: function(dist) {
-	        this.perspective = unit(dist, 'px');
-	      },
-	
-	      // ### x / y
-	      // Translations. Notice how this keeps the other value.
-	      //
-	      //     .css({ x: 4 })       //=> "translate(4px, 0)"
-	      //     .css({ y: 10 })      //=> "translate(4px, 10px)"
-	      //
-	      x: function(x) {
-	        this.set('translate', x, null);
-	      },
-	
-	      y: function(y) {
-	        this.set('translate', null, y);
-	      },
-	
-	      // ### translate
-	      // Notice how this keeps the other value.
-	      //
-	      //     .css({ translate: '2, 5' })    //=> "translate(2px, 5px)"
-	      //
-	      translate: function(x, y) {
-	        if (this._translateX === undefined) { this._translateX = 0; }
-	        if (this._translateY === undefined) { this._translateY = 0; }
-	
-	        if (x !== null && x !== undefined) { this._translateX = unit(x, 'px'); }
-	        if (y !== null && y !== undefined) { this._translateY = unit(y, 'px'); }
-	
-	        this.translate = this._translateX + "," + this._translateY;
-	      }
-	    },
-	
-	    getter: {
-	      x: function() {
-	        return this._translateX || 0;
-	      },
-	
-	      y: function() {
-	        return this._translateY || 0;
-	      },
-	
-	      scale: function() {
-	        var s = (this.scale || "1,1").split(',');
-	        if (s[0]) { s[0] = parseFloat(s[0]); }
-	        if (s[1]) { s[1] = parseFloat(s[1]); }
-	
-	        // "2.5,2.5" => 2.5
-	        // "2.5,1" => [2.5,1]
-	        return (s[0] === s[1]) ? s[0] : s;
-	      },
-	
-	      rotate3d: function() {
-	        var s = (this.rotate3d || "0,0,0,0deg").split(',');
-	        for (var i=0; i<=3; ++i) {
-	          if (s[i]) { s[i] = parseFloat(s[i]); }
-	        }
-	        if (s[3]) { s[3] = unit(s[3], 'deg'); }
-	
-	        return s;
-	      }
-	    },
-	
-	    // ### parse()
-	    // Parses from a string. Called on constructor.
-	    parse: function(str) {
-	      var self = this;
-	      str.replace(/([a-zA-Z0-9]+)\((.*?)\)/g, function(x, prop, val) {
-	        self.setFromString(prop, val);
-	      });
-	    },
-	
-	    // ### toString()
-	    // Converts to a `transition` CSS property string. If `use3d` is given,
-	    // it converts to a `-webkit-transition` CSS property string instead.
-	    toString: function(use3d) {
-	      var re = [];
-	
-	      for (var i in this) {
-	        if (this.hasOwnProperty(i)) {
-	          // Don't use 3D transformations if the browser can't support it.
-	          if ((!support.transform3d) && (
-	            (i === 'rotateX') ||
-	            (i === 'rotateY') ||
-	            (i === 'perspective') ||
-	            (i === 'transformOrigin'))) { continue; }
-	
-	          if (i[0] !== '_') {
-	            if (use3d && (i === 'scale')) {
-	              re.push(i + "3d(" + this[i] + ",1)");
-	            } else if (use3d && (i === 'translate')) {
-	              re.push(i + "3d(" + this[i] + ",0)");
-	            } else {
-	              re.push(i + "(" + this[i] + ")");
-	            }
-	          }
-	        }
-	      }
-	
-	      return re.join(" ");
-	    }
-	  };
-	
-	  function callOrQueue(self, queue, fn) {
-	    if (queue === true) {
-	      self.queue(fn);
-	    } else if (queue) {
-	      self.queue(queue, fn);
-	    } else {
-	      self.each(function () {
-	                fn.call(this);
-	            });
-	    }
-	  }
-	
-	  // ### getProperties(dict)
-	  // Returns properties (for `transition-property`) for dictionary `props`. The
-	  // value of `props` is what you would expect in `$.css(...)`.
-	  function getProperties(props) {
-	    var re = [];
-	
-	    $.each(props, function(key) {
-	      key = $.camelCase(key); // Convert "text-align" => "textAlign"
-	      key = $.transit.propertyMap[key] || $.cssProps[key] || key;
-	      key = uncamel(key); // Convert back to dasherized
-	
-	      // Get vendor specify propertie
-	      if (support[key])
-	        key = uncamel(support[key]);
-	
-	      if ($.inArray(key, re) === -1) { re.push(key); }
-	    });
-	
-	    return re;
-	  }
-	
-	  // ### getTransition()
-	  // Returns the transition string to be used for the `transition` CSS property.
-	  //
-	  // Example:
-	  //
-	  //     getTransition({ opacity: 1, rotate: 30 }, 500, 'ease');
-	  //     //=> 'opacity 500ms ease, -webkit-transform 500ms ease'
-	  //
-	  function getTransition(properties, duration, easing, delay) {
-	    // Get the CSS properties needed.
-	    var props = getProperties(properties);
-	
-	    // Account for aliases (`in` => `ease-in`).
-	    if ($.cssEase[easing]) { easing = $.cssEase[easing]; }
-	
-	    // Build the duration/easing/delay attributes for it.
-	    var attribs = '' + toMS(duration) + ' ' + easing;
-	    if (parseInt(delay, 10) > 0) { attribs += ' ' + toMS(delay); }
-	
-	    // For more properties, add them this way:
-	    // "margin 200ms ease, padding 200ms ease, ..."
-	    var transitions = [];
-	    $.each(props, function(i, name) {
-	      transitions.push(name + ' ' + attribs);
-	    });
-	
-	    return transitions.join(', ');
-	  }
-	
-	  // ## $.fn.transition
-	  // Works like $.fn.animate(), but uses CSS transitions.
-	  //
-	  //     $("...").transition({ opacity: 0.1, scale: 0.3 });
-	  //
-	  //     // Specific duration
-	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, 500);
-	  //
-	  //     // With duration and easing
-	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, 500, 'in');
-	  //
-	  //     // With callback
-	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, function() { ... });
-	  //
-	  //     // With everything
-	  //     $("...").transition({ opacity: 0.1, scale: 0.3 }, 500, 'in', function() { ... });
-	  //
-	  //     // Alternate syntax
-	  //     $("...").transition({
-	  //       opacity: 0.1,
-	  //       duration: 200,
-	  //       delay: 40,
-	  //       easing: 'in',
-	  //       complete: function() { /* ... */ }
-	  //      });
-	  //
-	  $.fn.transition = $.fn.transit = function(properties, duration, easing, callback) {
-	    var self  = this;
-	    var delay = 0;
-	    var queue = true;
-	
-	    var theseProperties = $.extend(true, {}, properties);
-	
-	    // Account for `.transition(properties, callback)`.
-	    if (typeof duration === 'function') {
-	      callback = duration;
-	      duration = undefined;
-	    }
-	
-	    // Account for `.transition(properties, options)`.
-	    if (typeof duration === 'object') {
-	      easing = duration.easing;
-	      delay = duration.delay || 0;
-	      queue = typeof duration.queue === "undefined" ? true : duration.queue;
-	      callback = duration.complete;
-	      duration = duration.duration;
-	    }
-	
-	    // Account for `.transition(properties, duration, callback)`.
-	    if (typeof easing === 'function') {
-	      callback = easing;
-	      easing = undefined;
-	    }
-	
-	    // Alternate syntax.
-	    if (typeof theseProperties.easing !== 'undefined') {
-	      easing = theseProperties.easing;
-	      delete theseProperties.easing;
-	    }
-	
-	    if (typeof theseProperties.duration !== 'undefined') {
-	      duration = theseProperties.duration;
-	      delete theseProperties.duration;
-	    }
-	
-	    if (typeof theseProperties.complete !== 'undefined') {
-	      callback = theseProperties.complete;
-	      delete theseProperties.complete;
-	    }
-	
-	    if (typeof theseProperties.queue !== 'undefined') {
-	      queue = theseProperties.queue;
-	      delete theseProperties.queue;
-	    }
-	
-	    if (typeof theseProperties.delay !== 'undefined') {
-	      delay = theseProperties.delay;
-	      delete theseProperties.delay;
-	    }
-	
-	    // Set defaults. (`400` duration, `ease` easing)
-	    if (typeof duration === 'undefined') { duration = $.fx.speeds._default; }
-	    if (typeof easing === 'undefined')   { easing = $.cssEase._default; }
-	
-	    duration = toMS(duration);
-	
-	    // Build the `transition` property.
-	    var transitionValue = getTransition(theseProperties, duration, easing, delay);
-	
-	    // Compute delay until callback.
-	    // If this becomes 0, don't bother setting the transition property.
-	    var work = $.transit.enabled && support.transition;
-	    var i = work ? (parseInt(duration, 10) + parseInt(delay, 10)) : 0;
-	
-	    // If there's nothing to do...
-	    if (i === 0) {
-	      var fn = function(next) {
-	        self.css(theseProperties);
-	        if (callback) { callback.apply(self); }
-	        if (next) { next(); }
-	      };
-	
-	      callOrQueue(self, queue, fn);
-	      return self;
-	    }
-	
-	    // Save the old transitions of each element so we can restore it later.
-	    var oldTransitions = {};
-	
-	    var run = function(nextCall) {
-	      var bound = false;
-	
-	      // Prepare the callback.
-	      var cb = function() {
-	        if (bound) { self.unbind(transitionEnd, cb); }
-	
-	        if (i > 0) {
-	          self.each(function() {
-	            this.style[support.transition] = (oldTransitions[this] || null);
-	          });
-	        }
-	
-	        if (typeof callback === 'function') { callback.apply(self); }
-	        if (typeof nextCall === 'function') { nextCall(); }
-	      };
-	
-	      if ((i > 0) && (transitionEnd) && ($.transit.useTransitionEnd)) {
-	        // Use the 'transitionend' event if it's available.
-	        bound = true;
-	        self.bind(transitionEnd, cb);
-	      } else {
-	        // Fallback to timers if the 'transitionend' event isn't supported.
-	        window.setTimeout(cb, i);
-	      }
-	
-	      // Apply transitions.
-	      self.each(function() {
-	        if (i > 0) {
-	          this.style[support.transition] = transitionValue;
-	        }
-	        $(this).css(theseProperties);
-	      });
-	    };
-	
-	    // Defer running. This allows the browser to paint any pending CSS it hasn't
-	    // painted yet before doing the transitions.
-	    var deferredRun = function(next) {
-	        this.offsetWidth; // force a repaint
-	        run(next);
-	    };
-	
-	    // Use jQuery's fx queue.
-	    callOrQueue(self, queue, deferredRun);
-	
-	    // Chainability.
-	    return this;
-	  };
-	
-	  function registerCssHook(prop, isPixels) {
-	    // For certain properties, the 'px' should not be implied.
-	    if (!isPixels) { $.cssNumber[prop] = true; }
-	
-	    $.transit.propertyMap[prop] = support.transform;
-	
-	    $.cssHooks[prop] = {
-	      get: function(elem) {
-	        var t = $(elem).css('transit:transform');
-	        return t.get(prop);
-	      },
-	
-	      set: function(elem, value) {
-	        var t = $(elem).css('transit:transform');
-	        t.setFromString(prop, value);
-	
-	        $(elem).css({ 'transit:transform': t });
-	      }
-	    };
-	
-	  }
-	
-	  // ### uncamel(str)
-	  // Converts a camelcase string to a dasherized string.
-	  // (`marginLeft` => `margin-left`)
-	  function uncamel(str) {
-	    return str.replace(/([A-Z])/g, function(letter) { return '-' + letter.toLowerCase(); });
-	  }
-	
-	  // ### unit(number, unit)
-	  // Ensures that number `number` has a unit. If no unit is found, assume the
-	  // default is `unit`.
-	  //
-	  //     unit(2, 'px')          //=> "2px"
-	  //     unit("30deg", 'rad')   //=> "30deg"
-	  //
-	  function unit(i, units) {
-	    if ((typeof i === "string") && (!i.match(/^[\-0-9\.]+$/))) {
-	      return i;
-	    } else {
-	      return "" + i + units;
-	    }
-	  }
-	
-	  // ### toMS(duration)
-	  // Converts given `duration` to a millisecond string.
-	  //
-	  // toMS('fast') => $.fx.speeds[i] => "200ms"
-	  // toMS('normal') //=> $.fx.speeds._default => "400ms"
-	  // toMS(10) //=> '10ms'
-	  // toMS('100ms') //=> '100ms'  
-	  //
-	  function toMS(duration) {
-	    var i = duration;
-	
-	    // Allow string durations like 'fast' and 'slow', without overriding numeric values.
-	    if (typeof i === 'string' && (!i.match(/^[\-0-9\.]+/))) { i = $.fx.speeds[i] || $.fx.speeds._default; }
-	
-	    return unit(i, 'ms');
-	  }
-	
-	  // Export some functions for testable-ness.
-	  $.transit.getTransitionValue = getTransition;
-	
-	  return $;
-	}));
-
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(jQuery) {(function(window, document, $) {
-	  var sn;
-	  sn = $.Quantize = {};
-	  sn.support = {};
-	  sn.Quantize = (function() {
-	    Quantize.prototype.defaults = {
-	      kerningObj: {
-	        "!": [-0.05, -0.03],
-	        "\"": [-0.06, -0.05],
-	        "#": [-0.02, 0],
-	        "%": [0, -0.03],
-	        "&": [-0.02, 0],
-	        "'": [-0.06, -0.05],
-	        "(": [-0.03, 0],
-	        ")": [0, -0.03],
-	        "*": [-0.02, -0.02],
-	        "+": [-0.03, -0.03],
-	        ",": [-0.05, -0.03],
-	        "-": [-0.03, -0.03],
-	        ".": [-0.05, -0.03],
-	        "0": [0, -0.02],
-	        "1": [-0.03, -0.02],
-	        "2": [-0.02, -0.02],
-	        "3": [-0.02, 0],
-	        "4": [-0.02, 0],
-	        "5": [-0.02, -0.02],
-	        "6": [-0.02, -0.02],
-	        "7": [-0.03, -0.02],
-	        "8": [-0.02, 0],
-	        "9": [-0.02, -0.02],
-	        ":": [-0.05, -0.03],
-	        ";": [-0.05, -0.03],
-	        "<": [-0.03, -0.03],
-	        "=": [-0.03, -0.02],
-	        ">": [-0.03, -0.03],
-	        "?": [-0.02, -0.02],
-	        "@": [-0.02, -0.02],
-	        "B": [0, -0.03],
-	        "C": [-0.02, -0.02],
-	        "D": [-0.05, -0.02],
-	        "E": [-0.05, 0],
-	        "F": [-0.05, 0],
-	        "G": [-0.02, -0.03],
-	        "H": [-0.05, -0.03],
-	        "I": [-0.05, -0.03],
-	        "J": [0, -0.03],
-	        "K": [-0.05, 0],
-	        "M": [-0.05, -0.05],
-	        "N": [-0.05, -0.03],
-	        "O": [-0.02, -0.02],
-	        "P": [-0.05, -0.02],
-	        "Q": [-0.03, -0.02],
-	        "R": [-0.05, -0.02],
-	        "S": [-0.02, 0],
-	        "U": [-0.05, -0.03],
-	        "[": [-0.05, -0.03],
-	        "]": [-0.05, -0.03],
-	        "^": [-0.05, -0.03],
-	        "`": [0, -0.02],
-	        "a": [-0.02, -0.02],
-	        "b": [-0.03, -0.02],
-	        "c": [-0.02, -0.01],
-	        "d": [-0.02, -0.03],
-	        "e": [-0.02, 0],
-	        "g": [-0.02, -0.03],
-	        "h": [-0.03, -0.03],
-	        "i": [-0.03, -0.04],
-	        "j": [0, -0.03],
-	        "k": [-0.02, 0],
-	        "l": [0, -0.03],
-	        "m": [-0.03, -0.03],
-	        "n": [-0.02, -0.05],
-	        "o": [-0.03, -0.02],
-	        "p": [-0.03, 0],
-	        "q": [-0.02, -0.03],
-	        "r": [-0.03, -0.02],
-	        "s": [-0.06, 0],
-	        "u": [-0.03, -0.03],
-	        "{": [0, -0.06],
-	        "|": [0, -0.06],
-	        "}": [0, -0.06],
-	        "~": [0, -0.08],
-	        "　": [-0.15, -0.15],
-	        "、": [-0.03, -0.48],
-	        "。": [-0.03, -0.5],
-	        "〈": [-0.45, -0.02],
-	        "〉": [-0.02, -0.45],
-	        "《": [-0.41, -0.02],
-	        "》": [-0.02, -0.41],
-	        "「": [-0.59, -0.02],
-	        "」": [-0.02, -0.59],
-	        "『": [-0.47, -0.02],
-	        "』": [-0.02, -0.47],
-	        "【": [-0.41, -0.02],
-	        "】": [-0.02, -0.41],
-	        "〒": [-0.09, -0.09],
-	        "〓": [-0.09, -0.09],
-	        "〔": [-0.51, -0.02],
-	        "〕": [-0.02, -0.51],
-	        "〘": [-0.44, -0.03],
-	        "〙": [-0.03, -0.42],
-	        "〜": [-0.03, -0.03],
-	        "〝": [-0.38, -0.02],
-	        "〟": [-0.02, -0.38],
-	        "ぁ": [-0.15, -0.12],
-	        "あ": [-0.08, -0.05],
-	        "ぃ": [-0.14, -0.12],
-	        "い": [-0.06, -0.05],
-	        "ぅ": [-0.21, -0.2],
-	        "う": [-0.15, -0.16],
-	        "ぇ": [-0.15, -0.15],
-	        "え": [-0.09, -0.09],
-	        "ぉ": [-0.12, -0.11],
-	        "お": [-0.05, -0.03],
-	        "か": [-0.06, -0.03],
-	        "が": [-0.06, -0.02],
-	        "き": [-0.14, -0.12],
-	        "ぎ": [-0.14, -0.12],
-	        "く": [-0.2, -0.21],
-	        "ぐ": [-0.2, -0.08],
-	        "け": [-0.11, -0.05],
-	        "げ": [-0.11, 0],
-	        "こ": [-0.15, -0.12],
-	        "ご": [-0.15, -0.02],
-	        "さ": [-0.13, -0.14],
-	        "ざ": [-0.13, -0.03],
-	        "し": [-0.15, -0.06],
-	        "じ": [-0.15, -0.06],
-	        "す": [-0.03, -0.03],
-	        "ず": [-0.03, 0],
-	        "そ": [-0.09, -0.08],
-	        "ぞ": [-0.09, -0.03],
-	        "た": [-0.09, -0.06],
-	        "だ": [-0.09, -0.02],
-	        "ち": [-0.11, -0.08],
-	        "ぢ": [-0.11, -0.06],
-	        "っ": [-0.11, -0.12],
-	        "つ": [-0.03, -0.05],
-	        "づ": [-0.03, -0.04],
-	        "て": [-0.08, -0.08],
-	        "で": [-0.08, -0.02],
-	        "と": [-0.16, -0.15],
-	        "ど": [-0.16, -0.05],
-	        "な": [-0.13, -0.06],
-	        "に": [-0.11, -0.06],
-	        "ぬ": [-0.06, -0.03],
-	        "ね": [-0.05, -0.03],
-	        "の": [-0.06, -0.06],
-	        "は": [-0.09, -0.05],
-	        "ば": [-0.09, 0],
-	        "ぱ": [-0.09, 0],
-	        "ひ": [-0.12, -0.03],
-	        "び": [-0.12, 0],
-	        "ぴ": [-0.12, 0],
-	        "ふ": [-0.02, -0.02],
-	        "ぶ": [-0.02, -0.02],
-	        "ぷ": [-0.02, -0.02],
-	        "へ": [-0.03, 0],
-	        "べ": [-0.03, 0],
-	        "ぺ": [-0.03, 0],
-	        "ほ": [-0.09, -0.05],
-	        "ぼ": [-0.09, 0],
-	        "ぽ": [-0.09, 0],
-	        "ま": [-0.11, -0.12],
-	        "み": [-0.03, -0.02],
-	        "む": [-0.08, -0.05],
-	        "め": [-0.08, -0.05],
-	        "も": [-0.11, -0.14],
-	        "ゃ": [-0.12, -0.11],
-	        "や": [-0.03, -0.03],
-	        "ゅ": [-0.12, -0.12],
-	        "ゆ": [-0.05, -0.03],
-	        "ょ": [-0.18, -0.18],
-	        "よ": [-0.14, -0.12],
-	        "ら": [-0.15, -0.09],
-	        "り": [-0.2, -0.18],
-	        "る": [-0.11, -0.11],
-	        "れ": [-0.03, 0],
-	        "ろ": [-0.1, -0.08],
-	        "ゎ": [-0.12, -0.12],
-	        "わ": [-0.03, -0.03],
-	        "ゐ": [-0.06, -0.08],
-	        "ゑ": [-0.03, -0.03],
-	        "を": [-0.11, -0.06],
-	        "ん": [-0.06, -0.05],
-	        "ゔ": [-0.12, -0.02],
-	        "゛": [0, -0.5],
-	        "゜": [-0.02, -0.54],
-	        "ゝ": [-0.22, -0.2],
-	        "ゞ": [-0.22, -0.11],
-	        "ァ": [-0.15, -0.12],
-	        "ア": [-0.09, -0.06],
-	        "ィ": [-0.2, -0.21],
-	        "イ": [-0.1, -0.15],
-	        "ゥ": [-0.15, -0.16],
-	        "ウ": [-0.09, -0.11],
-	        "ェ": [-0.18, -0.12],
-	        "エ": [-0.03, -0.05],
-	        "ォ": [-0.12, -0.15],
-	        "オ": [-0.05, -0.08],
-	        "カ": [-0.08, -0.05],
-	        "ガ": [-0.08, 0],
-	        "キ": [-0.09, -0.08],
-	        "ギ": [-0.09, -0.02],
-	        "ク": [-0.05, -0.11],
-	        "グ": [-0.03, 0],
-	        "ケ": [-0.05, -0.08],
-	        "ゲ": [-0.05, -0.03],
-	        "コ": [-0.12, -0.11],
-	        "ゴ": [-0.12, 0],
-	        "サ": [-0.02, -0.02],
-	        "ザ": [-0.02, 0],
-	        "シ": [-0.08, -0.02],
-	        "ジ": [-0.08, 0],
-	        "ス": [-0.08, -0.08],
-	        "ズ": [-0.08, -0.06],
-	        "セ": [-0.05, -0.06],
-	        "ゼ": [-0.05, 0],
-	        "ソ": [-0.12, -0.11],
-	        "ゾ": [-0.12, 0],
-	        "タ": [-0.02, -0.11],
-	        "ダ": [-0.02, 0],
-	        "チ": [-0.06, -0.06],
-	        "ヂ": [-0.06, 0],
-	        "ッ": [-0.16, -0.15],
-	        "ツ": [-0.11, -0.09],
-	        "ヅ": [-0.11, 0],
-	        "テ": [-0.08, -0.06],
-	        "デ": [-0.08, 0],
-	        "ト": [-0.22, -0.12],
-	        "ド": [-0.22, -0.08],
-	        "ナ": [-0.06, -0.05],
-	        "ニ": [-0.05, -0.06],
-	        "ヌ": [-0.08, -0.12],
-	        "ネ": [-0.03, -0.09],
-	        "ノ": [-0.08, -0.14],
-	        "ハ": [-0.02, -0.06],
-	        "バ": [-0.02, -0.06],
-	        "パ": [-0.02, -0.06],
-	        "ヒ": [-0.12, -0.12],
-	        "ビ": [-0.12, -0.03],
-	        "ピ": [-0.12, -0.06],
-	        "フ": [-0.12, -0.11],
-	        "ブ": [-0.12, 0],
-	        "プ": [-0.12, 0],
-	        "ヘ": [-0.06, -0.02],
-	        "ベ": [-0.06, -0.02],
-	        "ペ": [-0.06, -0.02],
-	        "ホ": [-0.08, -0.08],
-	        "ボ": [-0.08, -0.03],
-	        "ポ": [-0.08, -0.08],
-	        "マ": [-0.06, -0.05],
-	        "ミ": [-0.15, -0.15],
-	        "ム": [-0.08, -0.09],
-	        "メ": [-0.05, -0.15],
-	        "モ": [-0.06, -0.06],
-	        "ャ": [-0.14, -0.12],
-	        "ヤ": [-0.06, -0.05],
-	        "ュ": [-0.12, -0.12],
-	        "ユ": [-0.05, -0.05],
-	        "ョ": [-0.18, -0.15],
-	        "ヨ": [-0.12, -0.09],
-	        "ラ": [-0.11, -0.11],
-	        "リ": [-0.16, -0.18],
-	        "ル": [-0.02, 0],
-	        "レ": [-0.14, -0.05],
-	        "ロ": [-0.09, -0.13],
-	        "ヮ": [-0.16, -0.15],
-	        "ワ": [-0.11, -0.09],
-	        "ヰ": [-0.06, -0.06],
-	        "ヱ": [-0.03, -0.03],
-	        "ヲ": [-0.12, -0.09],
-	        "ン": [-0.11, -0.08],
-	        "ヴ": [-0.09, 0],
-	        "ヵ": [-0.11, -0.16],
-	        "ヶ": [-0.12, -0.15],
-	        "・": [-0.27, -0.27],
-	        "ー": [-0.08, -0.02],
-	        "ヽ": [-0.16, -0.18],
-	        "ヾ": [-0.16, -0.12],
-	        "！": [-0.28, -0.28],
-	        "＃": [-0.11, -0.11],
-	        "＄": [-0.16, -0.16],
-	        "％": [-0.08, -0.08],
-	        "＆": [-0.09, -0.03],
-	        "（": [-0.47, -0.02],
-	        "）": [-0.02, -0.47],
-	        "＊": [-0.2, -0.2],
-	        "＋": [-0.12, -0.12],
-	        "，": [-0.03, -0.53],
-	        "－": [-0.12, -0.12],
-	        "．": [-0.03, -0.53],
-	        "／": [-0.03, -0.03],
-	        "：": [-0.28, -0.28],
-	        "；": [-0.27, -0.28],
-	        "＜": [-0.12, -0.14],
-	        "＝": [-0.12, -0.12],
-	        "＞": [-0.14, -0.12],
-	        "？": [-0.16, -0.18],
-	        "＠": [-0.06, -0.06],
-	        "［": [-0.47, -0.03],
-	        "＼": [-0.02, -0.03],
-	        "］": [-0.03, -0.47],
-	        "＾": [-0.21, -0.21],
-	        "｀": [-0.21, -0.3],
-	        "｛": [-0.44, -0.02],
-	        "｜": [-0.35, -0.35],
-	        "｝": [-0.02, -0.44],
-	        "～": [-0.05, -0.06],
-	        "ｦ": [-0.03, -0.02],
-	        "ｧ": [-0.05, -0.02],
-	        "ｨ": [-0.03, -0.05],
-	        "ｩ": [-0.06, -0.03],
-	        "ｪ": [-0.05, -0.05],
-	        "ｫ": [-0.03, -0.03],
-	        "ｬ": [-0.02, -0.02],
-	        "ｭ": [-0.05, -0.05],
-	        "ｮ": [-0.06, -0.06],
-	        "ｯ": [-0.03, -0.03],
-	        "ｰ": [-0.03, -0.03],
-	        "ｱ": [-0.02, 0],
-	        "ｲ": [-0.02, -0.02],
-	        "ｳ": [-0.05, -0.02],
-	        "ｴ": [-0.02, -0.02],
-	        "ｵ": [-0.02, -0.02],
-	        "ｶ": [0, -0.03],
-	        "ｷ": [-0.02, -0.02],
-	        "ｸ": [-0.02, -0.02],
-	        "ｹ": [-0.02, -0.02],
-	        "ｺ": [-0.05, -0.05],
-	        "ｻ": [-0.02, -0.02],
-	        "ｼ": [-0.02, -0.02],
-	        "ｽ": [-0.02, -0.02],
-	        "ｿ": [-0.02, 0],
-	        "ﾀ": [-0.02, -0.02],
-	        "ﾁ": [-0.02, -0.02],
-	        "ﾂ": [-0.02, 0],
-	        "ﾃ": [-0.02, -0.02],
-	        "ﾄ": [-0.09, -0.02],
-	        "ﾅ": [-0.02, -0.02],
-	        "ﾆ": [-0.02, -0.02],
-	        "ﾇ": [-0.02, -0.02],
-	        "ﾈ": [-0.02, 0],
-	        "ﾉ": [-0.02, -0.02],
-	        "ﾊ": [-0.02, -0.02],
-	        "ﾋ": [-0.05, -0.03],
-	        "ﾌ": [-0.03, -0.02],
-	        "ﾎ": [-0.02, -0.02],
-	        "ﾏ": [-0.03, 0],
-	        "ﾐ": [-0.03, -0.02],
-	        "ﾑ": [-0.02, 0],
-	        "ﾒ": [0, -0.02],
-	        "ﾓ": [-0.02, -0.03],
-	        "ﾔ": [-0.02, 0],
-	        "ﾕ": [-0.02, -0.02],
-	        "ﾖ": [-0.03, -0.05],
-	        "ﾗ": [-0.05, -0.03],
-	        "ﾘ": [-0.06, -0.05],
-	        "ﾚ": [-0.05, -0.02],
-	        "ﾛ": [-0.03, -0.03],
-	        "ﾜ": [-0.05, -0.02],
-	        "ﾝ": [-0.02, -0.02],
-	        "ﾞ": [0, -0.2],
-	        "ﾟ": [-0.02, -0.22]
-	      },
-	      kerningPairObj: {
-	        "TW": -0.03,
-	        "Lv": -0.07,
-	        "Pe": -0.04,
-	        "Pa": -0.03,
-	        "Kw": -0.04,
-	        "TJ": -0.07,
-	        "Ku": -0.04,
-	        "Ky": -0.04,
-	        "Ko": -0.04,
-	        "SY": -0.04,
-	        "SX": -0.03,
-	        "TA": -0.12,
-	        "Kg": -0.04,
-	        "GW": -0.03,
-	        "Ke": -0.04,
-	        "Ka": -0.04,
-	        "SV": -0.04,
-	        "SW": -0.03,
-	        "Ay": -0.04,
-	        "Aw": -0.04,
-	        "Ly": -0.07,
-	        "SA": -0.04,
-	        "Av": -0.04,
-	        "Au": -0.04,
-	        "RY": -0.04,
-	        "RV": -0.04,
-	        "RX": -0.03,
-	        "QY": -0.04,
-	        "RW": -0.03,
-	        "QX": -0.03,
-	        "GA": -0.04,
-	        "At": -0.04,
-	        "As": -0.04,
-	        "GV": -0.04,
-	        "Aq": -0.04,
-	        "QW": -0.03,
-	        "QV": -0.04,
-	        "Aj": -0.04,
-	        "PY": -0.04,
-	        "QA": -0.04,
-	        "Ag": -0.04,
-	        "Af": -0.04,
-	        "PX": -0.03,
-	        "PW": -0.03,
-	        "PV": -0.04,
-	        "Ae": -0.04,
-	        "PJ": -0.07,
-	        "Ad": -0.04,
-	        "Ac": -0.04,
-	        "Aa": -0.04,
-	        "XS": -0.04,
-	        "OY": -0.04,
-	        "PA": -0.12,
-	        "XQ": -0.04,
-	        "OX": -0.03,
-	        "XO": -0.04,
-	        "OV": -0.04,
-	        "OW": -0.03,
-	        "XJ": -0.04,
-	        "XG": -0.04,
-	        "XC": -0.04,
-	        "OA": -0.04,
-	        "YS": -0.04,
-	        "LV": -0.12,
-	        "LY": -0.12,
-	        "LW": -0.09,
-	        "YQ": -0.04,
-	        "YO": -0.04,
-	        "LT": -0.12,
-	        "LQ": -0.04,
-	        "YJ": -0.07,
-	        "Ao": -0.04,
-	        "LO": -0.04,
-	        "TV": -0.04,
-	        "is": -0.04,
-	        "Yu": -0.06,
-	        "YG": -0.04,
-	        "Ye": -0.09,
-	        "Ya": -0.09,
-	        "YA": -0.12,
-	        "YC": -0.04,
-	        "WS": -0.04,
-	        "Yo": -0.09,
-	        "WO": -0.04,
-	        "WQ": -0.04,
-	        "Xe": -0.06,
-	        "Xa": -0.06,
-	        "Wy": -0.04,
-	        "Wr": -0.04,
-	        "Wo": -0.07,
-	        "WJ": -0.07,
-	        "WG": -0.04,
-	        "LG": -0.04,
-	        "WC": -0.04,
-	        "LC": -0.04,
-	        "We": -0.07,
-	        "KS": -0.03,
-	        "Wa": -0.07,
-	        "VS": -0.04,
-	        "WA": -0.09,
-	        "Vz": -0.04,
-	        "Vy": -0.06,
-	        "KQ": -0.04,
-	        "FJ": -0.07,
-	        "Vw": -0.04,
-	        "VO": -0.04,
-	        "KO": -0.04,
-	        "VQ": -0.04,
-	        "Vu": -0.06,
-	        "VG": -0.04,
-	        "VJ": -0.07,
-	        "FA": -0.12,
-	        "KG": -0.04,
-	        "DV": -0.04,
-	        "DW": -0.03,
-	        "Vr": -0.06,
-	        "Vo": -0.09,
-	        "DY": -0.04,
-	        "CW": -0.03,
-	        "VC": -0.04,
-	        "VA": -0.12,
-	        "CY": -0.04,
-	        "DA": -0.04,
-	        "CV": -0.04,
-	        "Ve": -0.09,
-	        "TY": -0.04,
-	        "UA": -0.04,
-	        "CA": -0.04,
-	        "BY": -0.04,
-	        "BW": -0.03,
-	        "KC": -0.04,
-	        "BV": -0.04,
-	        "BA": -0.03,
-	        "JA": -0.03,
-	        "GY": -0.04,
-	        "AW": -0.09,
-	        "AY": -0.12,
-	        "Va": -0.09,
-	        "AV": -0.12,
-	        "Tz": -0.12,
-	        "Ty": -0.12,
-	        "AQ": -0.04,
-	        "Tw": -0.12,
-	        "AT": -0.12,
-	        "AO": -0.04,
-	        "AG": -0.04,
-	        "Tr": -0.07,
-	        "To": -0.12,
-	        "Te": -0.12,
-	        "Ta": -0.12,
-	        "TX": -0.03,
-	        "Sy": -0.06,
-	        "Sx": -0.03,
-	        "Tu": -0.12,
-	        "AC": -0.04,
-	        "Sw": -0.04,
-	        "Po": -0.04
-	      },
-	      widthOfHalfPitch: {
-	        " ": 0.3036,
-	        " ": 0.3036,
-	        "!": 0.3572,
-	        "\"": 0.5,
-	        "#": 0.625,
-	        "$": 0.625,
-	        "%": 1,
-	        "&": 0.7322,
-	        "'": 0.3036,
-	        "(": 0.3572,
-	        ")": 0.3572,
-	        "*": 0.5,
-	        "+": 0.625,
-	        ",": 0.3036,
-	        "-": 0.4286,
-	        ".": 0.3036,
-	        "/": 0.3572,
-	        "0": 0.625,
-	        "1": 0.625,
-	        "2": 0.625,
-	        "3": 0.625,
-	        "4": 0.625,
-	        "5": 0.625,
-	        "6": 0.625,
-	        "7": 0.625,
-	        "8": 0.625,
-	        "9": 0.625,
-	        ":": 0.3572,
-	        ";": 0.3572,
-	        "<": 0.625,
-	        "=": 0.625,
-	        ">": 0.625,
-	        "?": 0.625,
-	        "@": 0.8036,
-	        "A": 0.6786,
-	        "B": 0.6608,
-	        "C": 0.6786,
-	        "D": 0.7143,
-	        "E": 0.6072,
-	        "F": 0.5715,
-	        "G": 0.7143,
-	        "H": 0.6965,
-	        "I": 0.2679,
-	        "J": 0.4643,
-	        "K": 0.625,
-	        "L": 0.5179,
-	        "M": 0.8572,
-	        "N": 0.6965,
-	        "O": 0.7322,
-	        "P": 0.6429,
-	        "Q": 0.7322,
-	        "R": 0.6429,
-	        "S": 0.625,
-	        "T": 0.5358,
-	        "U": 0.6965,
-	        "V": 0.6429,
-	        "W": 0.9108,
-	        "X": 0.625,
-	        "Y": 0.6072,
-	        "Z": 0.6072,
-	        "[": 0.3572,
-	        "\\": 0.3572,
-	        "]": 0.3572,
-	        "^": 0.625,
-	        "_": 0.5,
-	        "`": 0.3572,
-	        "a": 0.5179,
-	        "b": 0.5536,
-	        "c": 0.5179,
-	        "d": 0.5536,
-	        "e": 0.5358,
-	        "f": 0.2858,
-	        "g": 0.5536,
-	        "h": 0.5536,
-	        "i": 0.25,
-	        "j": 0.25,
-	        "k": 0.5358,
-	        "l": 0.25,
-	        "m": 0.7858,
-	        "n": 0.5536,
-	        "o": 0.5536,
-	        "p": 0.5536,
-	        "q": 0.5536,
-	        "r": 0.375,
-	        "s": 0.4822,
-	        "t": 0.3393,
-	        "u": 0.5358,
-	        "v": 0.5,
-	        "w": 0.7322,
-	        "x": 0.4822,
-	        "y": 0.5179,
-	        "z": 0.4822,
-	        "{": 0.3572,
-	        "|": 0.3036,
-	        "}": 0.3572,
-	        "~": 0.625,
-	        "": 0.3929,
-	        "｡": 0.5,
-	        "｢": 0.5,
-	        "｣": 0.5,
-	        "､": 0.5,
-	        "･": 0.5,
-	        "ｦ": 0.5,
-	        "ｧ": 0.5,
-	        "ｨ": 0.5,
-	        "ｩ": 0.5,
-	        "ｪ": 0.5,
-	        "ｫ": 0.5,
-	        "ｬ": 0.5,
-	        "ｭ": 0.5,
-	        "ｮ": 0.5,
-	        "ｯ": 0.5,
-	        "ｰ": 0.5,
-	        "ｱ": 0.5,
-	        "ｲ": 0.5,
-	        "ｳ": 0.5,
-	        "ｴ": 0.5,
-	        "ｵ": 0.5,
-	        "ｶ": 0.5,
-	        "ｷ": 0.5,
-	        "ｸ": 0.5,
-	        "ｹ": 0.5,
-	        "ｺ": 0.5,
-	        "ｻ": 0.5,
-	        "ｼ": 0.5,
-	        "ｽ": 0.5,
-	        "ｾ": 0.5,
-	        "ｿ": 0.5,
-	        "ﾀ": 0.5,
-	        "ﾁ": 0.5,
-	        "ﾂ": 0.5,
-	        "ﾃ": 0.5,
-	        "ﾄ": 0.5,
-	        "ﾅ": 0.5,
-	        "ﾆ": 0.5,
-	        "ﾇ": 0.5,
-	        "ﾈ": 0.5,
-	        "ﾉ": 0.5,
-	        "ﾊ": 0.5,
-	        "ﾋ": 0.5,
-	        "ﾌ": 0.5,
-	        "ﾍ": 0.5,
-	        "ﾎ": 0.5,
-	        "ﾏ": 0.5,
-	        "ﾐ": 0.5,
-	        "ﾑ": 0.5,
-	        "ﾒ": 0.5,
-	        "ﾓ": 0.5,
-	        "ﾔ": 0.5,
-	        "ﾕ": 0.5,
-	        "ﾖ": 0.5,
-	        "ﾗ": 0.5,
-	        "ﾘ": 0.5,
-	        "ﾙ": 0.5,
-	        "ﾚ": 0.5,
-	        "ﾛ": 0.5,
-	        "ﾜ": 0.5,
-	        "ﾝ": 0.5,
-	        "ﾞ": 0.5,
-	        "ﾟ": 0.5,
-	        "ﾠ": 0.5179,
-	        "": 0.5179,
-	        "": 0.5179,
-	        "": 0.5179,
-	        "": 0.5179
-	      },
-	      firstKerningList: "([｛〔〈《「『【〘〖〝‘“｟«",
-	      beforeException: "〈《「『【〔〘〝（［｛",
-	      afterException: "〉》」』】〕〙〟）］｝"
-	    };
-	
-	    function Quantize($el, options) {
-	      this.$el = $el;
-	      if (this._getBrowser().browser === "MSIE" && this._getBrowser().version <= 7) {
-	        return;
-	      }
-	      this.options = $.extend({}, this.defaults, options);
-	    }
-	
-	    Quantize.prototype.setup = function() {
-	      return $.Deferred((function(_this) {
-	        return function(defer) {
-	          var afterHTML, char, charCode, charWidth, direction, html, i, isBegining, k, l, lineKerning, lineWidth, maxTotal, nextChar, nextCharCode, nextCharWidth, offset, offset1, offset2, offsetEN, offsetException, offsetJP, onDone, regArr, regObj, skip, style, tagHash, total, _i;
-	          onDone = function() {
-	            return defer.resolve();
-	          };
-	          offset = 1;
-	          offset1 = 1;
-	          offset2 = 1;
-	          offsetJP = 0.5;
-	          offsetEN = 0;
-	          offsetException = 0.8;
-	          if (_this.options.offset != null) {
-	            offset = _this.options.offset;
-	          }
-	          html = _this.$el.html().replace(/[\n\r]/g, "");
-	          _this.$el.html("");
-	          afterHTML = "";
-	          tagHash = {};
-	          regObj = RegExp(/<.+?>/g);
-	          regArr = [];
-	          while ((regArr = regObj.exec(html)) !== null) {
-	            tagHash[regArr.index] = regArr[0];
-	          }
-	          isBegining = true;
-	          l = html.length;
-	          total = 0;
-	          maxTotal = 0;
-	          lineWidth = 0;
-	          lineKerning = 0;
-	          skip = 0;
-	          for (i = _i = 0; 0 <= l ? _i <= l : _i >= l; i = 0 <= l ? ++_i : --_i) {
-	            if (i < skip) {
-	              continue;
-	            }
-	            if (tagHash[i]) {
-	              afterHTML += tagHash[i];
-	              skip = i + tagHash[i].length;
-	              isBegining = true;
-	              maxTotal = maxTotal > total ? maxTotal : total;
-	              total = 0;
-	              continue;
-	            }
-	            char = html.charAt(i);
-	            nextChar = html.charAt(i + 1) || "";
-	            charWidth = _this.options.widthOfHalfPitch[char] !== void 0 ? _this.options.widthOfHalfPitch[char] : 1;
-	            nextCharWidth = _this.options.widthOfHalfPitch[nextChar] !== void 0 ? _this.options.widthOfHalfPitch[nextChar] : 1;
-	            charCode = char.charCodeAt(0);
-	            nextCharCode = nextChar.charCodeAt(0);
-	            if (charCode < 256 || (charCode >= 0xff61 && charCode <= 0xff9f)) {
-	              offset1 = offsetEN;
-	            } else {
-	              if (_this.options.afterException.indexOf(charCode) > -1) {
-	                offset1 = offsetException;
-	              } else {
-	                offset1 = offsetJP;
-	              }
-	            }
-	            if (nextCharCode < 256 || (nextCharCode >= 0xff61 && nextCharCode <= 0xff9f)) {
-	              offset2 = offsetEN;
-	            } else {
-	              if (_this.options.beforeException.indexOf(nextCharCode) > -1) {
-	                offset2 = offsetException;
-	              } else {
-	                offset2 = offsetJP;
-	              }
-	            }
-	            k = 0;
-	            if (_this.options.kerningPairObj[char + nextChar]) {
-	              k = _this.options.kerningPairObj[char + nextChar] * (offset1 + offset2) * 0.5;
-	              total += k;
-	            } else {
-	              if (_this.options.kerningObj[char] && _this.options.kerningObj[char][1]) {
-	                k += _this.options.kerningObj[char][1] * offset1;
-	              }
-	              if (_this.options.kerningObj[nextChar] && _this.options.kerningObj[nextChar][0]) {
-	                k += _this.options.kerningObj[nextChar][0] * offset2;
-	              }
-	              total += k;
-	            }
-	            k += _this._getDefaultSpacing(_this.$el);
-	            direction = k >= 0 ? 1 : -1;
-	            style = "letter-spacing:" + ((((0.5 + (1000 * Math.abs(k))) << 0) / 1000) * direction) + "em;";
-	            if (isBegining) {
-	              if (_this.options.kerningObj[char] && _this.options.kerningObj[char][0]) {
-	                if (_this.options.firstKerningList.indexOf(char) !== -1) {
-	                  style += "margin-left:" + (_this.options.kerningObj[char][0] / 2) + "em;";
-	                  total += _this.options.kerningObj[char][0] / 2;
-	                }
-	              }
-	              isBegining = false;
-	            }
-	            afterHTML += "<span style='" + style + "'>" + char + "</span>";
-	            if ((65 <= charCode && charCode <= 90) || (97 <= charCode && charCode <= 122)) {
-	              charWidth *= 1.1;
-	            }
-	            total += charWidth * 1.042;
-	          }
-	          maxTotal = maxTotal > total ? maxTotal : total;
-	          _this.$el.html(afterHTML);
-	          return onDone();
-	        };
-	      })(this)).promise();
-	    };
-	
-	    Quantize.prototype._getDefaultSpacing = function($el) {
-	      var fontSize, letterSpacing;
-	      fontSize = $el.css("font-size");
-	      letterSpacing = $el.css("letter-spacing");
-	      fontSize = (fontSize.replace(/px/, '')) * 1;
-	      if (letterSpacing === "normal") {
-	        letterSpacing = 0;
-	      } else {
-	        letterSpacing = (letterSpacing.replace(/px/, '')) * 1;
-	      }
-	      return letterSpacing / fontSize;
-	    };
-	
-	    Quantize.prototype._getBrowser = function() {
-	      var dataBrowser, dataString, i, index, result, versionSearchString, _i, _ref;
-	      result = {};
-	      dataBrowser = [
-	        {
-	          string: navigator.userAgent,
-	          subString: "Chrome",
-	          identity: "Chrome"
-	        }, {
-	          string: navigator.userAgent,
-	          subString: "MSIE",
-	          identity: "Explorer"
-	        }, {
-	          string: navigator.userAgent,
-	          subString: "Firefox",
-	          identity: "Firefox"
-	        }, {
-	          string: navigator.userAgent,
-	          subString: "Safari",
-	          identity: "Safari"
-	        }, {
-	          string: navigator.userAgent,
-	          subString: "Opera",
-	          identity: "Opera"
-	        }
-	      ];
-	      for (i = _i = 0, _ref = dataBrowser.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-	        dataString = dataBrowser[i].string;
-	        versionSearchString = dataBrowser[i].subString;
-	        if (dataString.indexOf(dataBrowser[i].subString) !== -1) {
-	          result.browser = dataBrowser[i].identity;
-	          break;
-	        } else {
-	          result.browser = "Other";
-	        }
-	      }
-	      index = dataString.indexOf(versionSearchString);
-	      if (index === -1) {
-	        result.version = "Unknown";
-	      } else {
-	        result.version = parseFloat(dataString.substring(index + versionSearchString.length + 1));
-	      }
-	      return result;
-	    };
-	
-	    return Quantize;
-	
-	  })();
-	  $.fn.quantize = function(options) {
-	    return $.Deferred((function(_this) {
-	      return function(defer) {
-	        var limit, onDone;
-	        onDone = function() {
-	          return defer.resolve();
-	        };
-	        limit = _this.size() - 1;
-	        _this.each(function(i, el) {
-	          var $el, instance;
-	          $el = $(el);
-	          instance = new sn.Quantize($el, options);
-	          instance.setup();
-	          $el.data("quantize", instance);
-	          if (i === limit) {
-	            return onDone();
-	          }
-	        });
-	        return onDone();
-	      };
-	    })(this)).promise();
-	  };
-	  return $.Quantize = sn.Quantize;
-	})(window, document, jQuery);
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(jQuery) {jQuery.easing["jswing"]=jQuery.easing["swing"];jQuery.extend(jQuery.easing,{def:"easeOutQuad",swing:function(x,t,b,c,d){return jQuery.easing[jQuery.easing.def](x,t,b,c,d)},easeInQuad:function(x,t,b,c,d){return c*(t/=d)*t+b},easeOutQuad:function(x,t,b,c,d){return-c*(t/=d)*(t-2)+b},easeInOutQuad:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t+b;return-c/2*(--t*(t-2)-1)+b},easeInCubic:function(x,t,b,c,d){return c*(t/=d)*t*t+b},easeOutCubic:function(x,t,b,c,d){return c*((t=t/d-1)*t*t+1)+b},easeInOutCubic:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t+b;return c/2*((t-=2)*t*t+2)+b},easeInQuart:function(x,t,b,c,d){return c*(t/=d)*t*t*t+b},easeOutQuart:function(x,t,b,c,d){return-c*((t=t/d-1)*t*t*t-1)+b},easeInOutQuart:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t*t+b;return-c/2*((t-=2)*t*t*t-2)+b},easeInQuint:function(x,t,b,c,d){return c*(t/=d)*t*t*t*t+b},easeOutQuint:function(x,t,b,c,d){return c*((t=t/d-1)*t*t*t*t+1)+b},easeInOutQuint:function(x,t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t*t*t+b;return c/2*((t-=2)*t*t*t*t+2)+b},easeInSine:function(x,t,b,c,d){return-c*Math.cos(t/d*(Math.PI/2))+c+b},easeOutSine:function(x,t,b,c,d){return c*Math.sin(t/d*(Math.PI/2))+b},easeInOutSine:function(x,t,b,c,d){return-c/2*(Math.cos(Math.PI*t/d)-1)+b},easeInExpo:function(x,t,b,c,d){return t==0?b:c*Math.pow(2,10*(t/d-1))+b},easeOutExpo:function(x,t,b,c,d){return t==d?b+c:c*(-Math.pow(2,-10*t/d)+1)+b},easeInOutExpo:function(x,t,b,c,d){if(t==0)return b;if(t==d)return b+c;if((t/=d/2)<1)return c/2*Math.pow(2,10*(t-1))+b;return c/2*(-Math.pow(2,-10*--t)+2)+b},easeInCirc:function(x,t,b,c,d){return-c*(Math.sqrt(1-(t/=d)*t)-1)+b},easeOutCirc:function(x,t,b,c,d){return c*Math.sqrt(1-(t=t/d-1)*t)+b},easeInOutCirc:function(x,t,b,c,d){if((t/=d/2)<1)return-c/2*(Math.sqrt(1-t*t)-1)+b;return c/2*(Math.sqrt(1-(t-=2)*t)+1)+b},easeInElastic:function(x,t,b,c,d){var s=1.70158;var p=0;var a=c;if(t==0)return b;if((t/=d)==1)return b+c;if(!p)p=d*.3;if(a<Math.abs(c)){a=c;var s=p/4}else var s=p/(2*Math.PI)*Math.asin(c/a);return-(a*Math.pow(2,10*(t-=1))*Math.sin((t*d-s)*2*Math.PI/p))+b},easeOutElastic:function(x,t,b,c,d){var s=1.70158;var p=0;var a=c;if(t==0)return b;if((t/=d)==1)return b+c;if(!p)p=d*.3;if(a<Math.abs(c)){a=c;var s=p/4}else var s=p/(2*Math.PI)*Math.asin(c/a);return a*Math.pow(2,-10*t)*Math.sin((t*d-s)*2*Math.PI/p)+c+b},easeInOutElastic:function(x,t,b,c,d){var s=1.70158;var p=0;var a=c;if(t==0)return b;if((t/=d/2)==2)return b+c;if(!p)p=d*.3*1.5;if(a<Math.abs(c)){a=c;var s=p/4}else var s=p/(2*Math.PI)*Math.asin(c/a);if(t<1)return-.5*a*Math.pow(2,10*(t-=1))*Math.sin((t*d-s)*2*Math.PI/p)+b;return a*Math.pow(2,-10*(t-=1))*Math.sin((t*d-s)*2*Math.PI/p)*.5+c+b},easeInBack:function(x,t,b,c,d,s){if(s==undefined)s=1.70158;return c*(t/=d)*t*((s+1)*t-s)+b},easeOutBack:function(x,t,b,c,d,s){if(s==undefined)s=1.70158;return c*((t=t/d-1)*t*((s+1)*t+s)+1)+b},easeInOutBack:function(x,t,b,c,d,s){if(s==undefined)s=1.70158;if((t/=d/2)<1)return c/2*t*t*(((s*=1.525)+1)*t-s)+b;return c/2*((t-=2)*t*(((s*=1.525)+1)*t+s)+2)+b},easeInBounce:function(x,t,b,c,d){return c-jQuery.easing.easeOutBounce(x,d-t,0,c,d)+b},easeOutBounce:function(x,t,b,c,d){if((t/=d)<1/2.75){return c*7.5625*t*t+b}else if(t<2/2.75){return c*(7.5625*(t-=1.5/2.75)*t+.75)+b}else if(t<2.5/2.75){return c*(7.5625*(t-=2.25/2.75)*t+.9375)+b}else{return c*(7.5625*(t-=2.625/2.75)*t+.984375)+b}},easeInOutBounce:function(x,t,b,c,d){if(t<d/2)return jQuery.easing.easeInBounce(x,t*2,0,c,d)*.5+b;return jQuery.easing.easeOutBounce(x,t*2-d,0,c,d)*.5+c*.5+b}});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
 /* 7 */
@@ -13087,7 +13087,7 @@
 	
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(3), __webpack_require__(7), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(6), __webpack_require__(7), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
@@ -15803,6 +15803,9 @@
 	
 	    Image.prototype.initialize = function() {
 	      console.log("View | Image -> initialize");
+	      console.log("-");
+	      console.log(this.model);
+	      console.log("-");
 	      this._config = SETTING.CONFIG.VIEWER.IMAGE;
 	      this.listenTo(this.model, "change:visible", this._changeVisibleHandler);
 	      this.listenTo(this.model, "change:delay", this._changeDelayHandler);
