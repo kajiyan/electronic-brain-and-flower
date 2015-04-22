@@ -30,14 +30,14 @@ Twitterのタイムラインがアップデートされたタイミングで発�
 - value: (2)[String] 言語設定 { en | ja }
 
 
-### RECEIVE 系 
+<!-- ### RECEIVE 系 
 port 12001に発信されたOSCを監視する。
 
 ##### ■【/updateScene】（from MAX/MSP）
 - value: (1)[int] 0  
 
 受信した値をキーにしてTwitter Stream API の  
-取得パラメータを更新する。
+取得パラメータを更新する。 -->
 
 
 ---
@@ -111,6 +111,11 @@ port 12002に発信されたOSCを監視する。
 - value: (2)[Int] \{ 0 , 1 \} ファイル名をユニークにするためのID  
 - value: (3)[String] word-\{ 0 , 1 \}-{ int }.aif 書きだされたファイル名
 
+##### ■【/updateScene】（from MAX/MSP）
+- value: (1)[int] 0  
+
+受信した値を元に正規表現を変える。  
+
 
 ##### ■【/complete/effect】（from Max/Msp）
 - value: (1)[Int] 再生が完了した音声クラスのID
@@ -159,12 +164,12 @@ port 12003に発信されたOSCを監視する。
 ## Max/Msp
 ### SEND 系
 
-####【/updateScene】（to Node Bridge App）
+####【/updateScene】（to OpenFrameWorks Main App）
 メインの音楽のタイムラインが変化したタイミングで発信される。  
 タイムラインの状態をOSCで発信する。以下のポートで受信可能。  
 
 ##### ■ Receive Port
-- 12001
+- 1200s
 ##### ■ Receive Value
 - address: /updateScene  
 - value: (1)[int] 0 
