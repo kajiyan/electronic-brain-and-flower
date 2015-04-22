@@ -16,7 +16,7 @@ viewerSocket.on('connect', function(socket){
   console.log('Bridge App | Socket -> Connect');
 
   // ROOM が破棄されていたらIDを再設定する必要がある
-  viewerSocket.emit('join', {id: '463295'}, function(err, roomID){
+  viewerSocket.emit('join', {id: '463295'}, function(error, roomID){
     if( error ){
       console.log( error );
       return;
