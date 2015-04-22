@@ -1,82 +1,155 @@
+var config = require('config');
 var io = require('socket.io-client');
-var dgram = require('dgram');
+var twitter = require('twitter');
 var osc = require('osc-min');
+var dgram = require('dgram');
 
 
 var viewerSocket = io.connect('http://localhost:3030/viewer');
-var udp = dgram.createSocket("udp4");
+var oscSender = dgram.createSocket("udp4");
 
 
-viewerSocket.on("post", function(data){
-  console.log("Bridge App | Socket -> _postHandler");
-
-  var buffer;
-
-  buffer = osc.toBuffer({
-    address: "/addImage",
-    args: [
-      {
-        type: "string",
-        value: data.url
-      }
-    ]
-  });
-  udp.send(buffer, 0, buffer.length, 12002, "localhost");
-});
-
+// ------------------------------------------------------------
+// Web Socket
+// ------------------------------------------------------------
 viewerSocket.on('connect', function(socket){
   console.log('Bridge App | Socket -> Connect');
 
-  viewerSocket.emit('join', {id: '983621'}, function(err, roomID){
-    if(err){
-      console.log(err);
+  // ROOM が破棄されていたらIDを再設定する必要がある
+  viewerSocket.emit('join', {id: '463295'}, function(err, roomID){
+    if( error ){
+      console.log( error );
       return;
     }
   });
 });
 
-// var socket = io.connect('http://ec2-54-65-140-79.ap-northeast-1.compute.amazonaws.com:3030/client');
- 
-// socket.on('news', function (data) {
-//     console.log(data);
-//     socket.emit('my other evenr', {my: 'data'});
-// });
+
+viewerSocket.on('post', function(data){
+  console.log('Bridge App | Socket -> _postHandler');
+
+  var buffer = osc.toBuffer({
+    address: '/addImage',
+    args: [
+      {
+        type: 'string',
+        value: data.url
+      }
+    ]
+  });
+  oscSender.send(buffer, 0, buffer.length, 12002, "localhost");
+});
 
 
-// var webSocket = require('websocket');
-// var WebSocketClient = webSocket.client;
+// ------------------------------------------------------------
+// TWITTER
+// ------------------------------------------------------------
+var twitterClient = new twitter({
+  consumer_key: config.twitter.consumerKey,
+  consumer_secret: config.twitter.consumerSecret,
+  access_token_key: config.twitter.accessTokenKey,
+  access_token_secret: config.twitter.accessTokenSecret
+});
 
-// var webSocketClient = new WebSocketClient();
+(function(){
+  try {
+    twitterClient.stream(
+      'statuses/filter',
+      { track: 'rain,wind,breathe,internet' },
+      function( stream ) {
+        stream.on( 'data', function( data ) {
+          if( data.user.lang === 'en' || data.user.lang === 'ja' ){
+            var buffer = osc.toBuffer({
+              address: "/updateStream",
+              args: [
+                {
+                  type: "string",
+                  value: data.user.lang
+                },
+                {
+                  type: "string",
+                  value: data.text
+                }
+              ]
+            });
+            oscSender.send(buffer, 0, buffer.length, 12002, "127.0.0.1");
+          }
+        });
 
-// webSocketClient.on('connectFailed', function(error) {
-//   console.log('Connect Error: ' + error.toString());
-// });
+        stream.on('error', function(error) {
+          console.log(error);
+        });
+      }
+    );
+  } catch (error) {
+    console.log('error twitterGetStream: ' + error);
+    return;
+  }
+})();
 
-// webSocketClient.on('connect', function(connection) {
-//   console.log('WebSocket webSocketClient Connected');
 
-//   connection.on('error', function(error) {
-//     console.log("Connection Error: " + error.toString());
-//   });
 
-//   connection.on('close', function() {
-//     console.log('echo-protocol Connection Closed');
-//   });
-
-//   connection.on('message', function(message) {
-//     if (message.type === 'utf8') {
-//       console.log("Received: '" + message.utf8Data + "'");
+// // ------------------------------------------------------------
+// // OSC RECEIVER
+// // ------------------------------------------------------------
+// // ------------------------------------------------------------
+// // From Max
+// var oscReceiverMaxMsp = dgram.createSocket( 'udp4', function( data, receiveInfo ) {
+//   /**
+//   * Twitter Stream APIに渡すキーワードを返す
+//   *
+//   * @access  private
+//   * @param   Int
+//   * @return  String
+//   *
+//   */
+//   var getSceneWord = function( key ) {
+//     var result = '';
+//     switch ( key ) {
+//       case 1:
+//         result = 'rain';
+//         break;
+//       case 2:
+//         result = 'wind';
+//         break;
+//       case 3:
+//         result = 'breathe';
+//         break;
+//       case 4:
+//         result = 'internet';
+//         break;
+//       default:
+//         result = 'rain';
+//         break;
 //     }
-//   });
+//     return result;
+//   };
 
-//   function sendNumber() {
-//     if (connection.connected) {
-//       var number = Math.round(Math.random() * 0xFFFFFF);
-//       connection.sendUTF(number.toString());
-//       setTimeout(sendNumber, 1000);
+//   try {
+//     // バイナリからJSON形式に変換
+//     data = osc.fromBuffer(data);
+//     var address = data.address;
+
+//     // 受信したアドレスによって処理を振り分ける
+//     if ( address === '/updateScene' ) {
+//       console.log('Bridge App -> OSC RECEIVE -> /updateScene');
+
+//       // メインの音楽ファイルのシーンを受け取る
+//       var values = data.args,
+//           scene  = values[0].value;
+
+//       // Twitter Stream API をアップデート
+//       var keyData = {
+//         keyWord: getSceneWord(scene)
+//       };
+//       twitterUpdateStream(keyData);
+
+//       console.log(getSceneWord(scene));
 //     }
+//   } catch (error) {
+//     console.log('error oscReceiverMaxMsp: ' + error);
+//     return;
 //   }
-//   sendNumber();
 // });
-  
-// webSocketClient.connect('ws://localhost:3030', 'bridge-protocol');
+
+// oscReceiverMaxMsp.bind( 12001 );
