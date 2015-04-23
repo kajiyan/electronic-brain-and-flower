@@ -77,3 +77,13 @@ chaos1 のエイリアス
 of_v0.8.4/apps/myApps/word_bridge/bin/data
 of_v0.8.4/apps/myApps/word_bridge/bin/word_bridge.app
 node/bridge-app/config
+of_v0.8.4/apps/myApps/word_publish/bin/word_publish.app
+of_v0.8.4/apps/myApps/word_publish/bin/word_publishDebug.app
+of_v0.8.4/apps/myApps/word_publish/addons.make
+of_v0.8.4/apps/myApps/word_publish/config.make
+of_v0.8.4/apps/myApps/word_publish/Makefile
+of_v0.8.4/apps/myApps/word_publish/openFrameworks-Info.plist
+of_v0.8.4/apps/myApps/word_publish/Project.xcconfig
+of_v0.8.4/apps/myApps/word_publish/word_publish.xcodeproj
+yada.pdf
+design
