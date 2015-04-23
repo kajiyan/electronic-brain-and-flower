@@ -143,9 +143,8 @@ say コマンドで音声ファイルの書き出しが完了したタイミン�
 
 ##### ■ Receive Value
 - address: /publish/word  
-- value: (1)[Int] { 0 | 1 } シェルが正常に終了したかのステータス  
-- value: (2)[Int] { 0 | 1 } ファイル名をユニークにするためのID  
-- value: (3)[String] word-{ 0 | 1 }-{ int }.aif 書きだされたファイル名
+- value: (1)[Int] ファイルのID
+- value: (2)[String] word-{ 0 | 1 }-{ int }.aif 書きだされたファイル名
 
 ### RECEIVE 系 
 port 12003に発信されたOSCを監視する。  
@@ -155,8 +154,7 @@ port 12003に発信されたOSCを監視する。
 - value: (3)[Int] { 0 | 1 } ファイル名をユニークにするためのID    
 - value: (4)[Int] ファイルのID  
 
-受信した値をキーにしてTwitter Stream API の
-取得パラメータを更新する。
+受信した値をキーにしてSayコマンドで音声ファイルを書き出す。
 
 
 
