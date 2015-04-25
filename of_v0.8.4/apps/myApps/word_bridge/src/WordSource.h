@@ -19,18 +19,38 @@
 #include "ofxJSON.h"
 
 class WordSource {
-    private:
-        int _ID;
-        ofxJSONElement _setting; // アプリケーションの設定ファイル
-        ofxOscSender _maxSender; // Max/Msp 用のOSC Sender
-        void _sendSignalToMax();
-    public:
-        WordSource( int ID );
-        void setup();
-        void update();
-        void draw();
+private:
+    int _ID;
+    int _uniqueID;
     
-        void setID(int ID);
+    bool _isDebug;
+    string _debugString;
+    
+    ofxJSONElement _setting; // アプリケーションの設定ファイル
+    
+    ofxOscSender _ofSubAppSender; // OF Sub App 用のOSC Sender
+    ofxOscSender _maxSender;      // Max/Msp 用のOSC Sender
+    
+    bool _isGetNewWord;
+    bool _isPublishProgress;
+    bool _isPublishWord;
+    bool _isCompletePlay;
+    string _language;
+    string _text;
+    
+    void _sendSignalToMax();
+    string _wordValidation( string message );
+    
+public:
+    WordSource( int ID );
+    void setup();
+    void update();
+    void draw();
+    
+    void setID( int ID );
+    void setDebugState( bool state );
+    void setWord( string language, string text );
+    void updateWordState( bool isGetNewWord, bool isPublishProgress );
 };
 
 #endif /* defined(__word_bridge__WordSource__) */

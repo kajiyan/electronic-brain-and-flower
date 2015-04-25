@@ -1,22 +1,7 @@
 #include "ofApp.h"
 
-
-#include "Poco/String.h"
-#include "Poco/RegularExpression.h"
-
-using Poco::replace;
-using Poco::RegularExpression;
-
-
-GLfloat lightOnePosition[] = {40.0, 40, 100.0, 0.0};
-GLfloat lightOneColor[] = {0.99, 0.99, 0.99, 1.0};
-
-GLfloat lightTwoPosition[] = {-40.0, 40, 100.0, 0.0};
-GLfloat lightTwoColor[] = {0.99, 0.99, 0.99, 1.0};
-
-
 //--------------------------------------------------------------
-void ofApp::setup(){    
+void ofApp::setup(){
     /*
      * Basic Configuration
      */
@@ -25,28 +10,28 @@ void ofApp::setup(){
     ofSetFrameRate(FPS);
     ofSetWindowTitle("電脳と花");
     
-    //some model / light stuff
-    ofEnableDepthTest();
-    glShadeModel (GL_SMOOTH);
-    
-    /* initialize lighting */
-    glLightfv (GL_LIGHT0, GL_POSITION, lightOnePosition);
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, lightOneColor);
-    glEnable (GL_LIGHT0);
-    glLightfv (GL_LIGHT1, GL_POSITION, lightTwoPosition);
-    glLightfv (GL_LIGHT1, GL_DIFFUSE, lightTwoColor);
-    glEnable (GL_LIGHT1);
-    glEnable (GL_LIGHTING);
-    glColorMaterial (GL_FRONT_AND_BACK, GL_DIFFUSE);
-    glEnable (GL_COLOR_MATERIAL);
-
-    
-    ofBackground(100, 100, 100);
+    ofBackground(0, 0, 0);
     
     // 設定ファイルを取得する
-    setting.open("config.json");
-    ofLogNotice("ofApp::setup") << setting.getRawString();
+    bool parsingSuccessful = setting.open("config.json");
     
+    if( parsingSuccessful ) {
+        ofLogNotice("ofApp::setup") << setting.getRawString();
+
+        // OSCを受信するポートの設定
+        receiver.setup(setting["address"]["openFrameWorks"]["main"]["port"].asInt());
+    }
+    
+    // Debug 用の情報を取得するか
+    isDebug = true;
+    
+    GLfloat lightOnePosition[] = { 40.0, 40, 100.0, 0.0 };
+    GLfloat lightOneColor[]    = { 0.99, 0.99, 0.99, 1.0 };
+    
+    GLfloat lightTwoPosition[] = { -40.0, 40, 100.0, 0.0 };
+    GLfloat lightTwoColor[]    = { 0.99, 0.99, 0.99, 1.0 };
+
+    // 各クラスのセットアップ
     /*
      * imagePublish
      */
@@ -55,27 +40,22 @@ void ofApp::setup(){
         ImagePublish *imagePublishInstance = new ImagePublish( i );
         imagePublishs.push_back(imagePublishInstance);
     }
-    
+
     /*
      * wordSource
      */
     for(int i = 0; i < wordsSize; i++){
         // wordSourceのインスタンスを作る
+        cout << i << "\n";
         WordSource *wordInstance = new WordSource( i );
         wordSources.push_back(wordInstance);
     }
-    
+
     // wordSourceのインスタンスのセットアップ
     for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->setup();
-        (*it)->update();
     }
-
-    
-    // OSCを受信するポートの設定
-    receiver.setup(setting["address"]["openFrameWorks"]["main"]["port"].asInt());
 }
-
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -83,41 +63,59 @@ void ofApp::update(){
     while(receiver.hasWaitingMessages()){
         ofxOscMessage message;
         receiver.getNextMessage(&message);
-        
+
         // Tweet を検知したタイミングで受信する
-        if(message.getAddress() == "/word"){
+        if(message.getAddress() == "/updateStream"){
             // 受信したテキストを取り出す
-            string messageBody = message.getArgAsString(0);
-            
+            string language = message.getArgAsString(0);
+            string text = message.getArgAsString(1);
+
             for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
-                (*it)->update();
+                // OF Sub App に送信する値をセットする
+                (*it)->setWord( language, text );
             }
-            
-            cout << wordValidation(messageBody) << "\n";
         }
-        
+
+        // Sub App の音声書き出しが完了されたタイミングで受信する
+        if(message.getAddress() == "/publish/word") {
+            int fileID = message.getArgAsInt32(0);
+            string fileName = message.getArgAsString(1);
+            
+            cout << "OSC: /publish/word " << fileID << "\n";
+            cout << "OSC: /publish/word " << fileName << "\n";
+            
+            // Max/Msp に書きだした音声ファイルを送る（/play/word）
+        }
+
         // Webサーバーに画像データが追加されたタイミングで受信する
         if(message.getAddress() == "/addImage"){
             // 受信したテキストを取り出す
             string messageBody = message.getArgAsString(0);
-            
+
             cout << "OSC: /addImage " << messageBody << "\n";
-            
+
             imagePublishs[0]->addLoadFileName(messageBody);
         }
     }
-    
+
     /*
      * ImagePublish
      */
     for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
         (*it)->update();
     }
-    
+
     /*
      * Butterfly
      */
     for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
+        (*it)->update();
+    }
+    
+    /*
+     * WordSource
+     */
+    for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->update();
     }
 }
@@ -130,7 +128,7 @@ void ofApp::draw(){
     for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
         (*it)->draw();
     }
-    
+
     /*
      * Butterfly
      */
@@ -138,16 +136,17 @@ void ofApp::draw(){
         (*it)->draw();
     }
 
+    /*
+     * WordSource
+     */
+    for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
+        (*it)->draw();
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    if(key == 'b'){
-        Butterfly *bt = new Butterfly(FPS);
-        butterfrys.push_back(bt);
-        
-        imagePublishs[0]->addLoadFileName("http://two-tone-cat.c.blog.so-net.ne.jp/_images/blog/_bec/two-tone-cat/calpis201303-2f009.jpg");
-    }
+
 }
 
 //--------------------------------------------------------------
@@ -189,58 +188,3 @@ void ofApp::gotMessage(ofMessage msg){
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
-
-//--------------------------------------------------------------
-string ofApp::wordValidation(string message){
-    // 正規表現で余計な文字列を削除する
-    // 改行コードのパターン
-    RegularExpression bReakEx1("\r\n");
-    bReakEx1.subst(message, "");
-    
-    RegularExpression bReakEx2("\r");
-    bReakEx2.subst(message, "");
-    
-    RegularExpression bReakEx3("\n");
-    bReakEx3.subst(message, "");
-    
-    // 絵文字のパターン
-    RegularExpression pictogramEx("[\xF0-\xF7][\x80-\xBF][\x80-\xBF][\x80-\xBF]");
-    pictogramEx.subst(message, "");
-    
-    // Twitterアカウントのパターン
-    RegularExpression accountEx("@([A-Za-z]+[A-Za-z0-9_]+)");
-    accountEx.subst(message, "");
-    
-    // URLのパターン
-    RegularExpression urlEx("(https?|ftp)(://[-_.!~*\'()a-zA-Z0-9;/?:@&=+$,%#]+)");
-    urlEx.subst(message, "");
-    
-    // メールアドレスのパターン
-    RegularExpression mailEx("[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*");
-    mailEx.subst(message, "");
-    
-    return message;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

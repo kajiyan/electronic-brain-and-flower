@@ -29,66 +29,66 @@ class Butterfly {
     const int OFFSET_Z = -1000;
     
     const float MAX_FLIP = 0.8;
-
-    private:
-        ofx3DModelLoader _body;
-        ofx3DModelLoader _hone;
-        ofx3DModelLoader _featherLT;
-        ofx3DModelLoader _featherLU;
-        ofx3DModelLoader _featherRT;
-        ofx3DModelLoader _featherRU;
-
-        Boolean _isPowerMode = false;
-        Boolean _isSlowFlip = false;
-        
-        int _flg = 0;
-        // float* _peakArray;
-        vector <float *> _peakArray;
-        vector <float *> _peak;
     
-        int _directionX = -1;
-        int _directionY = -1;
-        float _pRadZ;
+private:
+    ofx3DModelLoader _body;
+    ofx3DModelLoader _hone;
+    ofx3DModelLoader _featherLT;
+    ofx3DModelLoader _featherLU;
+    ofx3DModelLoader _featherRT;
+    ofx3DModelLoader _featherRU;
     
-        //float* _orbitArray;
-        vector <float *> _orbitArray;
-        vector <float *> _orbit;
+    Boolean _isPowerMode = false;
+    Boolean _isSlowFlip = false;
     
-        //float* _rotationArray;
-        vector <float *> _rotationArray;
-        vector <float *> _rotation;
+    int _flg = 0;
+    // float* _peakArray;
+    vector <float *> _peakArray;
+    vector <float *> _peak;
     
-        //float* _flipArray;
-        vector <float *> _flipArray;
-        vector <float *> _flip;
-        
-        float _px = 0;
-        float _py = 0;
-        float _pz = 0;
-        
-        float _ang = 0;
+    int _directionX = -1;
+    int _directionY = -1;
+    float _pRadZ;
     
-        int _flipDirection = 1;
-        
-        int _count = 0;
-        
-        int _n;
-        int _m;
+    //float* _orbitArray;
+    vector <float *> _orbitArray;
+    vector <float *> _orbit;
     
-        float fps;
+    //float* _rotationArray;
+    vector <float *> _rotationArray;
+    vector <float *> _rotation;
+    
+    //float* _flipArray;
+    vector <float *> _flipArray;
+    vector <float *> _flip;
+    
+    float _px = 0;
+    float _py = 0;
+    float _pz = 0;
+    
+    float _ang = 0;
+    
+    int _flipDirection = 1;
+    
+    int _count = 0;
+    
+    int _n;
+    int _m;
+    
+    float fps;
     
     
     
-    public:
-        Butterfly(float _fps);
-        void update();
-        void draw();
-        void fly();
-        void createPeak();
-        void generateOrbit();
+public:
+    Butterfly(float _fps);
+    void update();
+    void draw();
+    void fly();
+    void createPeak();
+    void generateOrbit();
     
-        void destinationPeak();
-        void destinationOrbit();
+    void destinationPeak();
+    void destinationOrbit();
 };
 
 #endif /* defined(__word_bridge__Butterfly__) */

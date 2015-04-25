@@ -48,7 +48,7 @@ port 12001に発信されたOSCを監視する。
 
 
 ####【/add/word】（to OpenFrameWorks Sub App）
-【/updateScene】で受信した本文を正規表現で無害化、  
+【/updateStream】で受信した本文を正規表現で無害化、  
 言語設定を元にボイスアクターを選出してにOSCを発信する。  
 ただし、OpenFrameWorks Sub App から【/publish/word】が返ってこない限り  
 再度発信されることはない。以下のポートで受信可能。

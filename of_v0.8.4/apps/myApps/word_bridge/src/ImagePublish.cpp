@@ -6,7 +6,7 @@ using Poco::RegularExpression;
 
 //--------------------------------------------------------------
 ImagePublish::ImagePublish( int ID ) {
-    cout << "WordSource -> constructor\n";
+    cout << "ImagePublish -> constructor\n";
     
     _ID = ID;
     _isLoading = false;

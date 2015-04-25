@@ -45,7 +45,10 @@ void ofApp::update(){
             int uniqueID = message.getArgAsInt32(2);
             int fileID = message.getArgAsInt32(3);
             
-            
+            cout << voiseActor << "\n";
+            cout << word << "\n";
+            cout << uniqueID << "\n";
+            cout << fileID << "\n";
             
             for(vector <CommandRun *>::iterator it = commandRuns.begin(); it != commandRuns.end(); ++it) {
                 (*it)->createSoundFile( voiseActor, word, uniqueID, fileID );

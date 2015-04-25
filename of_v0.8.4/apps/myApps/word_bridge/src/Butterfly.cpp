@@ -54,14 +54,14 @@ void Butterfly::draw(){
     glPushMatrix();
     
     glTranslatef(ofGetWidth() / 2, ofGetHeight() / 2, 0);
-
+    
     //glTranslatef(x, y, z);
     
     glRotatef(_rotation[_count][0] * -1 * 180 / PI + -90, 1, 0, 0);   // x軸
     glRotatef(180, 0, 1, 0);                                          // y軸
     glRotatef(_rotation[_count][1] * -1 * 180 / PI, 0, 0, 1);         // z軸
     _body.draw();
-        
+    
     // featherLT
     glPushMatrix();
     glRotatef(ft * rfy * 180 / PI, 0, 0, 1);    // y軸
@@ -69,7 +69,7 @@ void Butterfly::draw(){
     _featherLT.draw();
     glTranslatef(0, 0, 0);
     glPopMatrix();
-        
+    
     // featherLU
     glPushMatrix();
     glRotatef(-fu * 180 / PI, 0, 1, 0);         // y軸
@@ -77,7 +77,7 @@ void Butterfly::draw(){
     _featherLU.draw();
     glTranslatef(0, 0, 0);
     glPopMatrix();
-        
+    
     // featherRT
     glPushMatrix();
     glRotatef(ft * 180 / PI, 0, 1, 0);          // y軸
@@ -85,7 +85,7 @@ void Butterfly::draw(){
     _featherRT.draw();
     glTranslatef(0, 0, 0);
     glPopMatrix();
-        
+    
     // featherRU
     glPushMatrix();
     glRotatef(fu * 180 / PI, 0, 1, 0);          // y軸
@@ -93,16 +93,16 @@ void Butterfly::draw(){
     _featherRU.draw();
     glTranslatef(0, 0, 0);
     glPopMatrix();
-        
+    
     glPushMatrix();
     glRotatef(_rotation[_count][3] * -1 * 180 / PI, 1, 0, 0); // y軸
     _hone.draw();
     glPopMatrix();
-        
+    
     // glTranslatef(0, 0, 0);
     glPopMatrix();
     ofPopStyle();
-
+    
     
     if(++_count >= _orbit.size()){
         for (int i = 0; i < _orbitArray.size(); i++) {
@@ -123,12 +123,12 @@ void Butterfly::draw(){
         _orbit.clear();
         _rotation.clear();
         _flip.clear();
-
+        
         for (int i = 0; i < _peakArray.size(); i++) {
             delete _peakArray[i];
         }
         _peakArray.clear();
-
+        
         _count = 0;
         
         createPeak();
@@ -282,7 +282,7 @@ void Butterfly::generateOrbit(){
     int interpolate = INTERPOLATE;
     float tmp;
     float plus = 1.0 / (interpolate - 1);
-
+    
     for (int i= 0; i < INTERPOLATE * ((_n - 1) / 2); i++){
         float* orbit = new float[3];
         _orbitArray.push_back(orbit);
@@ -426,7 +426,7 @@ void Butterfly::generateOrbit(){
         vector<float>(p1).swap(p1);
         vector<float>(p2).swap(p2);
     }
-
+    
 }
 
 //--------------------------------------------------------------

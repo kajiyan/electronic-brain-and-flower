@@ -1,17 +1,15 @@
 #pragma once
 
 #include "ofMain.h"
+
 #include "ofxOsc.h"
 #include "ofxJSON.h"
-
 
 #include "Butterfly.h"
 #include "ImagePublish.h"
 #include "WordSource.h"
 
-
 #define FPS  60.0
-
 
 class ofApp : public ofBaseApp{
 
@@ -30,41 +28,33 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
+        ofxOscReceiver receiver;
     
         // アプリケーションの設定ファイル
         ofxJSONElement setting;
     
-    
+        // debug を表示するかのフラグ
+        bool isDebug;
+
         /* =============================================================================
-         
          Butterfry
          蝶々のビジュアルクラス
-         
          ============================================================================= */
         vector<Butterfly *> butterfrys;
-    
-    
+
+
         /* =============================================================================
-     
          ImagePublish
          HTTP経由で画像を取得して書き出すクラス
-     
          ============================================================================= */
         int ImagePublishSize = 1;
         vector<ImagePublish *> imagePublishs;
-    
-    
+
+
         /* =============================================================================
-         
          WordSource
          取得した言葉を管理するクラス
-         
          ============================================================================= */
         int wordsSize = 2;
         vector<WordSource *> wordSources;
-    
-    
-        ofxOscReceiver receiver;
-    
-        string wordValidation(string message);
 };
