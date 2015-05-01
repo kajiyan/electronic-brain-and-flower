@@ -30,6 +30,21 @@ void ofApp::setup(){
     
     GLfloat lightTwoPosition[] = { -40.0, 40, 100.0, 0.0 };
     GLfloat lightTwoColor[]    = { 0.99, 0.99, 0.99, 1.0 };
+    
+    //some model / light stuff
+    ofEnableDepthTest();
+    glShadeModel (GL_SMOOTH);
+
+    /* initialize lighting */
+    glLightfv (GL_LIGHT0, GL_POSITION, lightOnePosition);
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, lightOneColor);
+    glEnable (GL_LIGHT0);
+    glLightfv (GL_LIGHT1, GL_POSITION, lightTwoPosition);
+    glLightfv (GL_LIGHT1, GL_DIFFUSE, lightTwoColor);
+    glEnable (GL_LIGHT1);
+    glEnable (GL_LIGHTING);
+    glColorMaterial (GL_FRONT_AND_BACK, GL_DIFFUSE);
+    glEnable (GL_COLOR_MATERIAL);
 
     // 各クラスのセットアップ
     /*
@@ -55,6 +70,12 @@ void ofApp::setup(){
     for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->setup();
     }
+    
+    // OSCを受信するポートの設定
+    _maxMspAppSender.setup(
+        ofToString(setting["address"]["max"]["host"]),
+        setting["address"]["max"]["port"].asInt()
+    );
 }
 
 //--------------------------------------------------------------
@@ -85,7 +106,13 @@ void ofApp::update(){
             cout << "OSC: /publish/word " << fileName << "\n";
             
             // Max/Msp に書きだした音声ファイルを送る（/play/word）
+            ofxOscMessage sendMessage;
+            sendMessage.setAddress( "/play/word" );
+            sendMessage.addIntArg( fileID );
+            sendMessage.addStringArg( fileName );
+            _maxMspAppSender.sendMessage( sendMessage );
         }
+        
 
         // Webサーバーに画像データが追加されたタイミングで受信する
         if(message.getAddress() == "/addImage"){
@@ -146,7 +173,12 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+        if(key == 'b'){
+            Butterfly *bt = new Butterfly(FPS);
+            butterfrys.push_back(bt);
+    
+//            imagePublishs[0]->addLoadFileName("http://two-tone-cat.c.blog.so-net.ne.jp/_images/blog/_bec/two-tone-cat/calpis201303-2f009.jpg");
+        }
 }
 
 //--------------------------------------------------------------

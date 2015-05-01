@@ -30,6 +30,9 @@ class ofApp : public ofBaseApp{
 		
         ofxOscReceiver receiver;
     
+        ofxOscSender _maxMspAppSender;
+
+    
         // アプリケーションの設定ファイル
         ofxJSONElement setting;
     
@@ -55,6 +58,6 @@ class ofApp : public ofBaseApp{
          WordSource
          取得した言葉を管理するクラス
          ============================================================================= */
-        int wordsSize = 2;
+        int wordsSize = 1;
         vector<WordSource *> wordSources;
 };

@@ -3,7 +3,7 @@
 Butterfly::Butterfly(float _fps){
     cout << "Butterfly -> Constructor" << "\n";
     
-    fps = _fps * 2;
+    fps = 30;
     
     // モデルデータ読み込み 第2引数はスケール
     _body.loadModel("butterfly/body.3ds", 0.75);
@@ -53,9 +53,9 @@ void Butterfly::draw(){
     
     glPushMatrix();
     
-    glTranslatef(ofGetWidth() / 2, ofGetHeight() / 2, 0);
+//    glTranslatef(ofGetWidth() / 2, ofGetHeight() / 2, 0);
     
-    //glTranslatef(x, y, z);
+    glTranslatef(x, y, z);
     
     glRotatef(_rotation[_count][0] * -1 * 180 / PI + -90, 1, 0, 0);   // x軸
     glRotatef(180, 0, 1, 0);                                          // y軸
