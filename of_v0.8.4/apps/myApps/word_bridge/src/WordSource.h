@@ -33,8 +33,8 @@ private:
     
     bool _isGetNewWord;
     bool _isPublishProgress;
-    bool _isPublishWord;
-    bool _isCompletePlay;
+    //bool _isPublishWord;
+    //bool _isCompletePlay;
     string _language;
     string _text;
     
@@ -48,6 +48,7 @@ public:
     void draw();
     
     void setID( int ID );
+    int  getID();
     void setDebugState( bool state );
     void setWord( string language, string text );
     void updateWordState( bool isGetNewWord, bool isPublishProgress );

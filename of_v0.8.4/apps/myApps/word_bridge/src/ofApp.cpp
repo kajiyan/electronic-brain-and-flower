@@ -20,6 +20,12 @@ void ofApp::setup(){
 
         // OSCを受信するポートの設定
         receiver.setup(setting["address"]["openFrameWorks"]["main"]["port"].asInt());
+        
+        // OSCを送信するポートの設定
+        _maxMspAppSender.setup(
+           ofToString(setting["address"]["max"]["host"]),
+           setting["address"]["max"]["port"].asInt()
+       );
     }
     
     // Debug 用の情報を取得するか
@@ -70,12 +76,6 @@ void ofApp::setup(){
     for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->setup();
     }
-    
-    // OSCを受信するポートの設定
-    _maxMspAppSender.setup(
-        ofToString(setting["address"]["max"]["host"]),
-        setting["address"]["max"]["port"].asInt()
-    );
 }
 
 //--------------------------------------------------------------
@@ -113,6 +113,20 @@ void ofApp::update(){
             _maxMspAppSender.sendMessage( sendMessage );
         }
         
+        // Max/Msp 音声の再生が終了したタイミングで受信する
+        if(message.getAddress() == "/complete/word") {
+            int fileID = message.getArgAsInt32(0);
+            
+            for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
+                // 受信したIDと同じIDを持つインスタンスのステータスを
+                // OSC受信可能状態にする
+                if( fileID == (*it)->getID() ){
+                    bool isGetNewWord      = true;
+                    bool isPublishProgress = false;
+                    (*it)->updateWordState( isGetNewWord, isPublishProgress );
+                }
+            }
+        }
 
         // Webサーバーに画像データが追加されたタイミングで受信する
         if(message.getAddress() == "/addImage"){

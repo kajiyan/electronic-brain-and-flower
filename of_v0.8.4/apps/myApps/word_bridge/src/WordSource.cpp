@@ -18,12 +18,11 @@ WordSource::WordSource( int ID ) {
     
     _isDebug = true;
     
-    _isGetNewWord = true;      // 新しいワードを取得できるかのフラグ
-    
+    _isGetNewWord = true;       // 新しいワードを取得できるかのフラグ
     _isPublishProgress = false; // 音声ファイルの書き出し中かのフラグ
-    _isPublishWord = false;     // 音声ファイルの書き出しが終了したかのフラグ
     
-    _isCompletePlay = false; // 音声ファイルの読み上げが終了したかのフラグ
+    //_isPublishWord = false;   // 音声ファイルの書き出しが終了したかのフラグ
+    //_isCompletePlay = false;  // 音声ファイルの読み上げが終了したかのフラグ
 }
 
 //--------------------------------------------------------------
@@ -59,6 +58,10 @@ void WordSource::update() {
             voiseActor = "Kyoko";
         }
         
+        // ファイル名を一意にするIDをアップデート
+        _uniqueID = ( ( _uniqueID + 1 ) % 2 + 2 ) % 2;
+        cout << "uniqueID:" << _uniqueID << "\n";
+        
         // デバッグ用のテキストを設定
         _debugString = "WordSource ID" + ofToString( _ID ) + " -> /add/word \n" +
         "actor: " + ofToString( voiseActor ) + "\n" +
@@ -70,7 +73,7 @@ void WordSource::update() {
         sendMessage.setAddress( "/add/word" );
         sendMessage.addStringArg( voiseActor );
         sendMessage.addStringArg( "\"" + _text + "\"" );
-        sendMessage.addIntArg( ( _uniqueID % 1 + 1 ) % 1 );
+        sendMessage.addIntArg( _uniqueID );
         sendMessage.addIntArg( _ID );
         _ofSubAppSender.sendMessage( sendMessage );
     }
@@ -133,6 +136,13 @@ void WordSource::setID( int ID ) {
 }
 
 
+//--------------------------------------------------------------
+int WordSource::getID() {
+    cout << "WordSource -> getID\n";
+    return _ID;
+}
+
+
 /* --------------------------------------------------------------
  Max/Msp に OSCでデータを送信する
  
@@ -156,6 +166,9 @@ void WordSource::_sendSignalToMax() {
 //--------------------------------------------------------------
 string WordSource::_wordValidation( string message ){
     // 正規表現で余計な文字列を削除する
+    RegularExpression test( "\"" );
+    test.subst( message, "" );
+    
     // 改行コードのパターン
     RegularExpression bReakEx1( "\r\n" );
     bReakEx1.subst( message, "" );
