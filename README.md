@@ -37,14 +37,14 @@ EC2のSecurity Groups はNodeの実行環境に合わせて適切に設定する
 
 
 #### DMX CHANNEL
-- 1ch メタルハライドランプ 安定器 1
-- 2ch 電球
+- 1ch  メタルハライドランプ 安定器 1
+- 2ch
 - 3ch 
 - 4ch 
-- 5ch メタルハライドランプ 安定器 2
-- 6ch 
-- 7ch  
-- 8ch  
+- 5ch  読み上げ用の電球
+- 6ch  LED 蛍光灯
+- 7ch  LED 蛍光灯
+- 8ch  LED 蛍光灯
 - 9ch  超音波 噴霧機
 - 10ch スポット型電球
 - 11ch 汲み上げポンプ
