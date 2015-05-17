@@ -42,12 +42,12 @@ EC2のSecurity Groups はNodeの実行環境に合わせて適切に設定する
 - 3ch 
 - 4ch 
 - 5ch  読み上げ用の電球
-- 6ch  LED 蛍光灯
-- 7ch  LED 蛍光灯
-- 8ch  LED 蛍光灯
-- 9ch  超音波 噴霧機
-- 10ch スポット型電球
-- 11ch 汲み上げポンプ
+- 6ch  LED 蛍光灯 Center
+- 7ch  LED 蛍光灯 Left
+- 8ch  LED 蛍光灯 Right
+- 9ch  汲み上げポンプ
+- 10ch 超音波 噴霧機
+- 11ch スポット型電球
 - 12ch サーキュレーター 
 
 
