@@ -64,7 +64,6 @@
 						"description" : "",
 						"digest" : "",
 						"tags" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"fontname" : "Arial",
@@ -309,8 +308,8 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 48.0, 558.0, 193.0, 20.0 ],
-									"text" : "if ($i1 > 1) || ($i1 < 6) then 1 else 0"
+									"patching_rect" : [ 83.0, 561.0, 203.0, 20.0 ],
+									"text" : "if ($i1 > 1) && ($i1 < 6) then 1 else 0"
 								}
 
 							}
@@ -656,7 +655,7 @@
 							}
 , 							{
 								"patchline" : 								{
-									"destination" : [ "obj-28", 0 ],
+									"destination" : [ "obj-30", 1 ],
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-24", 0 ]
@@ -687,15 +686,6 @@
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-27", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-30", 1 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-28", 0 ]
 								}
 
 							}
@@ -5761,7 +5751,7 @@
 					"numoutlets" : 2,
 					"outlettype" : [ "int", "bang" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 451.75, 461.0, 50.0, 20.0 ]
+					"patching_rect" : [ 451.75, 457.0, 50.0, 20.0 ]
 				}
 
 			}
@@ -5899,8 +5889,8 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 473.25, 125.0, 71.0, 18.0 ],
-					"text" : "0 1 2 30 40"
+					"patching_rect" : [ 473.25, 125.0, 87.0, 18.0 ],
+					"text" : "0 1 2 30 40 50"
 				}
 
 			}
@@ -8688,7 +8678,6 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-209",
-					"int" : 1,
 					"maxclass" : "gswitch2",
 					"numinlets" : 2,
 					"numoutlets" : 2,
@@ -10524,7 +10513,7 @@
 							"architecture" : "x86"
 						}
 ,
-						"rect" : [ 409.0, 45.0, 850.0, 779.0 ],
+						"rect" : [ 940.0, 45.0, 850.0, 779.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -10543,7 +10532,6 @@
 						"description" : "",
 						"digest" : "",
 						"tags" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"id" : "obj-11",
@@ -10588,8 +10576,8 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 421.25, 946.0, 193.0, 20.0 ],
-									"text" : "if ($i1 > 1) || ($i1 < 6) then 1 else 0"
+									"patching_rect" : [ 421.25, 946.0, 203.0, 20.0 ],
+									"text" : "if ($i1 > 1) && ($i1 < 6) then 1 else 0"
 								}
 
 							}
