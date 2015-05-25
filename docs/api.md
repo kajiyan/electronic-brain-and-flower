@@ -17,6 +17,18 @@ Webサーバーに画像データが追加されたタイミングで発信さ�
 保存された画像のURL
 
 
+####【/showImage】
+Webサーバーに加速度センサーの値が一定値を超えた時に発信される。  
+設定されている画像ファイル名をOSCで発信する。以下のポートで受信可能。  
+
+##### ■ Receive Port
+- 12002
+
+##### ■ Receive Value
+- address: /showImage  
+- value: (1)[String] { IMAGE ID } 
+
+
 ####【/updateStream】
 Twitterのタイムラインがアップデートされたタイミングで発信される。  
 取得したTweet のテキストと言語設定をOSCで発信する。以下のポートで受信可能。　　
@@ -94,6 +106,18 @@ Max/Mspに再生対象のファイルについてOSCを発信する。以下の�
 - value: (2)[String] 音声ファイル名  
 
 
+####【/MHlamp/status】（to Max/Msp）
+【/updateStream】で受信した本文に特定の文字列が含まれていたら  
+Max/Mspにメタルハライドランプの状態をOSCで発信する。以下のポートで受信可能。 
+
+##### ■ Receive Port
+- 12004
+
+##### ■ Receive Value
+- address: /MHlamp/status  
+- value: (1)[Int] { 0 | 1 }
+
+
 ### RECEIVE 系 
 port 12002に発信されたOSCを監視する。  
 
@@ -105,6 +129,10 @@ port 12002に発信されたOSCを監視する。
 入っていればMax/Msp にOSCを発信する。  
 正規表現で本文を無害化して OpenFrameWorks Sub App にOSCを送信する。
 
+##### ■【/showImage】（from Node Bridge App）
+- value: (1)[String] { IMAGE ID }  
+
+受信したIDと同じIDが設定されているButterflyインスタンスを画面に表示させる。
 
 ##### ■【/publish/word】（from OpenFrameWorks Sub App）
 - value: (1)[Int] \{ 0 , 1 \} シェルが正常に終了したかのステータス  
