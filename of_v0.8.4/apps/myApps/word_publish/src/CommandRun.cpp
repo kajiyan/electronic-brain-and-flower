@@ -57,14 +57,22 @@ void CommandRun::createSoundFile( string voiseActor, string word, int uniqueID, 
         _commandStatusCode = system(shellCommand);
         _commandStatusCode = WEXITSTATUS(_commandStatusCode);
         
-        if( _commandStatusCode == 0 ){
-            // コマンドが正常に終了した場合
-            ofxOscMessage sendMessage;
-            sendMessage.setAddress( "/publish/word" );
-            sendMessage.addIntArg( _fileID );
-            sendMessage.addStringArg( fileName );
-            _ofMainAppSender.sendMessage( sendMessage );
-        }
+        ofxOscMessage sendMessage;
+        sendMessage.setAddress( "/publish/word" );
+        sendMessage.addIntArg( _commandStatusCode );
+        sendMessage.addIntArg( _fileID );
+        sendMessage.addStringArg( fileName );
+        _ofMainAppSender.sendMessage( sendMessage );
+        
+//        if( _commandStatusCode == 0 ){
+//            // コマンドが正常に終了した場合
+//            ofxOscMessage sendMessage;
+//            sendMessage.setAddress( "/publish/word" );
+//            sendMessage.addIntArg( _commandStatusCode );
+//            sendMessage.addIntArg( _fileID );
+//            sendMessage.addStringArg( fileName );
+//            _ofMainAppSender.sendMessage( sendMessage );
+//        }
         
         _isCommandRun = false;
     }

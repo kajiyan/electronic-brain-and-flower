@@ -6,9 +6,13 @@
 using Poco::replace;
 using Poco::RegularExpression;
 
+
+static string _sceneLabels[6] = {"", "rain", "wind", "breathe", "internet", ""};
+
+
 //--------------------------------------------------------------
 WordSource::WordSource( int ID ) {
-    cout << "WordSource -> constructor" << ID << "\n";
+    cout << "WordSource -> constructor ID " << ID << "\n";
     
     // 設定ファイルを取得する
     _setting.open("config.json");
@@ -23,6 +27,10 @@ WordSource::WordSource( int ID ) {
     
     //_isPublishWord = false;   // 音声ファイルの書き出しが終了したかのフラグ
     //_isCompletePlay = false;  // 音声ファイルの読み上げが終了したかのフラグ
+    
+    _sceneIndex = 0; // 音楽のシーンID
+    
+    _MHlampSignal = 0;
 }
 
 //--------------------------------------------------------------
@@ -94,6 +102,17 @@ void WordSource::draw() {
 
 
 
+/* --------------------------------------------------------------
+ /updateScene でMax から取得した音楽のシーンIDをセットする
+ 
+ @access	public
+ @param	    none
+ @return	none
+ --------------------------------------------------------------  */
+void WordSource::setSceneIndex( int sceneIndex ) {
+    int _sceneIndex = sceneIndex;
+}
+
 
 
 /* --------------------------------------------------------------
@@ -104,17 +123,58 @@ void WordSource::draw() {
  @return	none
  --------------------------------------------------------------  */
 void WordSource::setWord( string language, string text ) {
-    if ( _isGetNewWord ) {
-        // 新しいテキスト情報を設定できない状態にする
-        _isGetNewWord = false;
+    int sceneLabelLen = sizeof(_sceneLabels) / sizeof(_sceneLabels[0]);
+    
+    if ( _isGetNewWord && ( _sceneIndex > 0 && _sceneIndex < sceneLabelLen ) ) {
         _language = _wordValidation( language );
         _text = _wordValidation( text );
+        
+        // 現在のシーン名を取得
+        string sceneLabel = _sceneLabels[_sceneIndex];
+        
+        // _textが空ではなく、_textの中にシーン名が含まれているか
+        if( !_language.empty() && !_text.empty() && ofStringTimesInString(_text, sceneLabel) > 0 ){
+            cout << "WordSource -> setWord: " << _text << "\n";
+            // 新しいテキスト情報を設定できない状態にする
+            _isGetNewWord = false;
+        }
     }
 }
 
 
+
 /* --------------------------------------------------------------
- of Sub App から/complete/word が通知されたタイミングで実行される
+ /signal/MHlamp でMax/Mspに送信するデータをセットする
+ 
+ @access	public
+ @param	    none
+ @return	none
+ --------------------------------------------------------------  */
+void WordSource::updateMHlampSignal( string text ) {
+    text = _wordValidation( text );
+    
+    // 特定のキーワードが入っているか判別する
+    // キーワードが含まれていた場合Max/Mspに対してOSCを発信する。
+    if(ofStringTimesInString(text, "lol") > 0 || ofStringTimesInString(text, "rofl")) {
+        ofxOscMessage sendMessage;
+        sendMessage.setAddress( "/MHlamp/status" );
+        sendMessage.addIntArg( 1 );
+        _maxSender.sendMessage( sendMessage );
+        
+         _MHlampSignal += 1;
+    }
+    
+     cout << _MHlampSignal << "\n";
+    // cout << ofStringTimesInString(text, "lol") << "\n";
+    // cout << ofStringTimesInString(text, "rofl") << "\n";
+    
+    // cout << "WordSource -> setWord: " << text << "\n";
+}
+
+
+
+/* --------------------------------------------------------------
+ Max/Msp から/complete/word が通知されたタイミングで実行される
  新しく読み上げファイルを書き出せる状態にする。 
 --------------------------------------------------------------  */
 void WordSource::updateWordState( bool isGetNewWord, bool isPublishProgress ) {
@@ -166,34 +226,35 @@ void WordSource::_sendSignalToMax() {
 //--------------------------------------------------------------
 string WordSource::_wordValidation( string message ){
     // 正規表現で余計な文字列を削除する
-    RegularExpression test( "\"" );
-    test.subst( message, "" );
     
     // 改行コードのパターン
     RegularExpression bReakEx1( "\r\n" );
-    bReakEx1.subst( message, "" );
-    
+    bReakEx1.subst( message, "", RegularExpression::RE_GLOBAL );
     RegularExpression bReakEx2( "\r" );
-    bReakEx2.subst( message, "" );
-    
+    bReakEx2.subst( message, "", RegularExpression::RE_GLOBAL );
     RegularExpression bReakEx3( "\n" );
-    bReakEx3.subst( message, "" );
+    bReakEx3.subst( message, "", RegularExpression::RE_GLOBAL );
     
     // 絵文字のパターン
     RegularExpression pictogramEx( "[\xF0-\xF7][\x80-\xBF][\x80-\xBF][\x80-\xBF]" );
-    pictogramEx.subst( message, "" );
+    pictogramEx.subst( message, "", RegularExpression::RE_GLOBAL );
     
     // Twitterアカウントのパターン
     RegularExpression accountEx( "@([A-Za-z]+[A-Za-z0-9_]+)" );
-    accountEx.subst( message, "" );
+    accountEx.subst( message, "", RegularExpression::RE_GLOBAL );
     
     // URLのパターン
     RegularExpression urlEx( "(https?|ftp)(://[-_.!~*\'()a-zA-Z0-9;/?:@&=+$,%#]+)" );
-    urlEx.subst( message, "" );
+    urlEx.subst( message, "", RegularExpression::RE_GLOBAL );
     
     // メールアドレスのパターン
     RegularExpression mailEx( "[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*" );
-    mailEx.subst( message, "" );
+    mailEx.subst( message, "", RegularExpression::RE_GLOBAL );
+    
+    // 記号のパターン
+    RegularExpression reSymbol( "[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]" );
+    reSymbol.subst( message, "", RegularExpression::RE_GLOBAL );
+    
     
     return message;
 }

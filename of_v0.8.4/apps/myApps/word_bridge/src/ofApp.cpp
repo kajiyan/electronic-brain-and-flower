@@ -90,20 +90,37 @@ void ofApp::update(){
             // 受信したテキストを取り出す
             string language = message.getArgAsString(0);
             string text = message.getArgAsString(1);
-
+            
             for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
                 // OF Sub App に送信する値をセットする
+                (*it)->updateMHlampSignal( text );
                 (*it)->setWord( language, text );
             }
         }
+        
+        // from MAX/MSP
+        if(message.getAddress() == "/updateScene"){
+            // 受信したテキストを取り出す
+            int index = message.getArgAsInt32(0);
+            
+            cout << "ofApp.h Receive OSC: /updateScene SceneID:" << index << "\n";
+            
+            // シーンのインデックスをセットする
+            for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
+                (*it)->setSceneIndex( index );
+            }
+        }
+
 
         // Sub App の音声書き出しが完了されたタイミングで受信する
         if(message.getAddress() == "/publish/word") {
-            int fileID = message.getArgAsInt32(0);
-            string fileName = message.getArgAsString(1);
+            int commandStatusCode = message.getArgAsInt32(0);
+            int fileID = message.getArgAsInt32(1);
+            string fileName = message.getArgAsString(2);
             
-            cout << "OSC: /publish/word " << fileID << "\n";
-            cout << "OSC: /publish/word " << fileName << "\n";
+            cout << "ofApp.h Receive OSC: /publish/word commandStatusCode:" << commandStatusCode << "\n";
+            cout << "ofApp.h Receive OSC: /publish/word fileID:" << fileID << "\n";
+            cout << "ofApp.h Receive OSC: /publish/word fileName:" << fileName << "\n";
             
             // Max/Msp に書きだした音声ファイルを送る（/play/word）
             ofxOscMessage sendMessage;
