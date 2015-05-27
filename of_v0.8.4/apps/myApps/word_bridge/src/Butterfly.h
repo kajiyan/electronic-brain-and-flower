@@ -14,6 +14,9 @@
 #include "ofMain.h"
 #include "ofx3DModelLoader.h"
 
+#include "ImagePublish.h"
+
+
 class Butterfly {
     const int TRAVEL_LENGTH = 18;
     const int DIVISION = 3;
@@ -31,6 +34,8 @@ class Butterfly {
     const float MAX_FLIP = 0.8;
     
 private:
+    ImagePublish _imagePublish;
+    
     ofx3DModelLoader _body;
     ofx3DModelLoader _hone;
     ofx3DModelLoader _featherLT;
@@ -80,10 +85,12 @@ private:
     int _modelIndex;
     
     bool _isVisible;
+    bool _isImagePublish;
     
     
 public:
     Butterfly(float fps, string objID, int modelIndex);
+    void setup();
     void update();
     void draw();
     void fly();
@@ -94,6 +101,8 @@ public:
     void destinationOrbit();
     
     void updateVisible(string objID);
+    void addLoadFileName( string fileName );
+    void imagePublishCallback( bool & e );
 };
 
 #endif /* defined(__word_bridge__Butterfly__) */

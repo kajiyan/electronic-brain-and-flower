@@ -10,13 +10,16 @@ Butterfly::Butterfly(float fps, string objID, int modelIndex){
     // 表示のステータス 初期値は非表示
     _isVisible = false;
     
+    // 画像書き出し完了のステータス
+    _isImagePublish = false;
+    
     // モデルデータ読み込み 第2引数はスケール
-    _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 0.75);
-    _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 0.75);
-    _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 0.75);
-    _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 0.75);
-    _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 0.75);
-    _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 0.75);
+    // _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 0.75);
+    // _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 0.75);
+    // _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 0.75);
+    // _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 0.75);
+    // _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 0.75);
+    // _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 0.75);
     
     // 配列の初期化
     for (int i= 0; i < N; i++){
@@ -35,13 +38,29 @@ Butterfly::Butterfly(float fps, string objID, int modelIndex){
     generateOrbit();
 }
 
+
+
+//--------------------------------------------------------------
+void Butterfly::setup(){
+    // 画像ローダーのセットアップ
+    _imagePublish.setup( 0, "butterfly" + ofToString(_modelIndex) + "/" );
+    _imagePublish.setFileName( "wing.jpg" );
+
+    // 画像が書き出された時のイベントリスナー
+    ofAddListener(_imagePublish.publishComplete, this, &Butterfly::imagePublishCallback);
+}
+
+
+
 //--------------------------------------------------------------
 void Butterfly::update(){
+    _imagePublish.update();
 }
 
 //--------------------------------------------------------------
 void Butterfly::draw(){
-    if ( _isVisible ) {
+    // スローと画像の書き出しが完了していたらアニメーションをはじめる
+    if ( _isVisible && _isImagePublish ) {
         float x = _orbit[_count][0];
         float y = _orbit[_count][1];
         float z = _orbit[_count][2];
@@ -450,6 +469,38 @@ void Butterfly::updateVisible( string objID ){
         _isVisible = true;
     }
 }
+
+
+
+/* --------------------------------------------------------------
+ 読み込む画像のファイルネームをセットする
+ --------------------------------------------------------------  */
+
+void Butterfly::addLoadFileName( string fileName ) {
+    _imagePublish.addLoadFileName( fileName );
+}
+
+
+
+/* --------------------------------------------------------------
+ 画像の書き出しが終了した時に呼ばれる関数
+ --------------------------------------------------------------  */
+void Butterfly::imagePublishCallback(bool & e){
+    cout << "Butterfly -> imagePublishCallback\n";
+    _isImagePublish = e;
+    
+    // 画像（テクスチャ）の読み込みが完了したらモデルデータ読み込み 第2引数はスケール
+    _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 0.75);
+    _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 0.75);
+    _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 0.75);
+    _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 0.75);
+    _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 0.75);
+    _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 0.75);
+
+}
+
+
+
 
 //--------------------------------------------------------------
 void Butterfly::destinationPeak(){

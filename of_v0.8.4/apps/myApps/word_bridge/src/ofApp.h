@@ -54,7 +54,7 @@ class ofApp : public ofBaseApp{
          ============================================================================= */
         // int ImagePublishSize = 1;
         // vector<ImagePublish *> imagePublishs;
-
+    
 
         /* =============================================================================
          WordSource

@@ -5,16 +5,29 @@
 using Poco::RegularExpression;
 
 //--------------------------------------------------------------
-ImagePublish::ImagePublish( int ID, string publishPath ) {
+ImagePublish::ImagePublish() {
     cout << "ImagePublish -> constructor\n";
     
-    _ID = ID;
-    _publishPath = publishPath;
+    // _ID = ID;
+    // _publishPath = publishPath;
     
     _isLoading = false;
     _isLoadingComplete = false;
     _isPublishComplete = false;
+    _isConfigFileName = false;
     ofRegisterURLNotification(this);
+}
+
+
+//--------------------------------------------------------------
+ImagePublish::~ImagePublish() {
+}
+
+
+//--------------------------------------------------------------
+void ImagePublish::setup( int ID, string publishPath ) {
+    _ID = ID;
+    _publishPath = publishPath;
 }
 
 
@@ -77,13 +90,28 @@ void ImagePublish::_publish(){
         string publishFileName;
         fileNameMatch.extract(_loadFileNames.front(), publishFileName);
         
-        _image.saveImage( _publishPath + publishFileName );
+        // ファイルネームが指定されているかでファイル名を分岐
+        if( _isConfigFileName ) {
+            _image.saveImage( _publishPath + _fileName );
+        } else {
+            _image.saveImage( _publishPath + publishFileName );
+        }
+        
         _loadFileNames.erase( _loadFileNames.begin() );
         
         // アルファブレンディングを有効にする
         ofEnableAlphaBlending();
     }
 }
+
+
+
+//--------------------------------------------------------------
+void ImagePublish::setFileName( string fileName ) {
+    _isConfigFileName = true;
+    _fileName = fileName;
+}
+
 
 
 //--------------------------------------------------------------

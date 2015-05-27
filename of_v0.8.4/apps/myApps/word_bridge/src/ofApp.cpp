@@ -118,6 +118,16 @@ void ofApp::update(){
             
             cout << "ofApp.h Receive OSC: /addImage imageURL:" << imageURL << "\n";
             cout << "ofApp.h Receive OSC: /addImage imageID:" << imageID << "\n";
+            
+            // モデルデータをセットアップする
+            butterfryModelIndex = (butterfryModelIndex % butterfryModelNum + butterfryModelNum) % butterfryModelNum;
+            butterfryModelIndex++;
+            Butterfly *bt = new Butterfly(FPS, imageID, (butterfryModelIndex - 1));
+            bt->setup();
+            bt->addLoadFileName( imageURL );
+            // bt->updateVisible("test");
+            butterfrys.push_back(bt);
+
         
 //            imagePublishs[0]->addLoadFileName( imageURL );
         }
@@ -130,6 +140,9 @@ void ofApp::update(){
             
             cout << "ofApp.h Receive OSC: /showImage imageID:" << imageID << "\n";
             
+            for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
+                (*it)->updateVisible( imageID );
+            }
 //            for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
 //                
 //            }
@@ -247,6 +260,7 @@ void ofApp::keyPressed(int key){
         butterfryModelIndex = (butterfryModelIndex % butterfryModelNum + butterfryModelNum) % butterfryModelNum;
         butterfryModelIndex++;
         Butterfly *bt = new Butterfly(FPS, "test", (butterfryModelIndex - 1));
+        bt->setup();
         bt->updateVisible("test");
         butterfrys.push_back(bt);
     
