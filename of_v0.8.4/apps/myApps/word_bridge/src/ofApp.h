@@ -43,6 +43,8 @@ class ofApp : public ofBaseApp{
          Butterfry
          蝶々のビジュアルクラス
          ============================================================================= */
+        int butterfryModelIndex; // 呼び出すモデルデータのID
+        int butterfryModelNum;   // モデルデータ種類
         vector<Butterfly *> butterfrys;
 
 
@@ -50,8 +52,8 @@ class ofApp : public ofBaseApp{
          ImagePublish
          HTTP経由で画像を取得して書き出すクラス
          ============================================================================= */
-        int ImagePublishSize = 1;
-        vector<ImagePublish *> imagePublishs;
+        // int ImagePublishSize = 1;
+        // vector<ImagePublish *> imagePublishs;
 
 
         /* =============================================================================

@@ -17,6 +17,8 @@ void ofApp::setup(){
     
     if( parsingSuccessful ) {
         ofLogNotice("ofApp::setup") << setting.getRawString();
+        
+        cout << setting["address"]["openFrameWorks"]["main"]["port"].asInt() << "\n";
 
         // OSCを受信するポートの設定
         receiver.setup(setting["address"]["openFrameWorks"]["main"]["port"].asInt());
@@ -54,13 +56,19 @@ void ofApp::setup(){
 
     // 各クラスのセットアップ
     /*
+     * Butterfly
+     */
+    butterfryModelIndex = 0;
+    butterfryModelNum = 3;
+    
+    /*
      * imagePublish
      */
-    for(int i = 0; i < ImagePublishSize; i++){
-        // imagePublishのインスタンスを作る
-        ImagePublish *imagePublishInstance = new ImagePublish( i );
-        imagePublishs.push_back(imagePublishInstance);
-    }
+//    for(int i = 0; i < ImagePublishSize; i++){
+//        // imagePublishのインスタンスを作る
+//        ImagePublish *imagePublishInstance = new ImagePublish( i, "" );
+//        imagePublishs.push_back(imagePublishInstance);
+//    }
 
     /*
      * wordSource
@@ -80,13 +88,15 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    // cout << receiver.hasWaitingMessages() << "\n";
+    
     // OSC メッセージを監視する
     while(receiver.hasWaitingMessages()){
         ofxOscMessage message;
         receiver.getNextMessage(&message);
 
         // Tweet を検知したタイミングで受信する
-        if(message.getAddress() == "/updateStream"){
+        if( message.getAddress() == "/updateStream" ){
             // 受信したテキストを取り出す
             string language = message.getArgAsString(0);
             string text = message.getArgAsString(1);
@@ -97,6 +107,34 @@ void ofApp::update(){
                 (*it)->setWord( language, text );
             }
         }
+        
+        
+        // from node.js
+        if( message.getAddress() == "/addImage" ){
+            // 投稿された写真のURL
+            string imageURL = message.getArgAsString(0);
+            // 投稿された写真のID
+            string imageID = message.getArgAsString(1);
+            
+            cout << "ofApp.h Receive OSC: /addImage imageURL:" << imageURL << "\n";
+            cout << "ofApp.h Receive OSC: /addImage imageID:" << imageID << "\n";
+        
+//            imagePublishs[0]->addLoadFileName( imageURL );
+        }
+        
+        
+        // from node.js
+        if( message.getAddress() == "/showImage" ){
+            // 受信したテキストを取り出す
+            string imageID = message.getArgAsString(0);
+            
+            cout << "ofApp.h Receive OSC: /showImage imageID:" << imageID << "\n";
+            
+//            for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
+//                
+//            }
+        }
+        
         
         // from MAX/MSP
         if(message.getAddress() == "/updateScene"){
@@ -146,22 +184,22 @@ void ofApp::update(){
         }
 
         // Webサーバーに画像データが追加されたタイミングで受信する
-        if(message.getAddress() == "/addImage"){
-            // 受信したテキストを取り出す
-            string messageBody = message.getArgAsString(0);
-
-            cout << "OSC: /addImage " << messageBody << "\n";
-
-            imagePublishs[0]->addLoadFileName(messageBody);
-        }
+//        if(message.getAddress() == "/addImage"){
+//            // 受信したテキストを取り出す
+//            string messageBody = message.getArgAsString(0);
+//
+//            cout << "OSC: /addImage " << messageBody << "\n";
+//
+//            imagePublishs[0]->addLoadFileName(messageBody);
+//        }
     }
 
     /*
      * ImagePublish
      */
-    for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
-        (*it)->update();
-    }
+//    for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
+//        (*it)->update();
+//    }
 
     /*
      * Butterfly
@@ -183,9 +221,9 @@ void ofApp::draw(){
     /*
      * ImagePublish
      */
-    for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
-        (*it)->draw();
-    }
+//    for(vector <ImagePublish *>::iterator it = imagePublishs.begin(); it != imagePublishs.end(); ++it){
+//        (*it)->draw();
+//    }
 
     /*
      * Butterfly
@@ -204,12 +242,23 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-        if(key == 'b'){
-            Butterfly *bt = new Butterfly(FPS);
-            butterfrys.push_back(bt);
+    if(key == 'b'){
+        // モデルデータのインデックスを進める
+        butterfryModelIndex = (butterfryModelIndex % butterfryModelNum + butterfryModelNum) % butterfryModelNum;
+        butterfryModelIndex++;
+        Butterfly *bt = new Butterfly(FPS, "test", (butterfryModelIndex - 1));
+        bt->updateVisible("test");
+        butterfrys.push_back(bt);
     
-//            imagePublishs[0]->addLoadFileName("http://two-tone-cat.c.blog.so-net.ne.jp/_images/blog/_bec/two-tone-cat/calpis201303-2f009.jpg");
-        }
+        // imagePublishs[0]->addLoadFileName("http://two-tone-cat.c.blog.so-net.ne.jp/_images/blog/_bec/two-tone-cat/calpis201303-2f009.jpg");
+    }
+    
+    if(key == 'a'){
+        butterfryModelIndex = (butterfryModelIndex % butterfryModelNum + butterfryModelNum) % butterfryModelNum;
+        butterfryModelIndex++;
+
+        cout << butterfryModelIndex << "\n";
+    }
 }
 
 //--------------------------------------------------------------

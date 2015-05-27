@@ -14,16 +14,22 @@ private:
     bool _isLoading;
     bool _isLoadingComplete;
     bool _isPublishComplete;
+    string _publishPath;
     vector <string> _loadFileNames;
     void _publish();
     
 public:
-    ImagePublish( int ID );
+    ImagePublish( int ID, string publishPath );
+    
+    ofEvent<bool> publishComplete;
+    
     void urlResponse(ofHttpResponse & response);
     // void setup();
     void update();
     void draw();
     void addLoadFileName( string fileName );
+    
+//    void publishCompleteEvent();
 };
 
 #endif

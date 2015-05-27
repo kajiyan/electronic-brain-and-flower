@@ -1,17 +1,22 @@
 #include "Butterfly.h"
 
-Butterfly::Butterfly(float _fps){
+Butterfly::Butterfly(float fps, string objID, int modelIndex){
     cout << "Butterfly -> Constructor" << "\n";
     
-    fps = 30;
+    _fps = 30;
+    _objID = objID;
+    _modelIndex = modelIndex;
+    
+    // 表示のステータス 初期値は非表示
+    _isVisible = false;
     
     // モデルデータ読み込み 第2引数はスケール
-    _body.loadModel("butterfly/body.3ds", 0.75);
-    _hone.loadModel("butterfly/hone.3ds", 0.75);
-    _featherLT.loadModel("butterfly/featherLT.3ds", 0.75);
-    _featherLU.loadModel("butterfly/featherLU.3ds", 0.75);
-    _featherRT.loadModel("butterfly/featherRT.3ds", 0.75);
-    _featherRU.loadModel("butterfly/featherRU.3ds", 0.75);
+    _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 0.75);
+    _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 0.75);
+    _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 0.75);
+    _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 0.75);
+    _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 0.75);
+    _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 0.75);
     
     // 配列の初期化
     for (int i= 0; i < N; i++){
@@ -36,103 +41,105 @@ void Butterfly::update(){
 
 //--------------------------------------------------------------
 void Butterfly::draw(){
-    float x = _orbit[_count][0];
-    float y = _orbit[_count][1];
-    float z = _orbit[_count][2];
-    
-    float rfy = .3;
-    float ft = _flip[_count][0];
-    float fu = _flip[_count][1];
-    
-    ofPushStyle();
-    
-    ofSetColor(255);
-    
-    ofEnableSmoothing();
-    glShadeModel(GL_SMOOTH);
-    
-    glPushMatrix();
-    
-//    glTranslatef(ofGetWidth() / 2, ofGetHeight() / 2, 0);
-    
-    glTranslatef(x, y, z);
-    
-    glRotatef(_rotation[_count][0] * -1 * 180 / PI + -90, 1, 0, 0);   // x軸
-    glRotatef(180, 0, 1, 0);                                          // y軸
-    glRotatef(_rotation[_count][1] * -1 * 180 / PI, 0, 0, 1);         // z軸
-    _body.draw();
-    
-    // featherLT
-    glPushMatrix();
-    glRotatef(ft * rfy * 180 / PI, 0, 0, 1);    // y軸
-    glRotatef(-ft * 180 / PI, 0, 1, 0);         // z軸
-    _featherLT.draw();
-    glTranslatef(0, 0, 0);
-    glPopMatrix();
-    
-    // featherLU
-    glPushMatrix();
-    glRotatef(-fu * 180 / PI, 0, 1, 0);         // y軸
-    glRotatef(fu * rfy * 180 / PI, 0, 0, 1);    // z軸
-    _featherLU.draw();
-    glTranslatef(0, 0, 0);
-    glPopMatrix();
-    
-    // featherRT
-    glPushMatrix();
-    glRotatef(ft * 180 / PI, 0, 1, 0);          // y軸
-    glRotatef(-ft * rfy * 180 / PI, 0, 0, 1);   // z軸
-    _featherRT.draw();
-    glTranslatef(0, 0, 0);
-    glPopMatrix();
-    
-    // featherRU
-    glPushMatrix();
-    glRotatef(fu * 180 / PI, 0, 1, 0);          // y軸
-    glRotatef(-fu * rfy * 180 / PI, 0, 0, 1);   // z軸
-    _featherRU.draw();
-    glTranslatef(0, 0, 0);
-    glPopMatrix();
-    
-    glPushMatrix();
-    glRotatef(_rotation[_count][3] * -1 * 180 / PI, 1, 0, 0); // y軸
-    _hone.draw();
-    glPopMatrix();
-    
-    // glTranslatef(0, 0, 0);
-    glPopMatrix();
-    ofPopStyle();
-    
-    
-    if(++_count >= _orbit.size()){
-        for (int i = 0; i < _orbitArray.size(); i++) {
-            delete _orbitArray[i];
+    if ( _isVisible ) {
+        float x = _orbit[_count][0];
+        float y = _orbit[_count][1];
+        float z = _orbit[_count][2];
+        
+        float rfy = .3;
+        float ft = _flip[_count][0];
+        float fu = _flip[_count][1];
+        
+        ofPushStyle();
+        
+        ofSetColor(255);
+        
+        ofEnableSmoothing();
+        glShadeModel(GL_SMOOTH);
+        
+        glPushMatrix();
+        
+        // glTranslatef(ofGetWidth() / 2, ofGetHeight() / 2, 0);
+        
+        glTranslatef(x, y, z);
+        
+        glRotatef(_rotation[_count][0] * -1 * 180 / PI + -90, 1, 0, 0);   // x軸
+        glRotatef(180, 0, 1, 0);                                          // y軸
+        glRotatef(_rotation[_count][1] * -1 * 180 / PI, 0, 0, 1);         // z軸
+        _body.draw();
+        
+        // featherLT
+        glPushMatrix();
+        glRotatef(ft * rfy * 180 / PI, 0, 0, 1);    // y軸
+        glRotatef(-ft * 180 / PI, 0, 1, 0);         // z軸
+        _featherLT.draw();
+        glTranslatef(0, 0, 0);
+        glPopMatrix();
+        
+        // featherLU
+        glPushMatrix();
+        glRotatef(-fu * 180 / PI, 0, 1, 0);         // y軸
+        glRotatef(fu * rfy * 180 / PI, 0, 0, 1);    // z軸
+        _featherLU.draw();
+        glTranslatef(0, 0, 0);
+        glPopMatrix();
+        
+        // featherRT
+        glPushMatrix();
+        glRotatef(ft * 180 / PI, 0, 1, 0);          // y軸
+        glRotatef(-ft * rfy * 180 / PI, 0, 0, 1);   // z軸
+        _featherRT.draw();
+        glTranslatef(0, 0, 0);
+        glPopMatrix();
+        
+        // featherRU
+        glPushMatrix();
+        glRotatef(fu * 180 / PI, 0, 1, 0);          // y軸
+        glRotatef(-fu * rfy * 180 / PI, 0, 0, 1);   // z軸
+        _featherRU.draw();
+        glTranslatef(0, 0, 0);
+        glPopMatrix();
+        
+        glPushMatrix();
+        glRotatef(_rotation[_count][3] * -1 * 180 / PI, 1, 0, 0); // y軸
+        _hone.draw();
+        glPopMatrix();
+        
+        // glTranslatef(0, 0, 0);
+        glPopMatrix();
+        ofPopStyle();
+        
+        
+        if(++_count >= _orbit.size()){
+            for (int i = 0; i < _orbitArray.size(); i++) {
+                delete _orbitArray[i];
+            }
+            _orbitArray.clear();
+            
+            for (int i = 0; i < _rotationArray.size(); i++) {
+                delete _rotationArray[i];
+            }
+            _rotationArray.clear();
+            
+            for (int i = 0; i < _flipArray.size(); i++) {
+                delete _flipArray[i];
+            }
+            _flipArray.clear();
+            
+            _orbit.clear();
+            _rotation.clear();
+            _flip.clear();
+            
+            for (int i = 0; i < _peakArray.size(); i++) {
+                delete _peakArray[i];
+            }
+            _peakArray.clear();
+            
+            _count = 0;
+            
+            createPeak();
+            generateOrbit();
         }
-        _orbitArray.clear();
-        
-        for (int i = 0; i < _rotationArray.size(); i++) {
-            delete _rotationArray[i];
-        }
-        _rotationArray.clear();
-        
-        for (int i = 0; i < _flipArray.size(); i++) {
-            delete _flipArray[i];
-        }
-        _flipArray.clear();
-        
-        _orbit.clear();
-        _rotation.clear();
-        _flip.clear();
-        
-        for (int i = 0; i < _peakArray.size(); i++) {
-            delete _peakArray[i];
-        }
-        _peakArray.clear();
-        
-        _count = 0;
-        
-        createPeak();
-        generateOrbit();
     }
 }
 
@@ -427,6 +434,21 @@ void Butterfly::generateOrbit(){
         vector<float>(p2).swap(p2);
     }
     
+}
+
+/* --------------------------------------------------------------
+ /updateScene でMax から取得した音楽のシーンIDをセットする
+ 
+ @access	public
+ @param	    string 写真のID
+ @return	none
+ --------------------------------------------------------------  */
+void Butterfly::updateVisible( string objID ){
+    // インスタンスに設定されているIDと同じだったら
+    // オブジェクトの表示ステータスを変える
+    if( _objID == objID ){
+        _isVisible = true;
+    }
 }
 
 //--------------------------------------------------------------

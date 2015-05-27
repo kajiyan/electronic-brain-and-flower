@@ -5,10 +5,12 @@
 using Poco::RegularExpression;
 
 //--------------------------------------------------------------
-ImagePublish::ImagePublish( int ID ) {
+ImagePublish::ImagePublish( int ID, string publishPath ) {
     cout << "ImagePublish -> constructor\n";
     
     _ID = ID;
+    _publishPath = publishPath;
+    
     _isLoading = false;
     _isLoadingComplete = false;
     _isPublishComplete = false;
@@ -48,12 +50,16 @@ void ImagePublish::urlResponse(ofHttpResponse & response){
         // すべてのファイルを読み込んだ時の処理
         if( _loadFileNames.size() == 0 ){
             _isLoadingComplete = true;
+            
+            // 読み込みが終了した時のイベント
+            ofNotifyEvent(publishComplete, _isLoadingComplete);
         }
     }else{
         cout << response.status << " " << response.error << endl;
         if(response.status != -1){
             _isLoading = false;
             _isLoadingComplete = true;
+            ofNotifyEvent(publishComplete, _isLoadingComplete);
         }
     }
 }
@@ -71,7 +77,7 @@ void ImagePublish::_publish(){
         string publishFileName;
         fileNameMatch.extract(_loadFileNames.front(), publishFileName);
         
-        _image.saveImage( publishFileName );
+        _image.saveImage( _publishPath + publishFileName );
         _loadFileNames.erase( _loadFileNames.begin() );
         
         // アルファブレンディングを有効にする

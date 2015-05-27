@@ -75,12 +75,15 @@ private:
     int _n;
     int _m;
     
-    float fps;
+    float _fps;
+    string _objID;
+    int _modelIndex;
     
+    bool _isVisible;
     
     
 public:
-    Butterfly(float _fps);
+    Butterfly(float fps, string objID, int modelIndex);
     void update();
     void draw();
     void fly();
@@ -89,6 +92,8 @@ public:
     
     void destinationPeak();
     void destinationOrbit();
+    
+    void updateVisible(string objID);
 };
 
 #endif /* defined(__word_bridge__Butterfly__) */

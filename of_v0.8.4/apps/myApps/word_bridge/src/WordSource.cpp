@@ -161,7 +161,7 @@ void WordSource::updateMHlampSignal( string text ) {
         sendMessage.addIntArg( 1 );
         _maxSender.sendMessage( sendMessage );
         
-         _MHlampSignal += 1;
+        // _MHlampSignal += 1;
     }
     
      cout << _MHlampSignal << "\n";
