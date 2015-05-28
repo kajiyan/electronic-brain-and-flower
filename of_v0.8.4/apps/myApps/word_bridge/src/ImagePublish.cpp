@@ -54,14 +54,19 @@ void ImagePublish::draw() {
 //--------------------------------------------------------------
 void ImagePublish::urlResponse(ofHttpResponse & response){
     if(response.status == 200){
-        _image.loadImage(response.data);
+        ofRemoveListener(ofURLResponseEvent(), this, &ImagePublish::urlResponse);
+        
+        _image.loadImage( response.data );
+        _image.setImageType( OF_IMAGE_COLOR );
         
         // 画像を書き出す
         _publish();
-        
+
         _isLoading = false;
         // すべてのファイルを読み込んだ時の処理
-        if( _loadFileNames.size() == 0 ){
+        // if( _loadFileNames.size() == 0 ){
+        if( _isPublishComplete ){
+            // _isPublishComplete = false;
             _isLoadingComplete = true;
             
             // 読み込みが終了した時のイベント
@@ -86,18 +91,21 @@ void ImagePublish::_publish(){
         // アルファブレンディングを無効にする
         ofDisableAlphaBlending();
         
-        RegularExpression fileNameMatch("([^/]+?)([\?#].*)?$");
-        string publishFileName;
-        fileNameMatch.extract(_loadFileNames.front(), publishFileName);
-        
         // ファイルネームが指定されているかでファイル名を分岐
         if( _isConfigFileName ) {
             _image.saveImage( _publishPath + _fileName );
         } else {
+            RegularExpression fileNameMatch("([^/]+?)([\?#].*)?$");
+            string publishFileName;
+            fileNameMatch.extract(_loadFileNames.front(), publishFileName);
+            
             _image.saveImage( _publishPath + publishFileName );
+            _loadFileNames.erase( _loadFileNames.begin() );
         }
         
-        _loadFileNames.erase( _loadFileNames.begin() );
+        _isPublishComplete = true;
+
+        // _loadFileNames.erase( _loadFileNames.begin() );
         
         // アルファブレンディングを有効にする
         ofEnableAlphaBlending();

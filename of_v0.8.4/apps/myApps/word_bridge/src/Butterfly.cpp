@@ -1,11 +1,17 @@
 #include "Butterfly.h"
 
 Butterfly::Butterfly(float fps, string objID, int modelIndex){
-    cout << "Butterfly -> Constructor" << "\n";
+    cout << "Butterfly -> Constructor " << modelIndex << "\n";
+    
+    // 設定ファイルを取得する
+    _setting.open("config.json");
     
     _fps = 30;
     _objID = objID;
     _modelIndex = modelIndex;
+    
+    // OSCを送信したかのフラグ
+    _isSendMHlampOSC = false;
     
     // 表示のステータス 初期値は非表示
     _isVisible = false;
@@ -42,6 +48,12 @@ Butterfly::Butterfly(float fps, string objID, int modelIndex){
 
 //--------------------------------------------------------------
 void Butterfly::setup(){
+    // Max 用のOSC Senderのセットアップ
+    _maxSender.setup(
+         _setting["address"]["max"]["host"].asString(),
+         _setting["address"]["max"]["port"].asInt()
+    );
+    
     // 画像ローダーのセットアップ
     _imagePublish.setup( 0, "butterfly" + ofToString(_modelIndex) + "/" );
     _imagePublish.setFileName( "wing.jpg" );
@@ -55,10 +67,24 @@ void Butterfly::setup(){
 //--------------------------------------------------------------
 void Butterfly::update(){
     _imagePublish.update();
+    
+    
+    // スローと画像の書き出しが完了していたら一度だけOSCを発信する
+    // MHlampを消灯する信号をMax/Mspに送る
+    if ( _isVisible && _isImagePublish && !_isSendMHlampOSC ) {
+        _isSendMHlampOSC = true;
+        
+        ofxOscMessage sendMessage;
+        sendMessage.setAddress( "/MHlamp/status" );
+        sendMessage.addIntArg( 0 );
+        _maxSender.sendMessage( sendMessage );
+    }
 }
 
 //--------------------------------------------------------------
 void Butterfly::draw(){
+    _imagePublish.draw();
+    
     // スローと画像の書き出しが完了していたらアニメーションをはじめる
     if ( _isVisible && _isImagePublish ) {
         float x = _orbit[_count][0];
@@ -475,8 +501,8 @@ void Butterfly::updateVisible( string objID ){
 /* --------------------------------------------------------------
  読み込む画像のファイルネームをセットする
  --------------------------------------------------------------  */
-
 void Butterfly::addLoadFileName( string fileName ) {
+    cout << "Butterfly -> Constructor: " << _modelIndex << " -> addLoadFileName" << "\n";
     _imagePublish.addLoadFileName( fileName );
 }
 
@@ -487,15 +513,17 @@ void Butterfly::addLoadFileName( string fileName ) {
  --------------------------------------------------------------  */
 void Butterfly::imagePublishCallback(bool & e){
     cout << "Butterfly -> imagePublishCallback\n";
+    ofRemoveListener(_imagePublish.publishComplete, this, &Butterfly::imagePublishCallback);
+    
     _isImagePublish = e;
     
     // 画像（テクスチャ）の読み込みが完了したらモデルデータ読み込み 第2引数はスケール
-    _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 0.75);
-    _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 0.75);
-    _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 0.75);
-    _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 0.75);
-    _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 0.75);
-    _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 0.75);
+    _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 1.0);
+    _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 1.0);
+    _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 1.0);
+    _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 1.0);
+    _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 1.0);
+    _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 1.0);
 
 }
 

@@ -12,7 +12,9 @@
 #include <stdio.h>
 
 #include "ofMain.h"
+#include "ofxOsc.h"
 #include "ofx3DModelLoader.h"
+#include "ofxJSON.h"
 
 #include "ImagePublish.h"
 
@@ -36,12 +38,16 @@ class Butterfly {
 private:
     ImagePublish _imagePublish;
     
+    ofxJSONElement _setting; // アプリケーションの設定ファイル
+    
     ofx3DModelLoader _body;
     ofx3DModelLoader _hone;
     ofx3DModelLoader _featherLT;
     ofx3DModelLoader _featherLU;
     ofx3DModelLoader _featherRT;
     ofx3DModelLoader _featherRU;
+    
+    ofxOscSender _maxSender; // Max/Msp 用のOSC Sender
     
     Boolean _isPowerMode = false;
     Boolean _isSlowFlip = false;
@@ -84,9 +90,9 @@ private:
     string _objID;
     int _modelIndex;
     
+    bool _isSendMHlampOSC;
     bool _isVisible;
     bool _isImagePublish;
-    
     
 public:
     Butterfly(float fps, string objID, int modelIndex);

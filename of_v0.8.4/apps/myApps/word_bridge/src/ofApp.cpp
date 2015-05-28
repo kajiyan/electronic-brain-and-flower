@@ -8,6 +8,7 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofEnableSmoothing();
     ofSetFrameRate(FPS);
+//    ofSetFrameRate(30);
     ofSetWindowTitle("電脳と花");
     
     ofBackground(0, 0, 0);
