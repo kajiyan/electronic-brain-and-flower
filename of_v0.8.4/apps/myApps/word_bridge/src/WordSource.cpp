@@ -6,8 +6,8 @@
 using Poco::replace;
 using Poco::RegularExpression;
 
-
-static string _sceneLabels[6] = {"", "rain", "wind", "breathe", "internet", ""};
+// 音楽のラベル
+static string _sceneLabels[6] = { "introduction", "rain", "wind", "breathe", "internet", "coda" };
 
 
 //--------------------------------------------------------------
@@ -53,6 +53,9 @@ void WordSource::setup() {
 
 //--------------------------------------------------------------
 void WordSource::update() {
+    _debugUpdateStream = "WordSource ID" + ofToString( _ID ) + " -> /updateStream \n" +
+    "text: " + _debugUpdateStreamText + "\n";
+    
     // 新しいテキストが設定されてあり、音声書き出し中でない状態であれば
     // Sub App にOSCでテキスト情報を送る
     if( !_isGetNewWord && !_isPublishProgress ) {
@@ -94,7 +97,9 @@ void WordSource::draw() {
         ofPushStyle();
         
         ofSetColor(ofColor(255, 255, 255));
+        
         ofDrawBitmapString(_debugString, 20, 100 * _ID + 100);
+        ofDrawBitmapString(_debugUpdateStream, 20, 500);
         
         ofPopStyle();
     }
@@ -123,6 +128,8 @@ void WordSource::setSceneIndex( int sceneIndex ) {
  @return	none
  --------------------------------------------------------------  */
 void WordSource::setWord( string language, string text ) {
+    _debugUpdateStreamText = _wordValidation( text );
+    
     int sceneLabelLen = sizeof(_sceneLabels) / sizeof(_sceneLabels[0]);
     
     if ( _isGetNewWord && ( _sceneIndex > 0 && _sceneIndex < sceneLabelLen ) ) {
@@ -153,9 +160,16 @@ void WordSource::setWord( string language, string text ) {
 void WordSource::updateMHlampSignal( string text ) {
     text = _wordValidation( text );
     
-    // 特定のキーワードが入っているか判別する
+    int sceneLabelLen = sizeof(_sceneLabels) / sizeof(_sceneLabels[0]);
+    string sceneLabel = _sceneLabels[_sceneIndex];
+    
+    //if ( _sceneIndex > 0 && _sceneIndex < sceneLabelLen ) {}
+    
+    // 現在のシーンのツイートの中に特定のキーワードが入っているか判別する
     // キーワードが含まれていた場合Max/Mspに対してOSCを発信する。
-    if(ofStringTimesInString(text, "lol") > 0 || ofStringTimesInString(text, "rofl")) {
+    if( (ofStringTimesInString(text, sceneLabel) > 0) && (ofStringTimesInString(text, "lol") > 0 || ofStringTimesInString(text, "rofl")) ) {
+        cout << "WordSource -> sendOSC | /MHlamp/status\n";
+        
         ofxOscMessage sendMessage;
         sendMessage.setAddress( "/MHlamp/status" );
         sendMessage.addIntArg( 1 );
@@ -163,12 +177,6 @@ void WordSource::updateMHlampSignal( string text ) {
         
         // _MHlampSignal += 1;
     }
-    
-     cout << _MHlampSignal << "\n";
-    // cout << ofStringTimesInString(text, "lol") << "\n";
-    // cout << ofStringTimesInString(text, "rofl") << "\n";
-    
-    // cout << "WordSource -> setWord: " << text << "\n";
 }
 
 

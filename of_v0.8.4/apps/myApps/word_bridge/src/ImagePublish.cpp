@@ -54,6 +54,7 @@ void ImagePublish::draw() {
 //--------------------------------------------------------------
 void ImagePublish::urlResponse(ofHttpResponse & response){
     if(response.status == 200){
+        // 一度受信したらイベントリスナーを破棄する
         ofRemoveListener(ofURLResponseEvent(), this, &ImagePublish::urlResponse);
         
         _image.loadImage( response.data );

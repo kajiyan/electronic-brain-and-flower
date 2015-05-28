@@ -24,6 +24,8 @@ private:
     int _uniqueID;
     
     bool _isDebug;
+    string _debugUpdateStream;
+    string _debugUpdateStreamText;
     string _debugString;
     
     ofxJSONElement _setting; // アプリケーションの設定ファイル
