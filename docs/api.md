@@ -107,8 +107,10 @@ Max/Mspに再生対象のファイルについてOSCを発信する。以下の�
 
 
 ####【/MHlamp/status】（to Max/Msp）
-【/updateStream】で受信した本文に特定の文字列が含まれていたら  
-Max/Mspにメタルハライドランプの状態をOSCで発信する。以下のポートで受信可能。 
+Max/Mspにメタルハライドランプの状態を発信する。値は整数で、0が消灯、1が点灯。  
+画像の投稿が終わったタイミングで消灯の値を持った信号がButterflyインスタンスから、  
+特定のキーワードをストリームから検出したタイミングて点灯の値を持った信号が  
+WordSourceインスタンスから発信される。以下のポートで受信可能。 
 
 ##### ■ Receive Port
 - 12004
@@ -223,6 +225,11 @@ port 12003に発信されたOSCを監視する。
 
 ### RECEIVE 系 
 port 12004に発信されたOSCを監視する。  
+
+##### ■【/MHlamp/status】（from OpenFrameWorks Main App）
+- value: (1)[Int] { 0 | 1 }  点灯のステータス
+
+受信した値を元にメタルハライドランプの点灯状態を変更する。
 
 ##### ■【/play/effect】（from OpenFrameWorks Main App）
 - value: (1)[String] WordSource のインスタンスID  
