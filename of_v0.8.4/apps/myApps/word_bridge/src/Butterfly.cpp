@@ -524,7 +524,6 @@ void Butterfly::imagePublishCallback(bool & e){
     _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 1.0);
     _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 1.0);
     _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 1.0);
-
 }
 
 

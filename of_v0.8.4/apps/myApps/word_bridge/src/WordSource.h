@@ -46,6 +46,10 @@ private:
     void _sendSignalToMax();
     string _wordValidation( string message );
     
+    float _wordPlayStartTime;
+    float _wordPlayEndTime;
+    bool _isTimerReached;
+    
 public:
     WordSource( int ID );
     void setup();
@@ -57,8 +61,10 @@ public:
     void setDebugState( bool state );
     void setSceneIndex( int sceneIndex );
     void setWord( string language, string text );
+    void setTimeOut( float wordPlayEndTime );
+    void updatePumpSignal( string text );
     void updateMHlampSignal( string text );
-    void updateWordState( bool isGetNewWord, bool isPublishProgress );
+    void updateWordState( bool isGetNewWord, bool isPublishProgress, bool isTimerReached );
 };
 
 #endif /* defined(__word_bridge__WordSource__) */

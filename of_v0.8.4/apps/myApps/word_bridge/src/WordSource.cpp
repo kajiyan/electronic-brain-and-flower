@@ -30,7 +30,16 @@ WordSource::WordSource( int ID ) {
     
     _sceneIndex = 0; // 音楽のシーンID
     
+    if ( _isDebug ) {
+        _sceneIndex = 1;
+    }
+    
     _MHlampSignal = 0;
+    
+    // Max/Mspに読み上げ用のシグナルを送ってから
+    // /complete/wordが返ってくるまでの待機時間を指定する
+    _wordPlayEndTime = 10000;
+    _isTimerReached = true;
 }
 
 //--------------------------------------------------------------
@@ -71,7 +80,7 @@ void WordSource::update() {
         
         // ファイル名を一意にするIDをアップデート
         _uniqueID = ( ( _uniqueID + 1 ) % 2 + 2 ) % 2;
-        cout << "uniqueID:" << _uniqueID << "\n";
+        cout << "WordSource -> update -> uniqueID:" << _uniqueID << "\n";
         
         // デバッグ用のテキストを設定
         _debugString = "WordSource ID" + ofToString( _ID ) + " -> /add/word \n" +
@@ -87,6 +96,18 @@ void WordSource::update() {
         sendMessage.addIntArg( _uniqueID );
         sendMessage.addIntArg( _ID );
         _ofSubAppSender.sendMessage( sendMessage );
+        
+        setTimeOut( 10000 );
+    }
+
+    
+    // Max/Mspに読み上げ用のシグナルを送ってから特定の時間以内に
+    // /complete/wordが返ってこない時、Sub Appからの応答がないときの処理
+    float timer = ofGetElapsedTimeMillis() - _wordPlayStartTime;
+    if( timer >= _wordPlayEndTime && !_isTimerReached ) {
+        cout << "WordSource -> TimeOut\n";
+        _isTimerReached = true;
+        updateWordState( true, false, true ); // OSC受信可能状態に戻す
     }
 }
 
@@ -115,7 +136,7 @@ void WordSource::draw() {
  @return	none
  --------------------------------------------------------------  */
 void WordSource::setSceneIndex( int sceneIndex ) {
-    int _sceneIndex = sceneIndex;
+    _sceneIndex = sceneIndex;
 }
 
 
@@ -151,7 +172,50 @@ void WordSource::setWord( string language, string text ) {
 
 
 /* --------------------------------------------------------------
- /signal/MHlamp でMax/Mspに送信するデータをセットする
+ 指定時間以内にMax/Mspから読み上げ完了のフラグが戻ってこなければフラグを戻す
+ 
+ @access	public
+ @param	    float wordPlayEndTime タイムアウトまでの時間（ms）
+ @return	none
+ --------------------------------------------------------------  */
+void WordSource::setTimeOut( float wordPlayEndTime ) {
+    cout << "WordSource -> setTimeOut: " + ofToString( wordPlayEndTime ) + "ms\n";
+    
+    _wordPlayStartTime = ofGetElapsedTimeMillis();
+    _wordPlayEndTime = wordPlayEndTime;
+    _isTimerReached = false;
+}
+
+
+
+/* --------------------------------------------------------------
+ /pump/status でMax/Mspに送信するデータをセットする
+ 
+ @access	public
+ @param	    none
+ @return	none
+ --------------------------------------------------------------  */
+void WordSource::updatePumpSignal( string text ) {
+    // 現在のシーンが雨なら処理をする
+    if( _sceneIndex == 2 ) {
+        string sceneLabel = _sceneLabels[1]; // Rain
+        text = _wordValidation( text );
+        
+        if( (ofStringTimesInString(text, sceneLabel) > 0) ) {
+            cout << "WordSource -> sendOSC | pump/status\n";
+            
+            ofxOscMessage sendMessage;
+            sendMessage.setAddress( "/pump/status" );
+            sendMessage.addIntArg( 1 );
+            _maxSender.sendMessage( sendMessage );
+        }
+    }
+}
+
+
+
+/* --------------------------------------------------------------
+ /MHlamp/status でMax/Mspに送信するデータをセットする
  
  @access	public
  @param	    none
@@ -163,8 +227,6 @@ void WordSource::updateMHlampSignal( string text ) {
     int sceneLabelLen = sizeof(_sceneLabels) / sizeof(_sceneLabels[0]);
     string sceneLabel = _sceneLabels[_sceneIndex];
     
-    //if ( _sceneIndex > 0 && _sceneIndex < sceneLabelLen ) {}
-    
     // 現在のシーンのツイートの中に特定のキーワードが入っているか判別する
     // キーワードが含まれていた場合Max/Mspに対してOSCを発信する。
     if( (ofStringTimesInString(text, sceneLabel) > 0) && (ofStringTimesInString(text, "lol") > 0 || ofStringTimesInString(text, "rofl")) ) {
@@ -174,8 +236,6 @@ void WordSource::updateMHlampSignal( string text ) {
         sendMessage.setAddress( "/MHlamp/status" );
         sendMessage.addIntArg( 1 );
         _maxSender.sendMessage( sendMessage );
-        
-        // _MHlampSignal += 1;
     }
 }
 
@@ -185,9 +245,10 @@ void WordSource::updateMHlampSignal( string text ) {
  Max/Msp から/complete/word が通知されたタイミングで実行される
  新しく読み上げファイルを書き出せる状態にする。 
 --------------------------------------------------------------  */
-void WordSource::updateWordState( bool isGetNewWord, bool isPublishProgress ) {
+void WordSource::updateWordState( bool isGetNewWord, bool isPublishProgress, bool isTimerReached ) {
     _isGetNewWord = isGetNewWord;
     _isPublishProgress = isPublishProgress;
+    _isTimerReached = isTimerReached;
 }
 
 

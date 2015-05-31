@@ -62,4 +62,8 @@ class ofApp : public ofBaseApp{
          ============================================================================= */
         int wordsSize = 1;
         vector<WordSource *> wordSources;
+    
+//        float wordPlayStartTime;
+//        float wordPlayEndTime;
+//        bool isTimerReached;
 };

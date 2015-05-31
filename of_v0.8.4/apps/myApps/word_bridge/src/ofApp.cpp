@@ -8,7 +8,6 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofEnableSmoothing();
     ofSetFrameRate(FPS);
-//    ofSetFrameRate(30);
     ofSetWindowTitle("電脳と花");
     
     ofBackground(0, 0, 0);
@@ -18,8 +17,6 @@ void ofApp::setup(){
     
     if( parsingSuccessful ) {
         ofLogNotice("ofApp::setup") << setting.getRawString();
-        
-        cout << setting["address"]["openFrameWorks"]["main"]["port"].asInt() << "\n";
 
         // OSCを受信するポートの設定
         receiver.setup(setting["address"]["openFrameWorks"]["main"]["port"].asInt());
@@ -85,6 +82,11 @@ void ofApp::setup(){
     for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->setup();
     }
+    
+    // Max/Mspに読み上げ用のシグナルを送ってから
+    // /complete/wordが返ってくるまでの待機時間を指定する
+//    wordPlayEndTime = 10000;
+//    isTimerReached = true;
 }
 
 //--------------------------------------------------------------
@@ -104,6 +106,7 @@ void ofApp::update(){
             
             for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
                 // OF Sub App に送信する値をセットする
+                (*it)->updatePumpSignal( text );
                 (*it)->updateMHlampSignal( text );
                 (*it)->setWord( language, text );
             }
@@ -128,9 +131,6 @@ void ofApp::update(){
             bt->addLoadFileName( imageURL );
             // bt->updateVisible("test");
             butterfrys.push_back(bt);
-
-        
-//            imagePublishs[0]->addLoadFileName( imageURL );
         }
         
         
@@ -144,9 +144,6 @@ void ofApp::update(){
             for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
                 (*it)->updateVisible( imageID );
             }
-//            for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
-//                
-//            }
         }
         
         
@@ -174,12 +171,34 @@ void ofApp::update(){
             cout << "ofApp.h Receive OSC: /publish/word fileID:" << fileID << "\n";
             cout << "ofApp.h Receive OSC: /publish/word fileName:" << fileName << "\n";
             
-            // Max/Msp に書きだした音声ファイルを送る（/play/word）
-            ofxOscMessage sendMessage;
-            sendMessage.setAddress( "/play/word" );
-            sendMessage.addIntArg( fileID );
-            sendMessage.addStringArg( fileName );
-            _maxMspAppSender.sendMessage( sendMessage );
+            
+            // 読み上げが終了しない場合のタイムアウトを設定する
+            for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
+                if( fileID == (*it)->getID() ){
+                    (*it)->setTimeOut( 120000 ); // 120秒待つ
+                }
+            }
+            
+            
+            // コマンドが正常に終了している場合
+            if( commandStatusCode == 0 ){
+                // Max/Msp に書きだした音声ファイルを送る（/play/word）
+                ofxOscMessage sendMessage;
+                sendMessage.setAddress( "/play/word" );
+                sendMessage.addIntArg( fileID );
+                sendMessage.addStringArg( fileName );
+                _maxMspAppSender.sendMessage( sendMessage );
+            } else {
+                for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
+                    // 受信したIDと同じIDを持つインスタンスのステータスをOSC受信可能状態にする
+                    if( fileID == (*it)->getID() ){
+                        bool isGetNewWord      = true;
+                        bool isPublishProgress = false;
+                        bool isTimerReached    = true;
+                        (*it)->updateWordState( isGetNewWord, isPublishProgress, isTimerReached );
+                    }
+                }
+            }
         }
         
         // Max/Msp 音声の再生が終了したタイミングで受信する
@@ -192,12 +211,13 @@ void ofApp::update(){
                 if( fileID == (*it)->getID() ){
                     bool isGetNewWord      = true;
                     bool isPublishProgress = false;
-                    (*it)->updateWordState( isGetNewWord, isPublishProgress );
+                    bool isTimerReached    = true;
+                    (*it)->updateWordState( isGetNewWord, isPublishProgress, isTimerReached );
                 }
             }
         }
 
-        // Webサーバーに画像データが追加されたタイミングで受信する
+//        // Webサーバーに画像データが追加されたタイミングで受信する
 //        if(message.getAddress() == "/addImage"){
 //            // 受信したテキストを取り出す
 //            string messageBody = message.getArgAsString(0);
@@ -228,6 +248,24 @@ void ofApp::update(){
     for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->update();
     }
+    
+    
+    // Max/Mspに読み上げ用のシグナルを送ってから特定の時間以内に
+    // /complete/wordが返ってこない時の処理
+//    float timer = ofGetElapsedTimeMillis() - wordPlayStartTime;
+//    
+//    if( timer >= wordPlayEndTime && !isTimerReached ) {
+//        isTimerReached = true;
+//        
+//        // OSC受信可能状態に戻す
+//        for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
+//            bool isGetNewWord      = true;
+//            bool isPublishProgress = false;
+//            (*it)->updateWordState( isGetNewWord, isPublishProgress );
+//        }
+//            
+//        cout << "test\n";
+//    }
 }
 
 //--------------------------------------------------------------
