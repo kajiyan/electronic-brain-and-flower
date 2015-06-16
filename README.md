@@ -42,17 +42,21 @@ EC2のSecurity Groups はNodeの実行環境に合わせて適切に設定する
 - 3ch  
 - 4ch  
 - 5ch  超音波 噴霧機
-- 6ch  汲み上げポンプ
-- 7ch  スポット型電球
-- 8ch  サーキュレーター
-- 9ch  LED 蛍光灯 Left(led_left) 
-- 10ch LED 蛍光灯 Right(led_right)
-- 11ch LED 蛍光灯 Center(led_center)
+- 6ch  スポット型電球
+- 7ch  サーキュレーター
+- 8ch  
+- 9ch  汲み上げポンプ・汲み上げポンプ
+- 10ch 汲み上げポンプ・汲み上げポンプ
+- 11ch 
 - 12ch 
-- 13ch メタルハライドランプ 安定器
-- 14ch 
-- 15ch 
+- 13ch LED 蛍光灯 Left(led_left) 
+- 14ch LED 蛍光灯 Right(led_right)
+- 15ch LED 蛍光灯 Center(led_center)
 - 16ch  
+- 17ch メタルハライドランプ 安定器
+- 18ch 
+- 19ch 
+- 20ch 
 
 
 ## Node
