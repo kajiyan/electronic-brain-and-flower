@@ -1,44 +1,95 @@
+// node index.js -m DEBUG -i int000000
+// node index.js -m PRODUCTION -i int000000
+
+
 var config = require('config');
 var io = require('socket.io-client');
 var twitter = require('twitter');
 var osc = require('osc-min');
 var dgram = require('dgram');
+var minimist = require('minimist');
 
 
 var viewerSocket = io.connect('http://localhost:3030/viewer');
 var oscSender = dgram.createSocket("udp4");
 
 
+// コマンドラインからわたってきた引数
+var options = minimist(process.argv.slice(2));
+
+var defaults = {
+  m: 'DEBUG', // or PRODUCTION
+  i: 'int'
+};
+
+for ( var key in options ) {
+  if ( options.hasOwnProperty( key ) ) {
+    defaults[key] = options[key];
+  }
+}
+
+var setting = {};
+setting.mode = defaults.m;
+setting.roomId = defaults.i.replace('int', '');
+
+
+
 // ------------------------------------------------------------
 // Web Socket
 // ------------------------------------------------------------
-viewerSocket.on('connect', function(socket){
-  console.log('Bridge App | Socket -> Connect');
+if(setting.roomId.length > 0){
+  viewerSocket.on('connect', function(socket){
+    console.log('Bridge App | Socket -> Connect');
 
-  // ROOM が破棄されていたらIDを再設定する必要がある
-  viewerSocket.emit('join', {id: '463295'}, function(error, roomID){
-    if( error ){
-      console.log( error );
-      return;
-    }
-  });
-});
-
-
-viewerSocket.on('post', function(data){
-  console.log('Bridge App | Socket -> _postHandler');
-
-  var buffer = osc.toBuffer({
-    address: '/addImage',
-    args: [
-      {
-        type: 'string',
-        value: data.url
+    // ROOM が破棄されていたらIDを再設定する必要がある
+    viewerSocket.emit('join', {id: setting.roomId}, function(error, roomID){
+      if( error ){
+        console.log( error );
+        return;
       }
-    ]
+    });
   });
-  oscSender.send(buffer, 0, buffer.length, 12002, "localhost");
-});
+
+
+  // ファイルが設定された時に受信
+  viewerSocket.on('post', function(data){
+    console.log('Bridge App | Socket -> _postHandler');
+
+    var buffer = osc.toBuffer({
+      address: '/addImage',
+      args: [
+        {
+          type: 'string',
+          value: data.url
+        },
+        {
+          type: "string",
+          value: data.id
+        }
+      ]
+    });
+    
+    oscSender.send(buffer, 0, buffer.length, 12002, "localhost");
+  });
+
+
+  // 加速度センサーが閾値を超えた時に受信
+  viewerSocket.on( 'trigger', function( data ) {
+    console.log( 'Bridge App | Socket -> _triggerHandler' );
+
+    var buffer = osc.toBuffer({
+      address: '/showImage',
+      args: [
+        {
+          type: 'string',
+          value: data.id
+        }
+      ]
+    });
+
+    oscSender.send(buffer, 0, buffer.length, 12002, "localhost");
+  });
+}
 
 
 // ------------------------------------------------------------
@@ -58,7 +109,9 @@ var twitterClient = new twitter({
       { track: 'rain,wind,breathe,internet' },
       function( stream ) {
         stream.on( 'data', function( data ) {
-          if( data.user.lang === 'en' || data.user.lang === 'ja' ){
+          if( (data.user.lang !== 'undefined' && data.user.lang !== null) &&
+            data.user.lang === 'en' || data.user.lang === 'ja' )
+          {
             var buffer = osc.toBuffer({
               address: "/updateStream",
               args: [
@@ -72,6 +125,7 @@ var twitterClient = new twitter({
                 }
               ]
             });
+            // console.log(data.text);
             oscSender.send(buffer, 0, buffer.length, 12002, "127.0.0.1");
           }
         });
@@ -86,6 +140,10 @@ var twitterClient = new twitter({
     return;
   }
 })();
+
+
+
+
 
 
 
