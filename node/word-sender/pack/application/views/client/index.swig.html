@@ -1,40 +1,123 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
+<html id="ebaf" class="ebaf client" lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://www.facebook.com/2008/fbml">
   <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="content-language" content="ja">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <meta http-equiv="imagetoolbar" content="no">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="" />
 
-  <title></title>
+  <title>client</title>
+
+  <link href="http://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet" type="text/css">
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="/css/style.css">
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="/common/js/common.js?v=1.0.0"></script>
+  <script src="/js/lib/binaryajax.js"></script>
+  <script src="/js/lib/exif.js"></script>
+  <script src="/js/lib/canvasResize.js"></script>
   <script src="/js/index.js?v=1.0.0"></script>
 </head>
 
-<body data-roomid="{{ roomid }}">
-<div id="wrapper">
-  <div id="image">
-    <div class="image-inner">
-      <div class="image-inner2">
-        <img class="image-img" />
-        <div class="image-mosaic"></div>
+<body class="client-body" data-roomid="{{ roomid }}">
+  <div class="wrapper">
+
+    <div class="image-select l-index-20">
+      <div class="image-select-inner">
+        <div class="image-select-header">
+          <h1 class="image-select-h1">
+            <span class="image-select-img-holder">
+              <img class="image-select-img l-fluid-image" src="/images/logo-0.svg" alt="電脳と花">
+            </span>
+          </h1>
+          <!-- <div class="image-select-highlight"></div> -->
+        </div>
+        <div class="back">
+          <div class="back-inner">
+            <div class="back-img-holder back-img-src-0">
+              <img class="back-img l-fluid-image" src="/images/light-0.svg" alt="*">
+            </div>
+            <div class="back-img-holder back-img-src-1">
+              <img class="back-img l-fluid-image" src="/images/flower-0.svg" alt="*">
+            </div>
+            <div id="js-read-light" class="back-img-holder back-img-src-2">
+              <img class="back-img l-fluid-image" src="/images/light-back-0.svg" alt="*">
+            </div>
+          </div>
+        </div><!-- /.back -->
+        <input class="image-select-input" type="file" accept="image/*">
       </div>
-      <div class="image-select">
-        <div class="pop image-select-pop"></div>
-        <h2 class="image-select-message">
-          　select-photo
-        </h2>
-        <div class="image-select-highlight"></div>
-        <input class="image-select-input" type="file" accept="image/*" />
+    </div>
+
+
+
+    <div class="update">
+      <div class="update-inner">
+        <span id="js-clock" class="update-body l-roboto-condensed"></span><br>
+        <span class="update-body l-roboto-condensed"><a href="https://goo.gl/maps/GqzsE">at 35.188740, 136.947270</a></span><br>
+        <span id="js-read-text" class="update-body l-roboto-condensed"></span>
       </div>
-      <div class="image-throw">
-        <div class="pop image-throw-pop"></div>
+    </div>
+
+
+    <div id="js-image-holder" class="image-holder l-index-19">
+      <div class="image-holder-wrapper l-index-2">
+        <div class="image-holder-inner">
+          <div class="image-holder-content">
+            <h2 class="image-holder-load">
+              <img class="image-holder-load-img l-fluid-image" src="/images/loading-0.gif" alt="読み込み中">
+            </h2>
+            <h2 class="image-holder-label is-hidden">
+              <img class="image-holder-label-img l-fluid-image" src="/images/throw-0.svg" alt="Throw">
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-holder-wrapper l-index-1">
+        <div class="image-holder-inner">
+          <div class="image-holder-content">
+            <img class="image-body l-fluid-image">
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+
+
+
+    <!-- 
+    <div id="wrapper">
+      <div id="image">
+        <div class="image-inner">
+          <div class="image-inner2">
+            <img class="image-img" />
+            <div class="image-mosaic"></div>
+          </div>
+          <div class="image-select">
+            <div class="pop image-select-pop"></div>
+            <h2 class="image-select-message">
+              　select-photo
+            </h2>
+            <div class="image-select-highlight"></div>
+            <input class="image-select-input" type="file" accept="image/*" />
+          </div>
+          <div class="image-throw">
+            <div class="pop image-throw-pop"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    -->
 </body>
 </html>

@@ -11,6 +11,8 @@ module.exports = (sn, $, _) ->
 
   class Client
     constructor: (options) ->
+      console.log "http://#{SETTING.HOST}:#{SETTING.PORT}/"
+
       console.log "Client -> constructor"
 
       # ============================================================
@@ -45,6 +47,9 @@ module.exports = (sn, $, _) ->
         context: do ->
           Context = require("./models/context")(sn, $, _)
           return new Context()
+        visual: do ->
+          Visual = require("./models/visual")(sn, $, _)
+          return new Visual()
 
       # COLLECTION
 
@@ -57,6 +62,12 @@ module.exports = (sn, $, _) ->
         select: do ->
           Select = require("./views/select")(sn, $, _)
           return new Select()
+        readText: do ->
+          ReadText = require("./views/readText")(sn, $, _)
+          return new ReadText()
+        readLightValue: do ->
+          ReadLightValue = require("./views/readLightValue")(sn, $, _)
+          return new ReadLightValue()
 
 
       # ============================================================

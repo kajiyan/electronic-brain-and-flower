@@ -34,22 +34,38 @@ module.exports = (sn, $, _) ->
     _postHandler: (model, id) ->
       console.log "View | Image -> _postHandler"
 
-      # originalImageWidth = model.get "width"
-      # originalImageHeight = model.get "height"
-      # isLandscape = originalImageWidth > originalImageHeight
-      # imageWidth = if isLandscape then originalImageHeight else originalImageWidth
-      # imageHeight = if isLandscape then originalImageWidth else originalImageHeight
-      # $inner = @$(".image-inner")
-      # parentWidth = $inner.width()
-      # parentHeight = $inner.height()
-      # rx = parentWidth / imageWidth
-      # ry = parentHeight / imageHeight
-      # r = if rx < ry then rx else ry
-      # imageWidth = imageWidth * r
-      # imageHeight = imageHeight * r
+      console.log "------------------"
+      console.log model.get "data"
+      console.log "------------------"
+
+      originalImageWidth = model.get "width"
+      originalImageHeight = model.get "height"
+      isLandscape = originalImageWidth > originalImageHeight
+      imageWidth = if isLandscape then originalImageHeight else originalImageWidth
+      imageHeight = if isLandscape then originalImageWidth else originalImageHeight
+      
+      $imageHolder = $("#js-image-holder")
+      
+      parentWidth = $imageHolder.width()
+      parentHeight = $imageHolder.height()
+      rx = parentWidth / imageWidth
+      ry = parentHeight / imageHeight
+      r = if rx < ry then rx else ry
+      imageWidth = imageWidth * r
+      imageHeight = imageHeight * r
+
+      $imageHolder.find(".image-body").attr
+        "src": model.get "data"
+
+      $imageHolder
+        .find ".image-holder-load-img"
+        .addClass "is-hidden"
+
+      $imageHolder
+        .find ".image-holder-label"
+        .removeClass "is-hidden"
 
       # console.log model.get "data"
-
 
       # @$el
       #   .queue (next) ->
@@ -85,6 +101,8 @@ module.exports = (sn, $, _) ->
     _throwHandler: () ->
       console.log "View | Image -> _throwHandler"
 
+      @_clear()
+
 
     # ------------------------------------------------------------
     _fly: (callback, context) ->
@@ -114,6 +132,26 @@ module.exports = (sn, $, _) ->
     # ------------------------------------------------------------
     _clear: (callback, context) ->
       console.log "View | Image -> _clear"
+
+      $imageHolder = $("#js-image-holder")
+
+      # モデルの削除は Socket -> _devicesensorThrowHandler の
+      # 処理が終わったタイミングで実行した方がいい
+      $imageHolder
+        .find ".image-body"
+        .removeAttr "src"
+
+      $imageHolder
+        .find ".image-holder-load-img"
+        .removeClass "is-hidden"
+
+      $imageHolder
+        .find ".image-holder-label"
+        .addClass "is-hidden"
+
+
+      
+      # @model.clear()
 
 
     # ------------------------------------------------------------

@@ -54,7 +54,7 @@ do (window=window, document=document, $=jQuery) ->
     # ============================================================
     # Module
     sn.stage = require( "./stage" )( sn )
-    # sn.clock = require( "./clock" )( sn )
+    sn.clock = require( "./clock" )( sn )
 
     # ============================================================
     # PAGE
@@ -81,6 +81,7 @@ do (window=window, document=document, $=jQuery) ->
       $.when(
         sn.router.setup()
         sn.stage.setup()
+        sn.clock.setup()
       ).then( =>
         $("body").removeClass "is-invisibility"
         console.log  "- SETUP SCRIPT -"
@@ -89,9 +90,11 @@ do (window=window, document=document, $=jQuery) ->
 
     # --------------------------------------------------------------
     sn.tf.update ->
+      sn.clock.update()
 
     # --------------------------------------------------------------
     sn.tf.draw ->
+      sn.clock.draw()
    
     # --------------------------------------------------------------
     sn.tf.hover ->

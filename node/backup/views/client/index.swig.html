@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="" />
+
+  <title></title>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/common/js/common.js?v=1.0.0"></script>
+  <script src="/js/index.js?v=1.0.0"></script>
+</head>
+
+<body data-roomid="{{ roomid }}">
+<div id="wrapper">
+  <div id="image">
+    <div class="image-inner">
+      <div class="image-inner2">
+        <img class="image-img" />
+        <div class="image-mosaic"></div>
+      </div>
+      <div class="image-select">
+        <div class="pop image-select-pop"></div>
+        <h2 class="image-select-message">
+          　select-photo
+        </h2>
+        <div class="image-select-highlight"></div>
+        <input class="image-select-input" type="file" accept="image/*" />
+      </div>
+      <div class="image-throw">
+        <div class="pop image-throw-pop"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

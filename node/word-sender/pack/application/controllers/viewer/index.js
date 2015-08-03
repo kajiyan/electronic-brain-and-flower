@@ -44,6 +44,7 @@ module.exports = Viewer = (function() {
             callback(err);
             return;
           }
+          // ルームに入る
           socket.join(id);
           callback(err, id);
         });
@@ -65,20 +66,27 @@ module.exports = Viewer = (function() {
 
   // --------------------------------------------------------------
   Viewer.prototype.post = function(image, data){
+    console.log('---------');
     console.log('[Controller] Viewer -> post');
 
     data.url = "http://" + config.host + ":" + config.port + "/images/api/" +　image.roomId + "/" + image.name;
-    data.id     = image.id;
+    data.id = image.id;
+
+    console.log(image.id);
 
     this.socketIO.to(image.roomId).emit('post', data);
+    console.log('---------');
   };
 
 
   // --------------------------------------------------------------
+  // 加速度センサーがトリガーになる
   Viewer.prototype.trigger = function(roomId, data){
+    console.log('---------');
     console.log('[Controller] Viewer -> trigger');
 
     this.socketIO.to(roomId).emit('trigger', data);
+    console.log('---------');
   };
 
   return Viewer;

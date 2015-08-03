@@ -1,0 +1,22 @@
+{
+  "address": {
+    "node": {
+      "host": "localhost",
+      "port": 12001
+    },
+    "openFrameWorks": {
+      "main": {
+        "host": "localhost",
+        "port": 12002
+      },
+      "sub": {
+        "host": "localhost",
+        "port": 12003
+      }
+    },
+    "max": {
+      "host": "localhost",
+      "port": 12004
+    }
+  }
+}

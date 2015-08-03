@@ -13,6 +13,8 @@ $support-rem-legacy: true;
 
 // Base Window Size
 $baseWidth: 980px;
+$smallBaseWidth: 320px;
+
 // $baseWidth: 660px;
 $baseHeight: 600px;
 $baceMaxWidth: 1280px;
@@ -86,3 +88,4 @@ $grid-columns:              12 !default;
 $grid-gutter-width:         20px !default;
 
 $baseInnerWidth: $baseWidth - $grid-gutter-width;
+$smallBaseInnerWidth: $smallBaseWidth - $grid-gutter-width;

@@ -30,9 +30,9 @@ WordSource::WordSource( int ID ) {
     
     _sceneIndex = 0; // 音楽のシーンID
     
-    if ( _isDebug ) {
-        _sceneIndex = 1;
-    }
+//    if ( _isDebug ) {
+//        _sceneIndex = 1;
+//    }
     
     _MHlampSignal = 0;
     
@@ -45,6 +45,11 @@ WordSource::WordSource( int ID ) {
 //--------------------------------------------------------------
 void WordSource::setup() {
     cout << "WordSource -> setup\n";
+    
+    _nodeAppSender.setup(
+        _setting["address"]["node"]["host"].asString(),
+        _setting["address"]["node"]["port"].asInt()
+    );
     
     // OF Sub App 用のOSC Senderのセットアップ
     _ofSubAppSender.setup(
@@ -96,6 +101,12 @@ void WordSource::update() {
         sendMessage.addIntArg( _uniqueID );
         sendMessage.addIntArg( _ID );
         _ofSubAppSender.sendMessage( sendMessage );
+        
+        
+        ofxOscMessage sendWebSocketMessage;
+        sendWebSocketMessage.setAddress( "/add/word" );
+        sendWebSocketMessage.addStringArg( "\"" + _text + "\"" );
+        _nodeAppSender.sendMessage( sendWebSocketMessage );
         
         setTimeOut( 10000 );
     }
@@ -158,7 +169,7 @@ void WordSource::setWord( string language, string text ) {
         _text = _wordValidation( text );
         
         // 現在のシーン名を取得
-        string sceneLabel = _sceneLabels[_sceneIndex];
+        string sceneLabel = _sceneLabels[_sceneIndex - 1];
         
         // _textが空ではなく、_textの中にシーン名が含まれているか
         if( !_language.empty() && !_text.empty() && ofStringTimesInString(_text, sceneLabel) > 0 ){
@@ -225,11 +236,12 @@ void WordSource::updateMHlampSignal( string text ) {
     text = _wordValidation( text );
     
     int sceneLabelLen = sizeof(_sceneLabels) / sizeof(_sceneLabels[0]);
-    string sceneLabel = _sceneLabels[_sceneIndex];
+    string sceneLabel = _sceneLabels[_sceneIndex - 1];
     
     // 現在のシーンのツイートの中に特定のキーワードが入っているか判別する
     // キーワードが含まれていた場合Max/Mspに対してOSCを発信する。
-    if( (ofStringTimesInString(text, sceneLabel) > 0) && (ofStringTimesInString(text, "lol") > 0 || ofStringTimesInString(text, "rofl")) ) {
+    // if( (ofStringTimesInString(text, sceneLabel) > 0) && (ofStringTimesInString(text, "lol") > 0 || ofStringTimesInString(text, "rofl")) ) {
+    if( (ofStringTimesInString(text, "lol") > 0 || ofStringTimesInString(text, "rofl")) ) {
         cout << "WordSource -> sendOSC | /MHlamp/status\n";
         
         ofxOscMessage sendMessage;

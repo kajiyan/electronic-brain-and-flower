@@ -30,6 +30,7 @@ private:
     
     ofxJSONElement _setting; // アプリケーションの設定ファイル
     
+    ofxOscSender _nodeAppSender; // OF Sub App 用のOSC Sender
     ofxOscSender _ofSubAppSender; // OF Sub App 用のOSC Sender
     ofxOscSender _maxSender;      // Max/Msp 用のOSC Sender
     

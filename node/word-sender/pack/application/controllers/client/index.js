@@ -13,6 +13,7 @@ module.exports = Client = (function() {
 
     this.NAMESPACE = 'client';
     this.eve = new events.EventEmitter();
+    this.socketIO = null;
   }
 
 
@@ -28,12 +29,27 @@ module.exports = Client = (function() {
       var app = module.parent.exports;
 
       var controllers = app.get('controllers');
-      var socketIO = app.get('socketIO').of(controllers.client.NAMESPACE);
       var eve = controllers.client.eve;
-      
 
-      socketIO.on('connection', function(socket){
+      this.socketIO = app.get('socketIO').of(controllers.client.NAMESPACE);
+
+      this.socketIO.on('connection', function(socket){
         console.log('[Controller] Client -> socketIO -> connection');
+
+        // From Local Node.js
+        socket.on('readText', function(data, callback){
+          console.log('[Controller] Client -> socketIO -> readText');
+
+          // dataには読み上げ用のテキスト（text）とRoomIdが入っている
+          controllers.client.sendReadText( data );
+        });
+
+        // From Local Node.js
+        socket.on('readLightValue', function(data, callback){
+          console.log('[Controller] Client -> socketIO -> readLightValue');
+
+          controllers.client.sendLightValue( data );
+        });
 
         socket.on('join', function(data, callback){
           console.log('[Controller] Client -> socketIO -> join');
@@ -87,6 +103,13 @@ module.exports = Client = (function() {
       /*
        * eventEmitter
        */
+      eve.on('test', function(roomId, callback){
+        console.log('[Controller] Client -> eventEmitter -> test');
+
+        console.log(controllers.client);
+        // socketIO.to(roomId).emit('fromBridgeAppReadText', '');
+      });
+
       eve.on('join', function(roomId, callback){
         console.log('[Controller] Client -> eventEmitter -> join');
 
@@ -123,6 +146,27 @@ module.exports = Client = (function() {
       });
     };
   })(this);
+  
+  // --------------------------------------------------------------
+  Client.prototype.sendReadText = function( data ){
+    console.log('---------');
+    console.log('[Controller] Client -> sendReadText');
+
+    this.socketIO.to(data.roomId).emit('readText', data);
+
+    console.log('---------');
+  };
+
+  // --------------------------------------------------------------
+  Client.prototype.sendLightValue = function( data ){
+    console.log('---------');
+    console.log('[Controller] Client -> sendLightState');
+
+    this.socketIO.to(data.roomId).emit('readLightValue', data);
+
+    console.log('---------');
+  };
+
   return Client;
 })();
 

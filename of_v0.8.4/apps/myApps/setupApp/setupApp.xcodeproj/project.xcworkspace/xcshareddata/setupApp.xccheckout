@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>E494A889-CD8A-4D8C-A90A-F568E4A9765D</string>
+	<key>IDESourceControlProjectName</key>
+	<string>project</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>216DB5D48F7FC5897D03D5E731A0013EE18C9A7A</key>
+		<string>https://github.com/kajiyan/electronic-brain-and-flower.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>of_v0.8.4/apps/myApps/setupApp/setupApp.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>216DB5D48F7FC5897D03D5E731A0013EE18C9A7A</key>
+		<string>../../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/kajiyan/electronic-brain-and-flower.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>216DB5D48F7FC5897D03D5E731A0013EE18C9A7A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>216DB5D48F7FC5897D03D5E731A0013EE18C9A7A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>%E9%9B%BB%E8%84%B3%E3%81%A8%E8%8A%B1</string>
+		</dict>
+	</array>
+</dict>
+</plist>

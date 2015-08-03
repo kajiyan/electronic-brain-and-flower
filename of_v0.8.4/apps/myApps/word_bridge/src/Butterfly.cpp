@@ -39,6 +39,13 @@ Butterfly::Butterfly(float fps, string objID, int modelIndex){
         _peak[i][2] = 0;
     }
     
+    // インスタンス削除までの時間をタイマーで管理する
+    _isTimerReached = true;
+    
+    _alpha = 255;
+    
+    _isDead = false;
+    
     // 飛行モードの選択
     createPeak();
     generateOrbit();
@@ -74,10 +81,31 @@ void Butterfly::update(){
     if ( _isVisible && _isImagePublish && !_isSendMHlampOSC ) {
         _isSendMHlampOSC = true;
         
+        // 非表示までのカウンターをセットする
+        setTimeOut( (int)ofRandom(60000, 120000) );
+        
         ofxOscMessage sendMessage;
         sendMessage.setAddress( "/MHlamp/status" );
         sendMessage.addIntArg( 0 );
         _maxSender.sendMessage( sendMessage );
+        
+        ofxOscMessage sendLEDMessage;
+        sendLEDMessage.setAddress( "/LED/status" );
+        sendLEDMessage.addIntArg( 0 );
+        _maxSender.sendMessage( sendLEDMessage );
+    }
+    
+    if ( _isVisible && _isImagePublish ) {
+        float timer = ofGetElapsedTimeMillis() - _startTime;
+        if( timer >= _endTime && !_isTimerReached ) {
+            // 透過していく
+            _alpha--;
+            
+            // アルファを0になったらステータスを変更する
+            if( _alpha <= 0 ){
+                _isDead = true;
+            }
+        }
     }
 }
 
@@ -97,7 +125,7 @@ void Butterfly::draw(){
         
         ofPushStyle();
         
-        ofSetColor(255);
+        ofSetColor(255, 255, 255, _alpha);
         
         ofEnableSmoothing();
         glShadeModel(GL_SMOOTH);
@@ -106,6 +134,7 @@ void Butterfly::draw(){
         
         // glTranslatef(ofGetWidth() / 2, ofGetHeight() / 2, 0);
         
+        glTranslatef(OFFSET_X, OFFSET_Y, OFFSET_Z);
         glTranslatef(x, y, z);
         
         glRotatef(_rotation[_count][0] * -1 * 180 / PI + -90, 1, 0, 0);   // x軸
@@ -481,6 +510,25 @@ void Butterfly::generateOrbit(){
     
 }
 
+
+
+/* --------------------------------------------------------------
+ 指定時間以内にMax/Mspから読み上げ完了のフラグが戻ってこなければフラグを戻す
+ 
+ @access	public
+ @param	    float wordPlayEndTime タイムアウトまでの時間（ms）
+ @return	none
+ --------------------------------------------------------------  */
+void Butterfly::setTimeOut( float endTime ) {
+    cout << "Butterfly -> setTimeOut: " + ofToString( endTime ) + "ms\n";
+    
+    _startTime = ofGetElapsedTimeMillis();
+    _endTime = endTime;
+    _isTimerReached = false;
+}
+
+
+
 /* --------------------------------------------------------------
  /updateScene でMax から取得した音楽のシーンIDをセットする
  
@@ -518,21 +566,21 @@ void Butterfly::imagePublishCallback(bool & e){
     _isImagePublish = e;
     
     // 画像（テクスチャ）の読み込みが完了したらモデルデータ読み込み 第2引数はスケール
-    _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 1.0);
-    _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 1.0);
-    _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 1.0);
-    _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 1.0);
-    _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 1.0);
-    _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 1.0);
+    _body.loadModel("butterfly" + ofToString(_modelIndex) + "/body.3ds", 2.0);
+    _hone.loadModel("butterfly" + ofToString(_modelIndex) + "/hone.3ds", 2.0);
+    _featherLT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLT.3ds", 2.0);
+    _featherLU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherLU.3ds", 2.0);
+    _featherRT.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRT.3ds", 2.0);
+    _featherRU.loadModel("butterfly" + ofToString(_modelIndex) + "/featherRU.3ds", 2.0);
 }
 
 
-
-
-//--------------------------------------------------------------
-void Butterfly::destinationPeak(){
-}
-
-//--------------------------------------------------------------
-void Butterfly::destinationOrbit(){
+/* --------------------------------------------------------------
+ インスタンスの表示状態を返す
+ 
+ @access	public
+ @return	bool
+ --------------------------------------------------------------  */
+bool Butterfly::getStateDead(){
+    return _isDead;
 }

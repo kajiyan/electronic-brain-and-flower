@@ -4,6 +4,8 @@ module.exports = (sn, $, _) ->
   class Socket extends Backbone.Model
     defaults:
       connected: false
+      readText: ""
+      readLightValue: ""
 
     # ------------------------------------------------------------
     constructor: (sn, $, Backbone, _) ->
@@ -50,8 +52,25 @@ module.exports = (sn, $, _) ->
       socket.on "connect_failed", @_connectFailedHandler.bind(@)
       socket.on "disconnect", @_disconnectHandler.bind(@)      
       socket.on "reconnect", @_reconnectHandler.bind(@)
-      socket.on "reconnect_failed", @_reconnectFailedHandler.bind(@)     
+      socket.on "reconnect_failed", @_reconnectFailedHandler.bind(@)
+
+      # ローカルホストからの node.js を経由して受信する値
+      socket.on "readText", @_readText.bind(@)
+      socket.on "readLightValue", @_readLightValue.bind(@)
+
       @_socket = socket;
+
+
+    # ------------------------------------------------------------ 
+    _readText: ( data ) ->
+      console.log "Socket -> _readText"
+      @set "readText", data.text
+
+
+    # ------------------------------------------------------------ 
+    _readLightValue: ( data ) ->
+      console.log "Socket -> _readLightValue: #{data.value}"
+      @set "readLightValue", data.value
 
 
     # ------------------------------------------------------------
@@ -80,14 +99,17 @@ module.exports = (sn, $, _) ->
 
 
     # ------------------------------------------------------------
-    _devicesensorThrowHandler: (model, heading) ->
-      console.log "Socket -> _devicesensorThrowHandler"
+    _devicesensorThrowHandler: (model) ->
+      console.log "Socket -> _devicesensorThrowHandler id: #{sn.__client__.models.image.id}"
 
       if not @_socket then return
 
-      @_socket.emit "trigger", 
-        id: sn.__client__.models.image.id
-        heading: heading
+      console.log sn.__client__.models.image.get "id"
+
+      @_socket.emit "trigger", id: sn.__client__.models.image.get "id"
+
+      # オリジナルはviewa image -> clearの中でモデルデータを削除している
+      sn.__client__.models.image.clear()
 
 
     # ------------------------------------------------------------
@@ -100,7 +122,6 @@ module.exports = (sn, $, _) ->
     # ------------------------------------------------------------
     _connectingHandler: () ->
       console.log "Socket -> _connectingHandler"
-
 
 
     # ------------------------------------------------------------

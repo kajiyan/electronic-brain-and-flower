@@ -32,26 +32,31 @@ void ofApp::setup(){
     isDebug = true;
     
     GLfloat lightOnePosition[] = { 40.0, 40, 100.0, 0.0 };
-    GLfloat lightOneColor[]    = { 0.99, 0.99, 0.99, 1.0 };
+    GLfloat lightOneColor[]    = { 1.0, 1.0, 1.0, 1.0 };
     
     GLfloat lightTwoPosition[] = { -40.0, 40, 100.0, 0.0 };
-    GLfloat lightTwoColor[]    = { 0.99, 0.99, 0.99, 1.0 };
+    GLfloat lightTwoColor[]    = { 1.0, 1.0, 1.0, 1.0 };
     
     //some model / light stuff
     ofEnableDepthTest();
-    glShadeModel (GL_SMOOTH);
+    glShadeModel(GL_SMOOTH);
+    
+//    light.enable();
+//    ofEnableSeparateSpecularLight();
 
     /* initialize lighting */
-    glLightfv (GL_LIGHT0, GL_POSITION, lightOnePosition);
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, lightOneColor);
-    glEnable (GL_LIGHT0);
-    glLightfv (GL_LIGHT1, GL_POSITION, lightTwoPosition);
-    glLightfv (GL_LIGHT1, GL_DIFFUSE, lightTwoColor);
-    glEnable (GL_LIGHT1);
-    glEnable (GL_LIGHTING);
-    glColorMaterial (GL_FRONT_AND_BACK, GL_DIFFUSE);
-    glEnable (GL_COLOR_MATERIAL);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightOnePosition);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightOneColor);
+    glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT1, GL_POSITION, lightTwoPosition);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, lightTwoColor);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHTING);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
 
+//    browserWindow.loadImage("images/frame.png");
+    
     // 各クラスのセットアップ
     /*
      * Butterfly
@@ -238,8 +243,17 @@ void ofApp::update(){
     /*
      * Butterfly
      */
-    for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
+    for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end();){
         (*it)->update();
+        // 表示する時間を越えていたらインスタンスを削除する
+        if( (*it)->getStateDead() ) {
+            //オブジェクトを解放
+            delete *it;
+            //動的配列から、オブジェクトを削除
+            it = butterfrys.erase(it);
+        } else {
+            ++it;
+        }
     }
     
     /*
@@ -270,6 +284,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+
     /*
      * ImagePublish
      */
@@ -280,16 +295,28 @@ void ofApp::draw(){
     /*
      * Butterfly
      */
+    ofEnableDepthTest();
+    glShadeModel(GL_SMOOTH);
+    light.enable();
+    ofEnableSeparateSpecularLight();
     for(vector <Butterfly *>::iterator it = butterfrys.begin(); it != butterfrys.end(); ++it){
         (*it)->draw();
     }
-
+    ofDisableDepthTest();
+    light.disable();
+    ofDisableLighting();
+    ofDisableSeparateSpecularLight();
+    
     /*
      * WordSource
      */
     for(vector <WordSource *>::iterator it = wordSources.begin(); it != wordSources.end(); ++it) {
         (*it)->draw();
     }
+    
+    ofDrawBitmapString("http://54.65.140.79/", 20, 40);
+    
+//    browserWindow.draw(0, 0);
 }
 
 //--------------------------------------------------------------
@@ -311,6 +338,10 @@ void ofApp::keyPressed(int key){
         butterfryModelIndex++;
 
         cout << butterfryModelIndex << "\n";
+    }
+    
+    if(key == 'f'){
+        ofSetFullscreen(true);
     }
 }
 

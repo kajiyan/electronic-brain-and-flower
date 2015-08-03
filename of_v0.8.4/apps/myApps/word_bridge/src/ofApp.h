@@ -38,6 +38,8 @@ class ofApp : public ofBaseApp{
     
         // debug を表示するかのフラグ
         bool isDebug;
+//        ofImage browserWindow;
+
 
         /* =============================================================================
          Butterfry
@@ -62,6 +64,9 @@ class ofApp : public ofBaseApp{
          ============================================================================= */
         int wordsSize = 1;
         vector<WordSource *> wordSources;
+    
+        ofLight	light;
+        
     
 //        float wordPlayStartTime;
 //        float wordPlayEndTime;

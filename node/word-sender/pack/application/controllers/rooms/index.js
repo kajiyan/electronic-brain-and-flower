@@ -199,6 +199,7 @@ Rooms = (function() {
         callback(undefined, id);
       });
     } else {
+      // IDがなければ設定する
       this._create(callback);
     }
   };

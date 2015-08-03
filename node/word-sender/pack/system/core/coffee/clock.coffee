@@ -51,7 +51,7 @@ module.exports = ( sn ) ->
         d = if date.getDate() < 10 then "0" + date.getDate() else date.getDate()
         w = date.getDay()
 
-        @timesOfDay = d + " " + @monthLabel[mon] + " " +  y  + " at " + hours + ":" + min + ":" + s
+        @timesOfDay = @weekLabel[w] + " " + d + " " + @monthLabel[mon] + " " +  y  + " at " + hours + ":" + min + ":" + s
         # console.log @timesOfDay 
         # h.toDate.obj.root.text('To: ' +  d + ' ' + h.toDate.state.monthLabel[mon] + ' ' +  y  + ' at ' + hours + ':' + min + ':' + s);
 
@@ -123,7 +123,7 @@ module.exports = ( sn ) ->
     _getElements: () ->
       @$els = {}
 
-      @$els.coverClock = $("#js-cover-clock")
+      @$els.coverClock = $("#js-clock")
 
       return @$els
 

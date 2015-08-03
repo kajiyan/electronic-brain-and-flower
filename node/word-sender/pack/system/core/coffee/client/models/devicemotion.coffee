@@ -35,73 +35,44 @@ module.exports = (sn, $, _) ->
 			console.log "DeviceMotion -> _devicemotionHandler"
 
 			# デバック用
-			@trigger "devicemotion", @
+			# setTimeout =>
+			# 	@trigger "devicemotion", @
+			# 	@unset "throwable"
+			# 	window.removeEventListener "devicemotion", @_devicemotionHandler, false
+			# , 4000
+			# return
 
-			# # listenFrom DeviceSensor
-
-			# if not @get "throwable" then return
+			if not @get "throwable" then return
 			
-			# thres = @THRESHOLD
-			# acceleration = e.accelerationIncludingGravity
-			# x = acceleration.x
-			# y = acceleration.y
-			# z = acceleration.z
-			# maxKey = null
-			# maxVal = null
+			thres = @THRESHOLD
+			acceleration = e.accelerationIncludingGravity
+			x = acceleration.x
+			y = acceleration.y
+			z = acceleration.z
+			maxKey = null
+			maxVal = null
 
+			if x > thres or y > thres or z > thres
+				if not @has "maxKey"
+					maxKey = if x > (if y > z then y else z) then "x" else if y > z then "y" else "z"
+					maxVal = acceleration[@maxKey]
 
-			# console.log acceleration
+					@set
+						"maxKey": maxKey
+						"maxVal": maxVal
+				else
+					maxKey = @get "maxKey"
+					maxVal = acceleration[maxKey]
 
-
-			# if x > thres or y > thres or z > thres
-
-
-			# 	if not @has "maxKey"
-			# 		maxKey = if x > (if y > z then y else z) then "x" else if y > z then "y" else "z"
-			# 		# maxKey = do ->
-			# 		# 	if y > z
-			# 		# 		if x > y
-			# 		# 			return "x"
-			# 		# 		else
-			# 		# 			if y > z
-			# 		# 				return "y"
-			# 		# 			else
-			# 		# 				return "z"
-			# 		# 	else
-			# 		# 		if x > z
-			# 		# 			return "x"
-			# 		# 		else
-			# 		# 			if y > z
-			# 		# 				return "y"
-			# 		# 			else
-			# 		# 				return "z"
-
-			# 		maxVal = acceleration[@maxKey]
-
-			# 		console.log maxKey
-			# 		console.log maxVal
-
-
-			# 		@set
-			# 			"maxKey": maxKey
-			# 			"maxVal": maxVal
-			
-
-
-			# 	else
-			# 		maxKey = @get "maxKey"
-			# 		maxVal = acceleration[maxKey]
-
-			# 		if @get "maxVal" < maxVal
-			# 			@set "maxVal", maxVal
-			# 		else
-			# 			@trigger "devicemotion", @
-
-			# 			@unset "throwable"
-			# 			window.removeEventListener "devicemotion", @devicemotionHandler, false
-			# else
-			# 	@unset "maxKey"
-			# 	@unset "maxVal"
+					if @get "maxVal" < maxVal
+						@set "maxVal", maxVal
+					else
+						@trigger "devicemotion", @
+						@unset "throwable"
+						window.removeEventListener "devicemotion", @_devicemotionHandler, false
+			else
+				@unset "maxKey"
+				@unset "maxVal"
 
 
 		# ------------------------------------------------------------

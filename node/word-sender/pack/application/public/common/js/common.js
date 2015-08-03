@@ -50,8 +50,8 @@
 	  window.common = {};
 	  __webpack_require__(4)(window, document, $);
 	  common.tf = new $.TypeFrameWork();
+	  __webpack_require__(8);
 	  __webpack_require__(7);
-	  __webpack_require__(6);
 	  sn.support = {};
 	  sn.support.transition = (function() {
 	    if ($.support.transition && $.support.transform && ($.fn.transition != null)) {
@@ -478,7 +478,7 @@
 	  if ($ == null) {
 	    $ = jQuery;
 	  }
-	  __webpack_require__(8)(window, document, $);
+	  __webpack_require__(6)(window, document, $);
 	  $window = $(window);
 	  $document = $(document);
 	  sn = $.TypeFrameWork = {};
@@ -1901,14 +1901,14 @@
 	    index: ""
 	  };
 	
-	  setting.PRODUCTION_HOST = "";
-	  setting.PRODUCTION_PORT = 80;
+	  setting.PRODUCTION_HOST = "54.65.140.79";
+	  setting.PRODUCTION_PORT = 10022;
 	
-	  setting.DEBUG_HOST = "";
-	  setting.DEBUG_PORT = 80;
+	  setting.DEBUG_HOST = "localhost";
+	  setting.DEBUG_PORT = 10022;
 	
 	  setting.DEBUG_LOCAL_HOST = "localhost";
-	  setting.DEBUG_LOCAL_PORT = 3030;
+	  setting.DEBUG_LOCAL_PORT = 10022;
 	
 	  setting.SYSTEM      = "system";
 	  setting.SYSTEM_CORE = "core";
@@ -1971,6 +1971,56 @@
 	      setting.BASE_IMG_URL = "";
 	    }
 	  }
+	
+	
+	
+	  if (typeof window !== "undefined" && window !== null && setting.IS_FRONT_END_SETTING) {
+	    var noop = function() {};
+	
+	    if (setting.MODE === "DEBUG") {
+	      if (window.console == null) {
+	        window.console = { log: noop };
+	      }
+	    } else if (setting.MODE === "PRODUCTION") {
+	      window.console = { log: noop };
+	    }
+	
+	    if ( window.location.hostname.indexOf(setting.PRODUCTION_HOST) >= 0 ) {
+	      setting.PROTOCOL = "http";
+	      setting.HOST = setting.PRODUCTION_HOST;
+	      setting.PORT = setting.PRODUCTION_PORT;
+	      setting.BASE_URL = "//" + setting.PRODUCTION_HOST + "/";
+	      setting.BASE_PATH = "top/";
+	      setting.BASE_VIDEO_URL = "";
+	      setting.BASE_SOUND_URL = "";
+	      setting.BASE_IMG_URL = ""; 
+	    } else if ( window.location.hostname.indexOf(setting.DEBUG_HOST) >= 0 ){
+	      setting.PROTOCOL = "http";
+	      setting.HOST = setting.DEBUG_HOST;
+	      setting.PORT = setting.DEBUG_PORT;
+	      setting.BASE_URL = "//" + setting.DEBUG_HOST + "/renewal/";
+	      setting.BASE_PATH = "";
+	      setting.BASE_VIDEO_URL = "";
+	      setting.BASE_SOUND_URL = "";
+	      setting.BASE_IMG_URL = "";
+	    } else if ( window.location.hostname.indexOf(setting.DEBUG_LOCAL_HOST) >= 0 ) {
+	      setting.PROTOCOL = "http";
+	      setting.HOST = setting.DEBUG_LOCAL_HOST;
+	      setting.PORT = setting.DEBUG_LOCAL_PORT;
+	      setting.BASE_URL = "//" + setting.DEBUG_LOCAL_HOST + ":" + setting.DEBUG_LOCAL_PORT + "/";
+	      setting.BASE_PATH = "";
+	      setting.BASE_VIDEO_URL = "";
+	      setting.BASE_SOUND_URL = "";
+	      setting.BASE_IMG_URL = "";
+	    }
+	
+	    console.log( "Front End Setting | /system/core/config/setting.js" );
+	  } else {
+	    console.log( "MODE: " + defaults.m.toUpperCase() + "| IS_LOCALHOST: " + defaults.l );
+	    console.log( "HOST: " + setting.HOST + "| PORT: " + setting.PORT );
+	  }
+	
+	
 	
 	  setting.PATH = {
 	    COMMON: setting.BASE_URL + setting.COMMON + "/",
@@ -2084,50 +2134,320 @@
 	      DEVICE_ORIENTATION: {
 	        THRESHOLD: 1.5 * 9.8
 	      }
+	    },
+	    RESIZE: {
+	      WIDTH: 640,
+	      HEIGHT: 640
 	    }
 	  };
 	
-	  if (typeof window !== "undefined" && window !== null && setting.IS_FRONT_END_SETTING) {
-	    var noop = function() {};
+	  // if (typeof window !== "undefined" && window !== null && setting.IS_FRONT_END_SETTING) {
+	  //   var noop = function() {};
 	
-	    if ( window.location.hostname.indexOf(setting.DEBUG_LOCAL_HOST) >= 0 ) {
-	      if (window.console == null) {
-	        window.console = {
-	          log: noop
-	        };
-	      }
-	    } else if ( window.location.hostname.indexOf(setting.DEBUG_HOST) >= 0 ){
-	      if (window.console == null) {
-	        window.console = {
-	          log: noop
-	        };
-	      }
-	    } else {
-	      window.console = {
-	        log: noop
-	      };
-	    }
+	  //   if ( window.location.hostname.indexOf(setting.DEBUG_LOCAL_HOST) >= 0 ) {
+	  //     if (window.console == null) {
+	  //       window.console = {
+	  //         log: noop
+	  //       };
+	  //     }
+	  //   } else if ( window.location.hostname.indexOf(setting.DEBUG_HOST) >= 0 ){
+	  //     if (window.console == null) {
+	  //       window.console = {
+	  //         log: noop
+	  //       };
+	  //     }
+	  //   } else {
+	  //     window.console = {
+	  //       log: noop
+	  //     };
+	  //   }
 	
-	    console.log( "Front End Setting! | /system/core/config/setting.js" );
-	  }else{
-	    console.log( "Gulp Setting! | /system/core/config/setting.js" );
-	    console.log( "MODE: " + defaults.m.toUpperCase() + "| IS_LOCALHOST: " + defaults.l );
-	    console.log( "HOST: " + setting.HOST + "| PORT: " + setting.PORT );
-	  }
+	  //   console.log( "Front End Setting! | /system/core/config/setting.js" );
+	  // }else{
+	  //   console.log( "Gulp Setting! | /system/core/config/setting.js" );
+	  //   console.log( "MODE: " + defaults.m.toUpperCase() + "| IS_LOCALHOST: " + defaults.l );
+	  //   console.log( "HOST: " + setting.HOST + "| PORT: " + setting.PORT );
+	  // }
 	
 	  return setting;
 	};
+	
+	// module.exports = function( options ){
+	//   if (options == null) {
+	//     options = {};
+	//   };
+	
+	//   var defaults = {
+	//     m: "DEBUG", // mode
+	//     l: true     // is localhost
+	//   };
+	
+	//   for (var key in options) {
+	//     if ( options.hasOwnProperty( key ) ) {
+	//       defaults[key] = options[key];
+	//     }
+	//   }
+	
+	//   defaults.l = (defaults.l == "false") ? false : defaults.l;
+	
+	//   var setting = {};
+	
+	//   setting.MODE = defaults.m.toUpperCase(); // string
+	//   setting.IS_LOCALHOST = defaults.l;       // bool
+	
+	//   setting.IS_FRONT_END_SETTING = true;     // bool
+	
+	//   setting.TARGET = {
+	//     index: ""
+	//   };
+	
+	//   setting.PRODUCTION_HOST = "";
+	//   setting.PRODUCTION_PORT = 80;
+	
+	//   setting.DEBUG_HOST = "";
+	//   setting.DEBUG_PORT = 80;
+	
+	//   setting.DEBUG_LOCAL_HOST = "localhost";
+	//   setting.DEBUG_LOCAL_PORT = 10022;
+	
+	//   setting.SYSTEM      = "system";
+	//   setting.SYSTEM_CORE = "core";
+	//   setting.APPLICATION = "application";
+	
+	//   setting.CORE = "../" + setting.SYSTEM_CORE + "/";
+	//   setting.DIST = "../../" + setting.APPLICATION  + "/public/";
+	  
+	//   setting.COMMON  = "common";
+	//   setting.IMAGES  = "images";
+	//   setting.CSS     = "css";
+	//   setting.JS      = "js";
+	//   setting.FONT    = "fonts";
+	//   setting.AUDIO   = "audio";
+	//   setting.VIDEO   = "video";
+	
+	//   setting.BUILDER          = "gulp";
+	//   setting.ENGINE           = "swig";
+	//   setting.ENGINE_ATTRIBUTE = "swig";
+	//   setting.STYLE            = "sass";
+	//   setting.ALT_JS           = "coffee";
+	
+	
+	//   if (setting.MODE === "PRODUCTION") {
+	//     /*
+	//      * 本番用サーバーの設定
+	//      */
+	//     setting.PROTOCOL = "http";
+	//     setting.HOST = setting.PRODUCTION_HOST;
+	//     setting.PORT = setting.PRODUCTION_PORT;
+	//     setting.BASE_URL = "//" + setting.PRODUCTION_HOST + "/";
+	//     setting.BASE_PATH = "";
+	//     setting.BASE_VIDEO_URL = "";
+	//     setting.BASE_SOUND_URL = "";
+	//     setting.BASE_IMG_URL = "";
+	//   } else {
+	//     if (!setting.IS_LOCALHOST) {
+	//       /*
+	//        * 開発用サーバーの設定
+	//        */
+	//       setting.PROTOCOL = "http";
+	//       setting.HOST = setting.DEBUG_HOST;
+	//       setting.PORT = setting.DEBUG_PORT;
+	//       setting.BASE_URL = "//" + setting.DEBUG_HOST + "/-/hiranomami/";
+	//       setting.BASE_PATH = "";
+	//       setting.BASE_VIDEO_URL = "";
+	//       setting.BASE_SOUND_URL = "";
+	//       setting.BASE_IMG_URL = "";
+	//     } else {
+	//       /*
+	//        * ローカルサーバーの設定
+	//        */
+	//       setting.PROTOCOL = "http";
+	//       setting.HOST = setting.DEBUG_LOCAL_HOST;
+	//       setting.PORT = setting.DEBUG_LOCAL_PORT;
+	//       setting.BASE_URL = "//" + setting.DEBUG_LOCAL_HOST + ":" + setting.DEBUG_LOCAL_PORT + "/";
+	//       setting.BASE_PATH = "";
+	//       setting.BASE_VIDEO_URL = "";
+	//       setting.BASE_SOUND_URL = "";
+	//       setting.BASE_IMG_URL = "";
+	//     }
+	//   }
+	
+	//   setting.PATH = {
+	//     COMMON: setting.BASE_URL + setting.COMMON + "/",
+	//     COMMON_IMAGES: setting.BASE_URL + setting.COMMON + "/" + setting.IMAGES + "/",
+	//     COMMON_CSS: setting.BASE_URL + setting.COMMON + "/" + setting.CSS + "/",
+	//     COMMON_JS: setting.BASE_URL + setting.COMMON + "/" + setting.JS + "/",
+	//     COMMON_FONT: setting.BASE_URL + setting.COMMON + "/" + setting.FONT + "/",
+	//     COMMON_AUDIO: setting.BASE_URL + setting.COMMON + "/" + setting.AUDIO + "/",
+	//     COMMON_VIDEO: setting.BASE_URL + setting.COMMON + "/" + setting.VIDEO + "/",
+	//     ABSOLUTE: setting.BASE_URL + setting.BASE_PATH,
+	//     ABSOLUTE_IMAGES: setting.BASE_URL + setting.BASE_PATH + setting.IMAGES + "/",
+	//     ABSOLUTE_CSS: setting.BASE_URL + setting.BASE_PATH + setting.CSS + "/",
+	//     ABSOLUTE_JS: setting.BASE_URL + setting.BASE_PATH + setting.JS + "/",
+	//     ABSOLUTE_FONT: setting.BASE_URL + setting.BASE_PATH + setting.FONT + "/",
+	//     ABSOLUTE_AUDIO: setting.BASE_URL + setting.BASE_PATH + setting.AUDIO + "/",
+	//     ABSOLUTE_VIDEO: setting.BASE_URL + setting.BASE_PATH + setting.VIDEO + "/"
+	//   };
+	
+	//   if (!(typeof window !== "undefined" && window !== null)) {
+	//     // フロントからの呼び出しでなければコマンドライン用のモジュールを読み込む
+	//     var path = require("path");
+	
+	//     var common = path.join(__dirname, "../../../../") + setting.COMMON + "/";
+	
+	//     setting.PATH.COMMON_FILE     = common;
+	//     setting.PATH.COMMON_ENGINE   = common + setting.ENGINE + "/";
+	//     setting.PATH.COMMON_SASS     = common + setting.STYLE + "/";
+	//     setting.PATH.COMMON_ALT_JS   = common + setting.ALT_JS + "/";
+	//   }
+	
+	//   setting.CONFIG = {
+	//     COMMON: {
+	//       BASE_WIDTH      : 1000,
+	//       BASE_HEIGHT     : 600,
+	//       BASE_MAX_WIDTH  : 1600,
+	//       BASE_MAX_HEIGHT : 900,
+	//       BASE_MIN_WIDTH  : 1000,
+	//       BASE_MIN_HEIGHT : 600
+	//     },
+	//     PAGE: {
+	//       INDEX: {
+	//         TITLE: "",
+	//         META: {
+	//           KEYWORDS: "KEYWORDS",
+	//           DESCRIPTION: "DESCRIPTION",
+	//         },
+	//         OGP: {
+	//           TITLE: "TITLE",
+	//           TYPE: "website",
+	//           DESCRIPTION: "DESCRIPTION",
+	//           URL: setting.PROTOCOL + ":" + setting.BASE_URL + setting.BASE_PATH,
+	//           IMAGE: setting.PROTOCOL + ":" + setting.PATH.COMMON_IMAGES + "ogp/index-0.png"
+	//         },
+	//         FACEBOOK: {
+	//           TITLE: "TITLE",
+	//           TYPE: "website",
+	//           DESCRIPTION: "DESCRIPTION",
+	//           URL: setting.PROTOCOL + ":" + setting.BASE_URL + setting.BASE_PATH,
+	//           IMAGE: setting.PROTOCOL + ":" + setting.PATH.COMMON_IMAGES + "ogp/index-0.png"
+	//         },
+	//         TWITTER: {
+	//           CARD: "summary_large_image",
+	//           TITLE: "TITLE",
+	//           DESCRIPTION: "DESCRIPTION",
+	//           URL: setting.PROTOCOL + ":" + setting.BASE_URL + setting.BASE_PATH,
+	//           IMAGE: {
+	//             SRC: setting.PROTOCOL + ":" + setting.PATH.COMMON_IMAGES + "ogp/index-0.png",
+	//             WIDTH: 900,
+	//             HEIGHT: 400
+	//           },
+	//           HASH_TAGS: "",
+	//           DOMAIN: setting.HOST
+	//         }
+	//       }
+	//     },
+	//     META: {
+	//       VIEWPORT: "width=980"
+	//     },
+	//     MODE: {
+	//       REFRESH_INTERVAL: 10
+	//     },
+	//     IMAGES: {
+	//       MAX_NUMBER_OF_IMAGES: 25,
+	//       STUBS: [
+	//         {
+	//           WIDTH: 480,
+	//           HEIGHT: 640,
+	//           DATA: ""
+	//         },
+	//         {
+	//           WIDTH: 480,
+	//           HEIGHT: 640,
+	//           DATA: ""
+	//         },
+	//         {
+	//           WIDTH: 640,
+	//           HEIGHT: 480,
+	//           DATA: ""
+	//         }
+	//       ]
+	//     },
+	//     VIEWER: {
+	//       VIEW: {
+	//         IMAGE: {
+	//           BASE_SIZE_RATIO: 0.75,
+	//           MAX_ROTATION: 15
+	//         }
+	//       }
+	//     },
+	//     CLIENT: {
+	//       DEVICE_ORIENTATION: {
+	//         THRESHOLD: 1.5 * 9.8
+	//       }
+	//     }
+	//   };
+	
+	//   if (typeof window !== "undefined" && window !== null && setting.IS_FRONT_END_SETTING) {
+	//     var noop = function() {};
+	
+	//     if ( window.location.hostname.indexOf(setting.DEBUG_LOCAL_HOST) >= 0 ) {
+	//       if (window.console == null) {
+	//         window.console = {
+	//           log: noop
+	//         };
+	//       }
+	//     } else if ( window.location.hostname.indexOf(setting.DEBUG_HOST) >= 0 ){
+	//       if (window.console == null) {
+	//         window.console = {
+	//           log: noop
+	//         };
+	//       }
+	//     } else {
+	//       window.console = {
+	//         log: noop
+	//       };
+	//     }
+	
+	//     console.log( "Front End Setting! | /system/core/config/setting.js" );
+	//   }else{
+	//     console.log( "Gulp Setting! | /system/core/config/setting.js" );
+	//     console.log( "MODE: " + defaults.m.toUpperCase() + "| IS_LOCALHOST: " + defaults.l );
+	//     console.log( "HOST: " + setting.HOST + "| PORT: " + setting.PORT );
+	//   }
+	
+	//   return setting;
+	// };
 	/* WEBPACK VAR INJECTION */}.call(exports, "/"))
 
 /***/ },
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/* WEBPACK VAR INJECTION */(function(jQuery) {module.exports = function(window, document, $) {
+	  if (window == null) {
+	    window = window;
+	  }
+	  if (document == null) {
+	    document = document;
+	  }
+	  if ($ == null) {
+	    $ = jQuery;
+	  }
+	  __webpack_require__(10)(window);
+	  return __webpack_require__(11)(window, document, $);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! device.js 0.2.0 */
 	(function(){var a,b,c,d,e,f,g,h,i,j;b=window.device,a={},window.device=a,d=window.document.documentElement,j=window.navigator.userAgent.toLowerCase(),a.ios=function(){return a.iphone()||a.ipod()||a.ipad()},a.iphone=function(){return e("iphone")},a.ipod=function(){return e("ipod")},a.ipad=function(){return e("ipad")},a.android=function(){return e("android")},a.androidPhone=function(){return a.android()&&e("mobile")},a.androidTablet=function(){return a.android()&&!e("mobile")},a.blackberry=function(){return e("blackberry")||e("bb10")||e("rim")},a.blackberryPhone=function(){return a.blackberry()&&!e("tablet")},a.blackberryTablet=function(){return a.blackberry()&&e("tablet")},a.windows=function(){return e("windows")},a.windowsPhone=function(){return a.windows()&&e("phone")},a.windowsTablet=function(){return a.windows()&&e("touch")&&!a.windowsPhone()},a.fxos=function(){return(e("(mobile;")||e("(tablet;"))&&e("; rv:")},a.fxosPhone=function(){return a.fxos()&&e("mobile")},a.fxosTablet=function(){return a.fxos()&&e("tablet")},a.meego=function(){return e("meego")},a.cordova=function(){return window.cordova&&"file:"===location.protocol},a.nodeWebkit=function(){return"object"==typeof window.process},a.mobile=function(){return a.androidPhone()||a.iphone()||a.ipod()||a.windowsPhone()||a.blackberryPhone()||a.fxosPhone()||a.meego()},a.tablet=function(){return a.ipad()||a.androidTablet()||a.blackberryTablet()||a.windowsTablet()||a.fxosTablet()},a.desktop=function(){return!a.tablet()&&!a.mobile()},a.portrait=function(){return window.innerHeight/window.innerWidth>1},a.landscape=function(){return window.innerHeight/window.innerWidth<1},a.noConflict=function(){return window.device=b,this},e=function(a){return-1!==j.indexOf(a)},g=function(a){var b;return b=new RegExp(a,"i"),d.className.match(b)},c=function(a){g(a)||(d.className+=" "+a)},i=function(a){g(a)&&(d.className=d.className.replace(" "+a,""))},a.ios()?a.ipad()?c("ios ipad tablet"):a.iphone()?c("ios iphone mobile"):a.ipod()&&c("ios ipod mobile"):c(a.android()?a.androidTablet()?"android tablet":"android mobile":a.blackberry()?a.blackberryTablet()?"blackberry tablet":"blackberry mobile":a.windows()?a.windowsTablet()?"windows tablet":a.windowsPhone()?"windows mobile":"desktop":a.fxos()?a.fxosTablet()?"fxos tablet":"fxos mobile":a.meego()?"meego mobile":a.nodeWebkit()?"node-webkit":"desktop"),a.cordova()&&c("cordova"),f=function(){a.landscape()?(i("portrait"),c("landscape")):(i("landscape"),c("portrait"))},h=window.hasOwnProperty("onorientationchange")?"orientationchange":"resize",window.addEventListener?window.addEventListener(h,f,!1):window.attachEvent?window.attachEvent(h,f):window[h]=f,f(),true?!(__WEBPACK_AMD_DEFINE_RESULT__ = function(){return a}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):"undefined"!=typeof module&&module.exports?module.exports=a:window.device=a}).call(this);
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -3540,26 +3860,6 @@
 	
 	})(this, this.document);
 	}.call(window));
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(jQuery) {module.exports = function(window, document, $) {
-	  if (window == null) {
-	    window = window;
-	  }
-	  if (document == null) {
-	    document = document;
-	  }
-	  if ($ == null) {
-	    $ = jQuery;
-	  }
-	  __webpack_require__(10)(window);
-	  return __webpack_require__(11)(window, document, $);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ },
 /* 9 */

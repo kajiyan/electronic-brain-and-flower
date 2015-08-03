@@ -17,6 +17,7 @@ module.exports = (sn, $, _) ->
     initialize: () ->
       console.log "Model -> Resize -> initialize"
 
+      @_setting = SETTING
 
     # ------------------------------------------------------------
     setup: () ->
@@ -27,17 +28,31 @@ module.exports = (sn, $, _) ->
 
     # ------------------------------------------------------------
     _events: () ->
-      sn.__client__.models.image.on "select", (model, file) ->
+      sn.__client__.models.image.on "select", (model, file) =>
         console.log "Model -> Resize -> Events -> select"        
         console.log file
 
-        fileReader = new FileReader()
+        canvasResize file
+          ,
+            "width": @_setting.CONFIG.RESIZE.WIDTH
+            "height": @_setting.CONFIG.RESIZE.HEIGHT
+            crop: true
+            callback: ( data, width, height ) ->
+              sn.__client__.models.image.set
+                "data": data
+                "width": width
+                "height": height
 
-        fileReader.onload = (e) ->
-          sn.__client__.models.image.set
-            "data": e.target.result
 
-        fileReader.readAsDataURL file
+        # @_setting.CONFIG.RESIZE.WIDTH
+
+        # fileReader = new FileReader()
+
+        # fileReader.onload = (e) ->
+        #   sn.__client__.models.image.set
+        #     "data": e.target.result
+
+        # fileReader.readAsDataURL file
 
 
 

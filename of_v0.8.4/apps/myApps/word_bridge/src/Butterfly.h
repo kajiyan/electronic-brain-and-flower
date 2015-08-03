@@ -22,7 +22,7 @@
 class Butterfly {
     const int TRAVEL_LENGTH = 18;
     const int DIVISION = 3;
-    const int INTERPOLATE = 14;
+    const int INTERPOLATE = 28;
     
     const int VELOCITY_X = 130;
     
@@ -33,7 +33,7 @@ class Butterfly {
     const int OFFSET_Y = ofGetHeight() + 550;
     const int OFFSET_Z = -1000;
     
-    const float MAX_FLIP = 0.8;
+    const float MAX_FLIP = 0.4;
     
 private:
     ImagePublish _imagePublish;
@@ -94,6 +94,13 @@ private:
     bool _isVisible;
     bool _isImagePublish;
     
+    float _startTime;
+    float _endTime;
+    bool _isTimerReached;
+    
+    int _alpha;
+    bool _isDead;
+    
 public:
     Butterfly(float fps, string objID, int modelIndex);
     void setup();
@@ -103,12 +110,12 @@ public:
     void createPeak();
     void generateOrbit();
     
-    void destinationPeak();
-    void destinationOrbit();
+    void setTimeOut( float endTime );
     
     void updateVisible(string objID);
     void addLoadFileName( string fileName );
     void imagePublishCallback( bool & e );
+    bool getStateDead();
 };
 
 #endif /* defined(__word_bridge__Butterfly__) */

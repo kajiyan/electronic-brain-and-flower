@@ -12,6 +12,11 @@ module.exports = (sn, $, _) ->
 
       @_config = SETTING
       @_host = @_config.HOST
+
+      console.log "---------"
+      console.log SETTING
+      console.log "---------"
+
       @_port = @_config.PORT
       @_maxNumberOfImages = @_config.CONFIG.IMAGES.MAX_NUMBER_OF_IMAGES
       @_stubs = @_config.CONFIG.IMAGES.STUBS
@@ -34,6 +39,7 @@ module.exports = (sn, $, _) ->
       
       # Image = require("../models/image")
       # return new Image()
+
 
     # ------------------------------------------------------------
     setup: () ->
